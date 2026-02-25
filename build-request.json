@@ -1,57 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Update Helpline page contact details and footer call link",
+  "title": "Add 'Sheep 🐑' to Category Dropdown in Post Ad and All Related Controls",
   "projectName": "Pashu Mandi",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-30",
-      "text": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the support email placeholder with the real email address 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the helpline number with two numbers: '7829297025' and '8461207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
+      "id": "REQ-34",
+      "text": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep 🐑' as a selectable option in the category dropdown. The option value should be consistent with the existing category value format used for other categories (e.g., 'Sheep'). It must appear in the dropdown list alongside the existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-user-latest"
         ],
         "quotes": [
-          "New Support Email: [irfankhansingboard1998@gmail.com]",
-          "New Helpline Number: [Aapka Naya Number Y7829297025\n8461207976]"
+          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
         ]
       },
       "acceptanceCriteria": [
-        "The Contact Details section on /helpline shows the email 'irfankhansingboard1998@gmail.com'.",
-        "The Contact Details section shows both helpline numbers: 7829297025 and 8461207976.",
-        "The 'Available: 10 AM – 6 PM' note is still present next to the helpline numbers.",
-        "The page layout and Professional Blue/white theme are unchanged."
+        "The category dropdown in PostAdPage includes a 'Sheep 🐑' option.",
+        "Selecting 'Sheep 🐑' sets the category field value to 'Sheep' (or the canonical string used for this category).",
+        "The option renders correctly in the dropdown alongside all other existing animal categories."
       ]
     },
     {
-      "id": "REQ-31",
-      "text": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8461207976'.",
+      "id": "REQ-35",
+      "text": "In frontend/src/pages/HomePage.tsx, add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. The filter option value must match the value stored for Sheep listings.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-user-latest"
         ],
         "quotes": [
-          "Update the Footer: Make sure the clickable 'Call' link in the footer also uses this new number."
+          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
         ]
       },
       "acceptanceCriteria": [
-        "The footer 'Call' link has href='tel:7829297025'.",
-        "Any visible phone number label in the footer reflects '7829297025 / 8461207976'.",
-        "No other footer content or styling is altered."
+        "The category filter dropdown on HomePage includes a 'Sheep 🐑' option.",
+        "Selecting 'Sheep 🐑' in the filter correctly filters the listings grid to show only Sheep listings."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the category label map and assign it a distinct badge color consistent with the existing Professional Blue and white theme (e.g., a muted green or warm teal that does not clash with existing badge colors). The label displayed on the badge should be 'Sheep 🐑'.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-latest"
+        ],
+        "quotes": [
+          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A listing with category 'Sheep' renders the badge label 'Sheep 🐑' on the ListingCard.",
+        "The badge has a distinct background color different from all other existing category badge colors.",
+        "The badge color is consistent with the app's Professional Blue and white theme."
       ]
     }
   ],
   "constraints": [
-    "Do not change any backend code.",
-    "Do not alter the page layout, form, or Professional Blue/white theme of the Helpline page.",
-    "Do not modify any immutable frontend paths."
+    "Do not change the backend API or data model — 'Sheep' as a category value is already supported by the backend's Text-based category field.",
+    "Do not modify any files listed under frontend.immutablePaths."
   ],
   "nonGoals": [
-    "Adding new sections or fields to the Helpline page.",
-    "Changing the contact form behavior or validation logic.",
-    "Updating any other page beyond HelplinePage.tsx and Layout.tsx (footer)."
+    "Adding any other new animal categories beyond Sheep.",
+    "Backend schema changes.",
+    "Changes to the payment flow, VIP logic, or any other unrelated feature."
   ],
   "imageRequirements": {
     "required": [],

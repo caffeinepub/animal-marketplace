@@ -1,47 +1,4 @@
 {
   "kind": "feature_evidence_report",
-  "features": [
-    {
-      "featureId": "feature-in-frontend-src-pages-helplinepage-tsx-update-the-contact-details-section-replace-the-support-email-placeholder-with-the-real-email-address-irfankhansingboard1998-gmail-com-displayed-as-a-styled-readable-text-element-or-mailto-link-and-replace-the-helpline-number-with-two-numbers-7829297025-and-8461207976-retaining-the-available-10-am-6-pm-note-the-layout-and-professional-blue-white-theme-must-remain-unchanged",
-      "featureTitle": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the support email placeholder with the real email address 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the helpline number with two numbers: '7829297025' and '8461207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
-      "files": [
-        "frontend/src/pages/HelplinePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-30"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-the-app-s-footer-within-layout-tsx-or-wherever-the-footer-call-link-is-rendered-update-the-clickable-call-href-to-use-the-primary-helpline-number-7829297025-i-e-href-tel-7829297025-if-the-footer-displays-a-visible-phone-number-label-update-it-to-show-7829297025-8461207976",
-      "featureTitle": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8461207976'.",
-      "files": [
-        "frontend/src/components/Layout.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-31"
-      ],
-      "confidence": "high"
-    }
-  ]
+  "features": []
 }

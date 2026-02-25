@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update the Helpline page contact details and footer call link with real phone numbers and email address.
+**Goal:** Add "Sheep 🐑" as a new category option across all relevant frontend controls in the Pashu Mandi app.
 
 **Planned changes:**
-- In `HelplinePage.tsx`, replace the support email placeholder with `irfankhansingboard1998@gmail.com` (as a mailto link or styled text)
-- In `HelplinePage.tsx`, replace the single helpline number with two numbers: `7829297025` and `8461207976`, keeping the "Available: 10 AM – 6 PM" note
-- In the footer (`Layout.tsx`), update the "Call" link `href` to `tel:7829297025`
-- In the footer, update any visible phone number label to show `7829297025 / 8461207976`
+- Add "Sheep 🐑" option to the category dropdown in `PostAdPage.tsx` with value `'Sheep'`
+- Add "Sheep 🐑" option to the category filter dropdown in `HomePage.tsx` so users can filter listings by Sheep
+- Add `'Sheep'` to the category label map in `ListingCard.tsx` with a distinct badge color consistent with the app's Professional Blue and white theme, displaying the label "Sheep 🐑"
 
-**User-visible outcome:** The Helpline page shows the real support email and both helpline numbers, and the footer's Call link dials the correct primary number.
+**User-visible outcome:** Users can post ads under the "Sheep 🐑" category, filter listings by Sheep on the home page, and see a correctly labeled and colored badge on Sheep listing cards.

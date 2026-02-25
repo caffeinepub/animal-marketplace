@@ -1,46 +1,48 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T13:37:52.148Z",
+  "generatedAt": "2026-02-25T13:49:52.917Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 0,
     "items": [
       {
-        "id": "REQ-30",
-        "summary": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the support email placeholder with the real email address 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the helpline number with two numbers: '7829297025' and '8461207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
-        "status": "implemented",
+        "id": "REQ-34",
+        "summary": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep 🐑' as a selectable option in the category dropdown. The option value should be consistent with the existing category value format used for other categories (e.g., 'Sheep'). It must appear in the dropdown list alongside the existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/pages/HelplinePage.tsx"
+          "frontend/src/pages/PostAdPage.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/pages/HelplinePage.tsx"
-        ]
+        "matchedFiles": []
       },
       {
-        "id": "REQ-31",
-        "summary": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8461207976'.",
-        "status": "implemented",
+        "id": "REQ-35",
+        "summary": "In frontend/src/pages/HomePage.tsx, add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. The filter option value must match the value stored for Sheep listings.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/pages/HomePage.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/components/Layout.tsx"
-        ]
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-36",
+        "summary": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the category label map and assign it a distinct badge color consistent with the existing Professional Blue and white theme (e.g., a muted green or warm teal that does not clash with existing badge colors). The label displayed on the badge should be 'Sheep 🐑'.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/ListingCard.tsx"
+        ],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/pages/HelplinePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

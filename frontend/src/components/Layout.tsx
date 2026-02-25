@@ -3,7 +3,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetMobileNumber } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
-import { Plus, MessageCircle, User, LogIn, LogOut, Menu, X, UserPlus, HeadphonesIcon, Phone } from 'lucide-react';
+import { Plus, MessageCircle, User, LogIn, LogOut, Menu, X, UserPlus, HeadphonesIcon, Phone, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -223,18 +223,18 @@ export default function Layout({ children }: LayoutProps) {
                 className="flex items-center gap-1.5 hover:text-foreground transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
-                7829297025 / 8461207976
+                7829297025 / 8431207976
               </a>
             </div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               © {new Date().getFullYear()} Built with{' '}
-              <span className="text-destructive">♥</span>{' '}
+              <Heart className="w-3.5 h-3.5 text-primary fill-primary inline" />{' '}
               using{' '}
               <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname || 'pashu-mandi')}`}
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== 'undefined' ? window.location.hostname : 'pashu-mandi')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline font-medium"
+                className="hover:text-foreground transition-colors underline underline-offset-2"
               >
                 caffeine.ai
               </a>

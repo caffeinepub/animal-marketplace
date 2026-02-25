@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 23,
+  "projectStateVersion": 27,
   "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
@@ -214,6 +214,22 @@
         "REQ-31"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-helplinepage-tsx-update-the-contact-details-section-replace-the-current-support-email-with-irfankhansingboard1998-gmail-com-displayed-as-a-styled-readable-text-element-or-mailto-link-and-replace-the-existing-helpline-numbers-with-7829297025-and-8431207976-retaining-the-available-10-am-6-pm-note-the-layout-and-professional-blue-white-theme-must-remain-unchanged",
+      "title": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the current support email with 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the existing helpline numbers with '7829297025' and '8431207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-app-s-footer-within-layout-tsx-or-wherever-the-footer-call-link-is-rendered-update-the-clickable-call-href-to-use-the-primary-helpline-number-7829297025-i-e-href-tel-7829297025-if-the-footer-displays-a-visible-phone-number-label-update-it-to-show-7829297025-8431207976",
+      "title": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8431207976'.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -353,6 +369,36 @@
       "id": "AR-26",
       "summary": "Update Helpline page contact details: support email to irfankhansingboard1998@gmail.com, helpline number to 7829297025 / 8461207976. Also update the footer's clickable 'Call' link to use the new helpline number.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Update the Category dropdown in the Post Ad section to add 'Sheep 🐑' as a new option alongside Dogs, Cats, Birds, etc.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep 🐑' as a selectable option in the category dropdown. The option value should be consistent with the existing category value format used for other categories (e.g., 'Sheep'). It must appear in the dropdown list alongside the existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "In frontend/src/pages/HomePage.tsx, add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. The filter option value must match the value stored for Sheep listings.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the category label map and assign it a distinct badge color consistent with the existing Professional Blue and white theme (e.g., a muted green or warm teal that does not clash with existing badge colors). The label displayed on the badge should be 'Sheep 🐑'.",
+      "reqIds": [
+        "REQ-36"
+      ],
       "status": "pending"
     }
   ],
