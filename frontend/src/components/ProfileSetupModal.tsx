@@ -23,8 +23,13 @@ export default function ProfileSetupModal() {
     e.preventDefault();
     if (!displayName.trim()) return;
     try {
-      await saveProfile({ displayName: displayName.trim(), bio: bio.trim() });
-      toast.success('Welcome to PawMarket! Your profile has been created.');
+      await saveProfile({
+        displayName: displayName.trim(),
+        bio: bio.trim(),
+        contactInfo: null,
+        mobileNumber: null,
+      });
+      toast.success('Welcome to Pashu Mandi! Your profile has been created.');
     } catch {
       toast.error('Failed to save profile. Please try again.');
     }
@@ -38,7 +43,7 @@ export default function ProfileSetupModal() {
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <PawPrint className="w-5 h-5 text-primary" />
             </div>
-            <DialogTitle className="font-display text-xl">Welcome to PawMarket!</DialogTitle>
+            <DialogTitle className="font-display text-xl">Welcome to Pashu Mandi!</DialogTitle>
           </div>
           <DialogDescription>
             Set up your profile to start buying and selling animals. Your display name will be visible to other users.
@@ -51,7 +56,7 @@ export default function ProfileSetupModal() {
             </Label>
             <Input
               id="displayName"
-              placeholder="e.g. John Smith"
+              placeholder="e.g. Ramesh Kumar"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               required

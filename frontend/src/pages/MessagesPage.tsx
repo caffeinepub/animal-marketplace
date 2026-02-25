@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, LogIn, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Principal } from '@dfinity/principal';
 
 interface ConversationItemProps {
   principalStr: string;
@@ -15,7 +16,16 @@ interface ConversationItemProps {
 }
 
 function ConversationItem({ principalStr, isSelected, onClick }: ConversationItemProps) {
-  const { data: profile } = useGetProfile(principalStr);
+  // Convert string to Principal for the hook
+  const principalObj = (() => {
+    try {
+      return Principal.fromText(principalStr);
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const { data: profile } = useGetProfile(principalObj);
   const displayName = profile?.displayName ?? `${principalStr.slice(0, 10)}...`;
 
   return (
@@ -39,16 +49,12 @@ function ConversationItem({ principalStr, isSelected, onClick }: ConversationIte
   );
 }
 
-interface MessagesPageProps {
-  principal?: string;
-}
-
 export default function MessagesPage() {
   const { identity, login, isLoggingIn } = useInternetIdentity();
   const isAuthenticated = !!identity;
   const navigate = useNavigate();
 
-  // Read principal from URL search params as a fallback approach
+  // Read principal from URL path as a fallback approach
   const urlPrincipal = (() => {
     const path = window.location.pathname;
     const match = path.match(/\/messages\/(.+)/);

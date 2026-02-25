@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 41,
+  "projectStateVersion": 73,
   "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
@@ -11,10 +11,16 @@
     "Posting an ad requires a ₹199 fee paid via UPI (ID: 8431207976king@ybl); listing is only published after payment confirmation",
     "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section",
     "Admin promo code 'FREEADMIN' bypasses payment entirely and sets fee to ₹0; admin secret identifier is 'IrfanKhanDj'",
-    "Admin approval workflow: new listings start in 'pending' state and are only publicly visible after admin approval from the admin dashboard"
+    "Admin approval workflow: new listings start in 'pending' state and are only publicly visible after admin approval from the admin dashboard",
+    "PWA standalone mode: Auth session persistence must be set to 'LOCAL'; Service Worker must handle navigation requests correctly in standalone/Add-to-Home-Screen mode"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "PWA 'Add to Home Screen': login session not persisting and/or login button fails in standalone mode",
+    "'Create Account' feature failing with 'Failed to create account' error; backend registration/signUp logic not saving new users correctly; possible mobile number validation conflict; API not returning success status for new registrations",
+    "Admin Dashboard not appearing in side menu for admin user — Admin Panel button still not visible despite multiple fix attempts; admin identification via mobile number not yet working",
+    "Cattle Tracker page (/tracker) is redirecting the owner principal (rhoqt-xhqg1-...) to the Home page instead of granting access — route guard or principal comparison logic is broken"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-design-and-apply-a-warm-nature-inspired-visual-theme-across-the-entire-app-earthy-tones-greens-ambers-warm-neutrals-friendly-typography-card-based-layouts-for-listings-and-a-consistent-header-navigation-bar-the-style-should-feel-trustworthy-and-approachable-for-an-animal-marketplace",
@@ -319,6 +325,382 @@
         "REQ-52"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-homepage-tsx-add-a-small-informational-banner-near-the-top-of-the-page-below-the-hero-section-above-the-featured-animals-section-that-displays-the-text-invite-a-friend-and-help-grow-our-community-the-banner-must-be-styled-consistently-with-the-professional-blue-and-white-theme-e-g-a-light-blue-background-strip-with-blue-or-dark-text-and-a-share-invite-icon-the-banner-must-include-a-clearly-labelled-share-or-invite-button",
+      "title": "In frontend/src/pages/HomePage.tsx, add a small informational banner near the top of the page (below the hero section, above the Featured Animals section) that displays the text: 'Invite a friend and help grow our community!' The banner must be styled consistently with the Professional Blue and white theme (e.g., a light blue background strip with blue or dark text and a share/invite icon). The banner must include a clearly labelled 'Share' or 'Invite' button.",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-the-share-or-invite-button-on-the-homepage-invite-banner-is-clicked-invoke-the-web-share-api-navigator-share-with-the-following-pre-filled-data-title-pashu-mandi-text-check-out-pashu-mandi-the-most-trusted-marketplace-to-buy-and-sell-livestock-click-here-to-join-url-window-location-origin-the-app-s-root-url-if-the-web-share-api-is-not-supported-by-the-browser-navigator-share-is-undefined-fall-back-to-copying-the-share-text-url-to-the-clipboard-and-show-a-brief-toast-notification-such-as-link-copied-to-clipboard",
+      "title": "When the 'Share' or 'Invite' button (on the HomePage invite banner) is clicked, invoke the Web Share API (navigator.share) with the following pre-filled data: title = 'Pashu Mandi', text = 'Check out Pashu Mandi - The most trusted marketplace to buy and sell livestock! Click here to join:', url = window.location.origin (the app's root URL). If the Web Share API is not supported by the browser (navigator.share is undefined), fall back to copying the share text + URL to the clipboard and show a brief toast notification such as 'Link copied to clipboard!'.",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-or-update-the-pwa-service-worker-e-g-frontend-public-sw-js-or-the-vite-pwa-plugin-configuration-to-correctly-handle-navigation-requests-in-standalone-mode-the-service-worker-must-use-a-network-first-or-navigate-fallback-strategy-for-all-document-navigation-fetch-requests-requests-with-mode-navigate-so-that-deep-link-routes-e-g-listing-id-messages-profile-resolve-correctly-when-the-app-is-launched-from-the-home-screen-ensure-the-service-worker-does-not-cache-block-the-internet-identity-redirect-flow-by-passing-through-requests-to-the-identity-ic0-app-or-auth-canister-origin-without-interception",
+      "title": "Create or update the PWA Service Worker (e.g., frontend/public/sw.js or the Vite PWA plugin configuration) to correctly handle navigation requests in standalone mode. The Service Worker must use a 'network-first' or 'navigate-fallback' strategy for all document/navigation fetch requests (requests with `mode === 'navigate'`) so that deep-link routes (e.g., /listing/:id, /messages, /profile) resolve correctly when the app is launched from the home screen. Ensure the Service Worker does not cache-block the Internet Identity redirect flow by passing through requests to the identity.ic0.app or auth canister origin without interception.",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-web-app-manifest-frontend-public-manifest-json-if-one-does-not-already-exist-or-update-the-existing-manifest-to-include-display-standalone-start-url-scope-and-correct-icons-entries-referencing-the-existing-goat-logo-asset-at-assets-generated-goat-logo-dim-64x64-png-reference-the-manifest-from-frontend-index-html-via-link-rel-manifest-href-manifest-json-if-not-already-present-this-ensures-the-pwa-is-correctly-identified-as-standalone-by-the-browser-and-that-the-authentication-redirect-returns-to-the-correct-origin",
+      "title": "Add a Web App Manifest (frontend/public/manifest.json) if one does not already exist, or update the existing manifest to include `\"display\": \"standalone\"`, `\"start_url\": \"/\"`, `\"scope\": \"/\"`, and correct `\"icons\"` entries referencing the existing goat logo asset at `/assets/generated/goat-logo.dim_64x64.png`. Reference the manifest from frontend/index.html via `<link rel=\"manifest\" href=\"/manifest.json\">` if not already present. This ensures the PWA is correctly identified as standalone by the browser and that the authentication redirect returns to the correct origin.",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-signup-mutation-in-frontend-src-hooks-usequeries-ts-to-correctly-interpret-the-backend-response-if-the-backend-returns-a-variant-result-e-g-ok-err-ensure-the-frontend-checks-for-the-ok-variant-to-determine-success-and-only-throws-or-shows-an-error-when-the-err-variant-is-present-the-failed-to-create-account-error-must-not-appear-when-the-backend-returns-a-success-response",
+      "title": "Update the `signUp` mutation in `frontend/src/hooks/useQueries.ts` to correctly interpret the backend response. If the backend returns a variant result (e.g., `{ ok: ... }` / `{ err: ... }`), ensure the frontend checks for the `ok` variant to determine success and only throws or shows an error when the `err` variant is present. The 'Failed to create account' error must not appear when the backend returns a success response.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-signup-mutation-in-frontend-src-hooks-usequeries-ts-to-correctly-interpret-the-backend-variant-response-check-for-the-presence-of-an-ok-key-in-the-response-to-determine-success-only-throw-or-display-an-error-when-the-err-key-is-present-replace-any-current-logic-that-treats-a-non-falsy-response-as-failure-propagate-the-specific-server-side-error-text-from-the-err-variant-value-to-the-ui-error-state-so-users-see-the-actual-error-message-instead-of-a-generic-failed-to-create-account-string",
+      "title": "Update the `signUp` mutation in `frontend/src/hooks/useQueries.ts` to correctly interpret the backend variant response. Check for the presence of an `ok` key in the response to determine success; only throw or display an error when the `err` key is present. Replace any current logic that treats a non-falsy response as failure. Propagate the specific server-side error text from the `err` variant value to the UI error state so users see the actual error message instead of a generic 'Failed to create account' string.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-signuppage-tsx-update-the-error-display-block-to-show-the-actual-error-message-string-returned-from-the-signup-mutation-via-usesignup-hook-error-or-thrown-error-message-rather-than-a-hardcoded-generic-string-ensure-the-error-is-shown-inline-beneath-the-form-submit-button",
+      "title": "In `frontend/src/pages/SignUpPage.tsx`, update the error display block to show the actual error message string returned from the `signUp` mutation (via `useSignUp` hook error or thrown error message) rather than a hardcoded generic string. Ensure the error is shown inline beneath the form submit button.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-public-sw-js-to-ensure-the-pwa-service-worker-does-not-intercept-or-cache-block-internet-identity-authentication-requests-when-the-app-is-running-in-standalone-add-to-home-screen-mode-all-fetch-requests-whose-url-origin-matches-identity-ic0-app-identity-internetcomputer-org-or-any-icp-auth-canister-url-must-be-passed-through-to-the-network-without-interception-navigation-requests-mode-navigate-must-use-a-network-first-strategy-with-a-fallback-to-the-cached-app-shell-index-html-only-when-the-network-is-unavailable",
+      "title": "Update `frontend/public/sw.js` to ensure the PWA Service Worker does not intercept or cache-block Internet Identity authentication requests when the app is running in standalone ('Add to Home Screen') mode. All fetch requests whose URL origin matches `identity.ic0.app`, `identity.internetcomputer.org`, or any ICP auth canister URL must be passed through to the network without interception. Navigation requests (mode === 'navigate') must use a network-first strategy with a fallback to the cached app shell (`/index.html`) only when the network is unavailable.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-signup-mutation-in-frontend-src-hooks-usequeries-ts-to-correctly-interpret-the-backend-variant-response-check-for-the-presence-of-an-ok-key-in-the-returned-object-to-determine-success-only-throw-or-surface-an-error-to-the-ui-when-the-err-key-is-present-replace-any-logic-that-treats-a-non-nullish-response-as-failure-propagate-the-exact-error-text-from-the-err-variant-value-so-users-see-the-actual-server-side-message-instead-of-a-generic-failed-to-create-account-string",
+      "title": "Update the `signUp` mutation in `frontend/src/hooks/useQueries.ts` to correctly interpret the backend variant response. Check for the presence of an `ok` key in the returned object to determine success; only throw or surface an error to the UI when the `err` key is present. Replace any logic that treats a non-nullish response as failure. Propagate the exact error text from the `err` variant value so users see the actual server-side message instead of a generic 'Failed to create account' string.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-signuppage-tsx-update-the-error-display-block-to-render-the-actual-error-message-string-from-the-signup-mutation-via-the-hook-s-error-object-or-thrown-error-message-rather-than-any-hardcoded-generic-fallback-string-ensure-the-error-is-displayed-inline-beneath-the-form-submit-button",
+      "title": "In `frontend/src/pages/SignUpPage.tsx`, update the error display block to render the actual error message string from the `signUp` mutation (via the hook's error object or thrown error message) rather than any hardcoded generic fallback string. Ensure the error is displayed inline beneath the form submit button.",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-add-a-route-guard-for-the-admin-route-if-the-currently-authenticated-user-s-principal-does-not-match-the-hardcoded-admin-principal-exposed-via-a-backend-query-such-as-getadminprincipal-or-stored-as-a-known-constant-in-a-frontend-config-immediately-redirect-them-to-the-home-page-the-guard-must-run-before-the-admindashboardpage-component-renders",
+      "title": "In frontend/src/App.tsx, add a route guard for the /admin route. If the currently authenticated user's principal does NOT match the hardcoded admin principal (exposed via a backend query such as getAdminPrincipal or stored as a known constant in a frontend config), immediately redirect them to the home page ('/'). The guard must run before the AdminDashboardPage component renders.",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-component-at-frontend-src-pages-userdashboardpage-tsx-for-the-route-dashboard-this-page-is-the-post-login-landing-page-for-authenticated-non-admin-users-it-must-display-1-a-welcome-heading-showing-the-user-s-display-name-2-a-my-ads-section-listing-the-user-s-own-active-listings-reuse-the-same-data-source-as-profilepage-and-3-a-my-profile-edit-section-display-name-and-bio-form-same-as-profilepage-admin-only-controls-user-lists-approval-queues-app-editing-tools-sensitive-settings-must-not-appear-anywhere-on-this-page-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme",
+      "title": "Create a new frontend page component at frontend/src/pages/UserDashboardPage.tsx for the route '/dashboard'. This page is the post-login landing page for authenticated non-admin users. It must display: (1) a welcome heading showing the user's display name, (2) a 'My Ads' section listing the user's own active listings (reuse the same data source as ProfilePage), and (3) a 'My Profile' edit section (display name and bio form, same as ProfilePage). Admin-only controls (user lists, approval queues, app-editing tools, sensitive settings) must not appear anywhere on this page. The page must be styled consistently with the existing Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-after-a-user-authenticates-via-internet-identity-and-their-profile-exists-redirect-non-admin-users-to-dashboard-userdashboardpage-instead-of-the-home-page-if-they-land-on-an-admin-only-route-admin-users-must-be-redirected-to-admin-after-login-if-they-were-attempting-to-access-it-regular-users-who-navigate-directly-to-home-must-not-be-forcibly-redirected-only-redirected-away-from-admin",
+      "title": "In frontend/src/App.tsx, after a user authenticates via Internet Identity and their profile exists, redirect non-admin users to '/dashboard' (UserDashboardPage) instead of the home page if they land on an admin-only route. Admin users must be redirected to '/admin' after login if they were attempting to access it. Regular users who navigate directly to '/' (home) must not be forcibly redirected — only redirected away from /admin.",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-conditionally-render-the-admin-navigation-link-in-the-header-only-when-the-authenticated-user-s-principal-matches-the-admin-principal-for-all-non-admin-authenticated-users-and-unauthenticated-visitors-the-admin-link-must-be-completely-absent-from-the-dom-not-just-visually-hidden-ensure-no-admin-related-navigation-items-leak-into-the-mobile-menu-for-non-admin-users-either",
+      "title": "In frontend/src/components/Layout.tsx, conditionally render the 'Admin' navigation link in the header only when the authenticated user's principal matches the admin principal. For all non-admin authenticated users and unauthenticated visitors, the 'Admin' link must be completely absent from the DOM (not just visually hidden). Ensure no admin-related navigation items leak into the mobile menu for non-admin users either.",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-add-a-useisadmin-react-query-hook-that-calls-the-backend-isadmin-query-and-returns-a-boolean-cache-the-result-appropriately-e-g-staletime-of-5-minutes-this-hook-must-be-used-by-layout-tsx-for-nav-link-visibility-app-tsx-for-route-guarding-and-userdashboardpage-admindashboardpage-to-determine-what-to-render",
+      "title": "In frontend/src/hooks/useQueries.ts, add a useIsAdmin React Query hook that calls the backend isAdmin() query and returns a boolean. Cache the result appropriately (e.g., staleTime of 5 minutes). This hook must be used by Layout.tsx (for nav link visibility), App.tsx (for route guarding), and UserDashboardPage/AdminDashboardPage to determine what to render.",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-ensure-the-useisadmin-react-query-hook-calling-the-backend-isadmin-query-is-present-and-correctly-returns-a-boolean-indicating-whether-the-authenticated-caller-is-the-admin-principal-cache-the-result-with-a-staletime-of-5-minutes-if-the-hook-already-exists-verify-it-handles-unauthenticated-users-by-returning-false-without-throwing",
+      "title": "In frontend/src/hooks/useQueries.ts, ensure the useIsAdmin React Query hook (calling the backend isAdmin() query) is present and correctly returns a boolean indicating whether the authenticated caller is the admin principal. Cache the result with a staleTime of 5 minutes. If the hook already exists, verify it handles unauthenticated users by returning false without throwing.",
+      "reqIds": [
+        "REQ-80"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-add-a-robust-route-guard-for-the-admin-route-that-uses-the-useisadmin-hook-if-the-currently-authenticated-user-is-not-the-admin-isadmin-false-immediately-redirect-to-the-home-page-the-guard-must-prevent-the-admindashboardpage-component-from-rendering-at-all-for-non-admin-users-also-register-the-dashboard-route-pointing-to-userdashboardpage-if-not-already-present",
+      "title": "In frontend/src/App.tsx, add a robust route guard for the /admin route that uses the useIsAdmin hook. If the currently authenticated user is not the admin (isAdmin === false), immediately redirect to the home page ('/'). The guard must prevent the AdminDashboardPage component from rendering at all for non-admin users. Also register the /dashboard route pointing to UserDashboardPage if not already present.",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-ensure-the-admin-navigation-link-is-completely-absent-from-the-dom-not-just-hidden-via-css-for-all-non-admin-users-and-unauthenticated-visitors-use-the-useisadmin-hook-to-conditionally-render-the-link-also-ensure-no-admin-related-navigation-items-appear-in-the-mobile-menu-for-non-admin-users",
+      "title": "In frontend/src/components/Layout.tsx, ensure the 'Admin' navigation link is completely absent from the DOM (not just hidden via CSS) for all non-admin users and unauthenticated visitors. Use the useIsAdmin hook to conditionally render the link. Also ensure no admin-related navigation items appear in the mobile menu for non-admin users.",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-pages-userdashboardpage-tsx-for-the-route-dashboard-as-the-post-login-landing-page-for-authenticated-non-admin-users-the-page-must-display-1-a-welcome-heading-showing-the-user-s-display-name-2-a-my-ads-section-listing-the-user-s-own-active-listings-with-deactivate-option-same-data-source-as-profilepage-and-3-a-my-profile-edit-section-with-display-name-and-bio-form-same-as-profilepage-no-admin-only-controls-approval-queues-user-lists-or-sensitive-settings-must-appear-anywhere-on-this-page-style-consistently-with-the-professional-blue-and-white-theme",
+      "title": "Create frontend/src/pages/UserDashboardPage.tsx for the route '/dashboard' as the post-login landing page for authenticated non-admin users. The page must display: (1) a welcome heading showing the user's display name, (2) a 'My Ads' section listing the user's own active listings with deactivate option (same data source as ProfilePage), and (3) a 'My Profile' edit section with display name and bio form (same as ProfilePage). No admin-only controls, approval queues, user lists, or sensitive settings must appear anywhere on this page. Style consistently with the Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-after-a-user-authenticates-via-internet-identity-and-their-profile-exists-redirect-non-admin-users-who-attempt-to-access-admin-to-dashboard-admin-users-are-redirected-to-admin-if-they-navigate-there-regular-users-who-navigate-directly-to-home-or-dashboard-must-not-be-forcibly-redirected-away-from-those-pages",
+      "title": "In frontend/src/App.tsx, after a user authenticates via Internet Identity and their profile exists, redirect non-admin users who attempt to access /admin to '/dashboard'. Admin users are redirected to '/admin' if they navigate there. Regular users who navigate directly to '/' (home) or '/dashboard' must not be forcibly redirected away from those pages.",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-verify-and-fix-the-useisadmin-hook-so-that-it-correctly-calls-the-backend-isadmin-query-and-returns-a-boolean-the-hook-must-1-only-run-the-query-when-an-authenticated-actor-is-available-not-anonymous-2-default-to-false-while-loading-or-unauthenticated-3-not-throw-or-surface-an-error-to-the-ui-when-the-caller-is-not-admin-and-4-cache-the-result-with-a-staletime-of-5-minutes-after-login-the-hook-must-refetch-to-reflect-the-newly-authenticated-principal",
+      "title": "In frontend/src/hooks/useQueries.ts, verify and fix the useIsAdmin hook so that it correctly calls the backend isAdmin() query and returns a boolean. The hook must: (1) only run the query when an authenticated actor is available (not anonymous), (2) default to false while loading or unauthenticated, (3) not throw or surface an error to the UI when the caller is not admin, and (4) cache the result with a staleTime of 5 minutes. After login, the hook must refetch to reflect the newly authenticated principal.",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-admindashboardpage-tsx-expand-the-admin-dashboard-to-include-an-app-statistics-section-above-the-pending-listings-list-this-section-must-display-the-following-stats-fetched-from-the-backend-1-total-listings-all-listings-count-2-pending-listings-count-3-approved-listings-count-4-total-registered-users-count-display-each-stat-as-a-clearly-labelled-card-or-metric-tile-styled-consistently-with-the-professional-blue-and-white-theme-the-existing-pending-listings-approval-rejection-functionality-must-remain-fully-intact-and-unchanged",
+      "title": "In frontend/src/pages/AdminDashboardPage.tsx, expand the Admin Dashboard to include an 'App Statistics' section above the pending listings list. This section must display the following stats fetched from the backend: (1) Total Listings (all listings count), (2) Pending Listings count, (3) Approved Listings count, (4) Total Registered Users count. Display each stat as a clearly labelled card or metric tile styled consistently with the Professional Blue and white theme. The existing pending listings approval/rejection functionality must remain fully intact and unchanged.",
+      "reqIds": [
+        "REQ-89"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-add-the-following-react-query-hooks-1-usegetalllistingsadmin-calls-the-backend-getalllistingsadmin-function-and-returns-all-listings-2-usedeletelisting-mutation-that-calls-deletelisting-id-3-usegetallmobilenumbers-calls-getallmobilenumbers-and-returns-the-list-of-principal-mobile-pairs-4-usegettotalloginscount-calls-gettotalloginscount-and-returns-the-nat-value-all-hooks-must-only-run-when-the-authenticated-actor-is-available",
+      "title": "In frontend/src/hooks/useQueries.ts, add the following React Query hooks: (1) `useGetAllListingsAdmin()` — calls the backend `getAllListingsAdmin()` function and returns all listings; (2) `useDeleteListing()` — mutation that calls `deleteListing(id)`; (3) `useGetAllMobileNumbers()` — calls `getAllMobileNumbers()` and returns the list of principal/mobile pairs; (4) `useGetTotalLoginsCount()` — calls `getTotalLoginsCount()` and returns the Nat value. All hooks must only run when the authenticated actor is available.",
+      "reqIds": [
+        "REQ-95"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-admindashboardpage-tsx-expand-the-admin-dashboard-with-the-following-additions-while-keeping-all-existing-statistics-cards-and-pending-listings-approval-rejection-functionality-intact-1-add-total-user-logins-stat-card-in-the-app-statistics-section-using-data-from-usegettotalloginscount-2-add-a-new-all-listings-section-below-the-pending-listings-section-fetch-all-listings-via-usegetalllistingsadmin-and-display-them-in-a-card-grid-showing-title-category-location-price-status-badge-pending-approved-rejected-seller-principal-and-first-photo-thumbnail-each-card-has-an-approve-button-professional-blue-disabled-if-already-approved-and-a-delete-button-red-destructive-that-calls-usedeletelisting-and-refreshes-the-list-on-success-3-add-a-new-registered-users-mobile-numbers-section-below-the-all-listings-section-fetch-data-via-usegetallmobilenumbers-and-display-a-clean-table-or-list-showing-each-user-s-principal-truncated-for-readability-and-mobile-number-styled-consistently-with-the-professional-blue-and-white-theme",
+      "title": "In frontend/src/pages/AdminDashboardPage.tsx, expand the Admin Dashboard with the following additions, while keeping all existing statistics cards and pending listings approval/rejection functionality intact: (1) Add 'Total User Logins' stat card in the App Statistics section using data from useGetTotalLoginsCount(); (2) Add a new 'All Listings' section below the pending listings section — fetch all listings via useGetAllListingsAdmin() and display them in a card grid showing title, category, location, price (₹), status badge (Pending/Approved/Rejected), seller principal, and first photo thumbnail; each card has an 'Approve' button (Professional Blue, disabled if already approved) and a 'Delete' button (red/destructive) that calls useDeleteListing() and refreshes the list on success; (3) Add a new 'Registered Users — Mobile Numbers' section below the All Listings section — fetch data via useGetAllMobileNumbers() and display a clean table or list showing each user's principal (truncated for readability) and mobile number, styled consistently with the Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-96"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-fix-the-useisadmin-hook-to-ensure-it-1-only-runs-when-a-non-anonymous-authenticated-actor-is-available-2-calls-the-backend-isadmin-query-and-returns-the-boolean-result-3-defaults-to-false-while-loading-or-when-unauthenticated-4-does-not-throw-or-surface-errors-to-the-ui-for-non-admin-callers-5-caches-the-result-with-a-staletime-of-5-minutes-and-6-automatically-refetches-after-login-so-the-newly-authenticated-principal-is-reflected-immediately",
+      "title": "In frontend/src/hooks/useQueries.ts, fix the useIsAdmin hook to ensure it: (1) only runs when a non-anonymous authenticated actor is available, (2) calls the backend isAdmin() query and returns the boolean result, (3) defaults to false while loading or when unauthenticated, (4) does not throw or surface errors to the UI for non-admin callers, (5) caches the result with a staleTime of 5 minutes, and (6) automatically refetches after login so the newly authenticated principal is reflected immediately.",
+      "reqIds": [
+        "REQ-98"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-fix-the-conditional-rendering-of-the-admin-dashboard-navigation-link-so-that-it-appears-in-both-the-desktop-header-nav-and-the-mobile-side-menu-when-and-only-when-useisadmin-returns-true-the-link-must-route-to-admin-it-must-be-completely-absent-from-the-dom-not-hidden-via-css-for-all-non-admin-users-and-unauthenticated-visitors-while-the-isadmin-query-is-still-loading-treat-it-as-false-so-the-link-does-not-flash-for-non-admin-users-the-link-must-be-styled-consistently-with-the-existing-professional-blue-nav-links",
+      "title": "In frontend/src/components/Layout.tsx, fix the conditional rendering of the 'Admin Dashboard' navigation link so that it appears in both the desktop header nav and the mobile/side menu when and only when useIsAdmin() returns true. The link must route to '/admin'. It must be completely absent from the DOM (not hidden via CSS) for all non-admin users and unauthenticated visitors. While the isAdmin query is still loading, treat it as false so the link does not flash for non-admin users. The link must be styled consistently with the existing Professional Blue nav links.",
+      "reqIds": [
+        "REQ-99"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-ensure-the-adminrouteguard-for-the-admin-route-uses-the-useisadmin-hook-result-if-isadmin-is-false-and-loading-is-complete-redirect-immediately-to-and-prevent-the-admindashboardpage-from-rendering-if-isadmin-is-still-loading-render-a-loading-state-rather-than-immediately-redirecting-so-that-a-brief-network-delay-does-not-incorrectly-redirect-the-admin-away-from-their-dashboard",
+      "title": "In frontend/src/App.tsx, ensure the AdminRouteGuard for the /admin route uses the useIsAdmin hook result. If isAdmin is false (and loading is complete), redirect immediately to '/' and prevent the AdminDashboardPage from rendering. If isAdmin is still loading, render a loading state rather than immediately redirecting, so that a brief network delay does not incorrectly redirect the admin away from their dashboard.",
+      "reqIds": [
+        "REQ-100"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-admindashboardpage-tsx-ensure-the-page-displays-all-existing-sections-correctly-app-statistics-total-listings-pending-count-approved-count-total-users-total-logins-pending-listings-with-approve-reject-buttons-all-listings-with-approve-delete-buttons-and-registered-users-mobile-numbers-table-verify-that-all-data-fetching-hooks-usegetalllistingsadmin-usegetallmobilenumbers-usegettotalloginscount-usegetpendinglistings-are-correctly-wired-and-that-the-page-does-not-crash-or-show-empty-data-due-to-hook-configuration-errors",
+      "title": "In frontend/src/pages/AdminDashboardPage.tsx, ensure the page displays all existing sections correctly: App Statistics (Total Listings, Pending count, Approved count, Total Users, Total Logins), Pending Listings with Approve/Reject buttons, All Listings with Approve/Delete buttons, and Registered Users — Mobile Numbers table. Verify that all data-fetching hooks (useGetAllListingsAdmin, useGetAllMobileNumbers, useGetTotalLoginsCount, useGetPendingListings) are correctly wired and that the page does not crash or show empty data due to hook configuration errors.",
+      "reqIds": [
+        "REQ-101"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-add-a-usegetalluserswithactivity-react-query-hook-that-calls-the-backend-getalluserswithactivity-function-and-returns-the-list-of-principal-mobile-lastlogintime-tuples-the-hook-must-only-run-when-an-authenticated-actor-is-available",
+      "title": "In frontend/src/hooks/useQueries.ts, add a `useGetAllUsersWithActivity()` React Query hook that calls the backend `getAllUsersWithActivity()` function and returns the list of (principal, mobile, lastLoginTime) tuples. The hook must only run when an authenticated actor is available.",
+      "reqIds": [
+        "REQ-103"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-admindashboardpage-tsx-add-a-users-tab-to-the-existing-tabbed-admin-dashboard-the-users-tab-must-display-a-clean-table-or-list-showing-each-user-s-principal-truncated-for-readability-mobile-number-and-last-login-date-formatted-as-a-readable-date-string-e-g-dd-mm-yyyy-hh-mm-data-must-be-fetched-via-the-new-usegetalluserswithactivity-hook-the-tab-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme-and-all-existing-tabs-sections-must-remain-intact",
+      "title": "In frontend/src/pages/AdminDashboardPage.tsx, add a 'Users' tab to the existing tabbed Admin Dashboard. The Users tab must display a clean table or list showing: each user's principal (truncated for readability), mobile number, and last login date (formatted as a readable date string, e.g. 'DD/MM/YYYY HH:mm'). Data must be fetched via the new `useGetAllUsersWithActivity()` hook. The tab must be styled consistently with the existing Professional Blue and white theme and all existing tabs/sections must remain intact.",
+      "reqIds": [
+        "REQ-104"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-admindashboardpage-tsx-ensure-the-app-statistics-section-includes-1-a-total-ads-posted-counter-using-the-total-listings-count-from-usegetalllistingsadmin-length-or-a-dedicated-backend-count-and-2-a-total-successful-logins-counter-using-data-from-usegettotalloginscount-both-counters-must-be-displayed-as-clearly-labelled-metric-tiles-consistent-with-the-existing-stats-card-layout",
+      "title": "In frontend/src/pages/AdminDashboardPage.tsx, ensure the App Statistics section includes: (1) a 'Total Ads Posted' counter using the total listings count (from `useGetAllListingsAdmin` length or a dedicated backend count), and (2) a 'Total Successful Logins' counter using data from `useGetTotalLoginsCount()`. Both counters must be displayed as clearly labelled metric tiles consistent with the existing stats card layout.",
+      "reqIds": [
+        "REQ-105"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-add-a-view-all-activity-button-link-in-the-side-mobile-menu-that-navigates-to-admin-the-admin-dashboard-this-button-must-only-be-visible-when-useisadmin-returns-true-it-must-be-completely-absent-from-the-dom-for-non-admin-users-and-unauthenticated-visitors-style-it-consistently-with-the-professional-blue-nav-links-positioned-prominently-e-g-at-or-near-the-top-of-the-side-menu-items-for-admin",
+      "title": "In frontend/src/components/Layout.tsx, add a 'View All Activity' button/link in the side/mobile menu that navigates to '/admin' (the Admin Dashboard). This button must only be visible when `useIsAdmin()` returns true — it must be completely absent from the DOM for non-admin users and unauthenticated visitors. Style it consistently with the Professional Blue nav links, positioned prominently (e.g., at or near the top of the side menu items for admin).",
+      "reqIds": [
+        "REQ-106"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-component-at-frontend-src-pages-managementpage-tsx-for-the-route-management-the-page-must-display-two-sections-1-a-registered-users-section-showing-a-clean-table-or-list-of-all-registered-users-with-their-principal-truncated-for-readability-and-phone-mobile-number-fetched-via-the-existing-usegetallmobilenumbers-hook-and-2-an-all-listings-section-showing-all-animal-listings-regardless-of-status-pending-approved-rejected-fetched-via-the-existing-usegetalllistingsadmin-hook-displayed-as-a-card-grid-or-table-showing-title-category-location-price-status-badge-seller-principal-and-first-photo-thumbnail-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme",
+      "title": "Create a new frontend page component at frontend/src/pages/ManagementPage.tsx for the route '/management'. The page must display two sections: (1) a 'Registered Users' section showing a clean table or list of all registered users with their principal (truncated for readability) and phone/mobile number, fetched via the existing useGetAllMobileNumbers() hook; and (2) an 'All Listings' section showing all animal listings regardless of status (pending/approved/rejected), fetched via the existing useGetAllListingsAdmin() hook, displayed as a card grid or table showing title, category, location, price (₹), status badge, seller principal, and first photo thumbnail. The page must be styled consistently with the existing Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-108"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-register-the-management-route-pointing-to-managementpage-and-add-a-managementrouteguard-that-protects-it-the-guard-must-compare-the-authenticated-user-s-principal-string-against-the-hardcoded-value-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-if-the-authenticated-principal-does-not-match-this-value-or-if-no-user-is-authenticated-redirect-immediately-to-the-home-page-while-authentication-state-is-still-loading-render-a-loading-spinner-rather-than-immediately-redirecting-to-prevent-false-redirects-on-initial-load",
+      "title": "In frontend/src/App.tsx, register the '/management' route pointing to ManagementPage and add a ManagementRouteGuard that protects it. The guard must compare the authenticated user's principal string against the hardcoded value 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. If the authenticated principal does NOT match this value (or if no user is authenticated), redirect immediately to the home page ('/'). While authentication state is still loading, render a loading spinner rather than immediately redirecting, to prevent false redirects on initial load.",
+      "reqIds": [
+        "REQ-109"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-add-a-management-navigation-link-in-both-the-desktop-header-nav-and-the-mobile-side-menu-that-routes-to-management-this-link-must-be-completely-absent-from-the-dom-not-just-hidden-via-css-for-all-users-whose-authenticated-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-and-for-unauthenticated-visitors-the-visibility-check-must-use-the-authenticated-user-s-principal-string-directly-not-the-useisadmin-hook-while-authentication-state-is-loading-treat-the-link-as-hidden-style-the-link-consistently-with-the-existing-professional-blue-nav-links",
+      "title": "In frontend/src/components/Layout.tsx, add a 'Management' navigation link in both the desktop header nav and the mobile/side menu that routes to '/management'. This link must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not the useIsAdmin hook). While authentication state is loading, treat the link as hidden. Style the link consistently with the existing Professional Blue nav links.",
+      "reqIds": [
+        "REQ-110"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-add-a-useismanagementuser-react-query-hook-or-a-simpler-utility-hook-that-reads-the-authenticated-user-s-principal-from-the-identity-context-and-returns-a-boolean-true-if-the-principal-matches-the-hardcoded-management-principal-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-false-otherwise-the-hook-must-return-false-while-loading-or-unauthenticated-and-must-not-throw-or-surface-errors-to-the-ui",
+      "title": "In frontend/src/hooks/useQueries.ts, add a useIsManagementUser() React Query hook (or a simpler utility hook) that reads the authenticated user's principal from the identity context and returns a boolean: true if the principal matches the hardcoded management principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', false otherwise. The hook must return false while loading or unauthenticated and must not throw or surface errors to the UI.",
+      "reqIds": [
+        "REQ-111"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-component-at-frontend-src-pages-ownerviewpage-tsx-for-the-route-owner-view-the-page-must-display-two-sections-1-a-registered-users-section-showing-a-clean-table-of-all-registered-users-with-their-principal-truncated-for-readability-and-mobile-number-fetched-via-the-existing-usegetallmobilenumbers-hook-and-2-an-all-animal-ads-section-showing-all-animal-listings-regardless-of-status-pending-approved-rejected-fetched-via-the-existing-usegetalllistingsadmin-hook-displayed-as-a-card-grid-or-table-showing-title-category-location-price-status-badge-pending-approved-rejected-seller-principal-and-first-photo-thumbnail-each-listing-entry-must-include-a-mark-as-live-button-styled-in-professional-blue-that-calls-the-approvelisting-backend-function-for-that-listing-and-refreshes-the-list-on-success-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme",
+      "title": "Create a new frontend page component at frontend/src/pages/OwnerViewPage.tsx for the route '/owner-view'. The page must display two sections: (1) a 'Registered Users' section showing a clean table of all registered users with their principal (truncated for readability) and mobile number, fetched via the existing useGetAllMobileNumbers() hook; and (2) an 'All Animal Ads' section showing all animal listings regardless of status (pending/approved/rejected), fetched via the existing useGetAllListingsAdmin() hook, displayed as a card grid or table showing title, category, location, price (₹), status badge (Pending/Approved/Rejected), seller principal, and first photo thumbnail. Each listing entry must include a 'Mark as Live' button (styled in Professional Blue) that calls the approveListing backend function for that listing and refreshes the list on success. The page must be styled consistently with the existing Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-112"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-register-the-owner-view-route-pointing-to-ownerviewpage-and-add-an-ownerviewrouteguard-that-protects-it-the-guard-must-compare-the-authenticated-user-s-principal-string-against-the-hardcoded-value-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-if-the-authenticated-principal-does-not-match-this-value-or-if-no-user-is-authenticated-redirect-immediately-to-the-home-page-while-authentication-state-is-still-loading-render-a-loading-spinner-rather-than-immediately-redirecting-to-prevent-false-redirects-on-initial-load",
+      "title": "In frontend/src/App.tsx, register the '/owner-view' route pointing to OwnerViewPage and add an OwnerViewRouteGuard that protects it. The guard must compare the authenticated user's principal string against the hardcoded value 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. If the authenticated principal does NOT match this value (or if no user is authenticated), redirect immediately to the home page ('/'). While authentication state is still loading, render a loading spinner rather than immediately redirecting, to prevent false redirects on initial load.",
+      "reqIds": [
+        "REQ-113"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-add-an-owner-view-navigation-link-in-both-the-desktop-header-nav-and-the-mobile-side-menu-that-routes-to-owner-view-this-link-must-be-completely-absent-from-the-dom-not-just-hidden-via-css-for-all-users-whose-authenticated-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-and-for-unauthenticated-visitors-the-visibility-check-must-use-the-authenticated-user-s-principal-string-directly-while-authentication-state-is-loading-treat-the-link-as-hidden-style-the-link-consistently-with-the-existing-professional-blue-nav-links",
+      "title": "In frontend/src/components/Layout.tsx, add an 'Owner View' navigation link in both the desktop header nav and the mobile/side menu that routes to '/owner-view'. This link must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly. While authentication state is loading, treat the link as hidden. Style the link consistently with the existing Professional Blue nav links.",
+      "reqIds": [
+        "REQ-114"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-add-a-useisowneruser-utility-hook-that-reads-the-authenticated-user-s-principal-from-the-identity-context-and-returns-a-boolean-true-if-the-principal-matches-the-hardcoded-owner-principal-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-false-otherwise-the-hook-must-return-false-while-loading-or-unauthenticated-and-must-not-throw-or-surface-errors-to-the-ui-use-this-hook-in-layout-tsx-and-app-tsx-for-the-owner-view-route-guard-and-nav-link-visibility",
+      "title": "In frontend/src/hooks/useQueries.ts, add a useIsOwnerUser() utility hook that reads the authenticated user's principal from the identity context and returns a boolean: true if the principal matches the hardcoded owner principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', false otherwise. The hook must return false while loading or unauthenticated and must not throw or surface errors to the UI. Use this hook in Layout.tsx and App.tsx for the '/owner-view' route guard and nav link visibility.",
+      "reqIds": [
+        "REQ-115"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-component-at-frontend-src-pages-cattletrackerpage-tsx-for-the-route-tracker-the-page-must-display-two-sections-1-a-registered-users-section-showing-a-clean-table-of-all-registered-users-with-their-principal-truncated-for-readability-and-mobile-number-fetched-via-the-existing-usegetallmobilenumbers-hook-and-2-an-all-animal-posts-section-showing-all-animal-listings-regardless-of-status-pending-approved-rejected-fetched-via-the-existing-usegetalllistingsadmin-hook-displayed-as-a-card-grid-or-table-showing-title-category-location-price-status-badge-pending-approved-rejected-seller-principal-and-first-photo-thumbnail-the-page-heading-must-read-cattle-tracker-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme",
+      "title": "Create a new frontend page component at frontend/src/pages/CattleTrackerPage.tsx for the route '/tracker'. The page must display two sections: (1) a 'Registered Users' section showing a clean table of all registered users with their principal (truncated for readability) and mobile number, fetched via the existing useGetAllMobileNumbers() hook; and (2) an 'All Animal Posts' section showing all animal listings regardless of status (pending/approved/rejected), fetched via the existing useGetAllListingsAdmin() hook, displayed as a card grid or table showing title, category, location, price (₹), status badge (Pending/Approved/Rejected), seller principal, and first photo thumbnail. The page heading must read 'Cattle Tracker'. The page must be styled consistently with the existing Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-116"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-register-the-tracker-route-pointing-to-cattletrackerpage-and-add-a-cattletrackerrouteguard-that-protects-it-the-guard-must-compare-the-authenticated-user-s-principal-string-against-the-hardcoded-value-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-if-the-authenticated-principal-does-not-match-this-value-or-if-no-user-is-authenticated-redirect-immediately-to-the-home-page-while-authentication-state-is-still-loading-render-a-loading-spinner-rather-than-immediately-redirecting-to-prevent-false-redirects-on-initial-load",
+      "title": "In frontend/src/App.tsx, register the '/tracker' route pointing to CattleTrackerPage and add a CattleTrackerRouteGuard that protects it. The guard must compare the authenticated user's principal string against the hardcoded value 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. If the authenticated principal does NOT match this value (or if no user is authenticated), redirect immediately to the home page ('/'). While authentication state is still loading, render a loading spinner rather than immediately redirecting, to prevent false redirects on initial load.",
+      "reqIds": [
+        "REQ-117"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-add-a-cattle-tracker-navigation-link-at-the-very-top-of-the-mobile-side-menu-that-routes-to-tracker-this-link-must-be-completely-absent-from-the-dom-not-just-hidden-via-css-for-all-users-whose-authenticated-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-and-for-unauthenticated-visitors-the-visibility-check-must-use-the-authenticated-user-s-principal-string-directly-while-authentication-state-is-loading-treat-the-link-as-hidden-the-link-must-be-positioned-at-the-very-top-of-the-side-menu-item-list-above-all-other-menu-items-style-it-consistently-with-the-existing-professional-blue-nav-links",
+      "title": "In frontend/src/components/Layout.tsx, add a 'Cattle Tracker' navigation link at the very top of the mobile/side menu that routes to '/tracker'. This link must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly. While authentication state is loading, treat the link as hidden. The link must be positioned at the very top of the side menu item list, above all other menu items. Style it consistently with the existing Professional Blue nav links.",
+      "reqIds": [
+        "REQ-118"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-ensure-a-useiscattletrackeruser-utility-hook-is-present-that-reads-the-authenticated-user-s-principal-from-the-identity-context-and-returns-a-boolean-true-if-the-principal-matches-the-hardcoded-value-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-false-otherwise-the-hook-must-return-false-while-loading-or-unauthenticated-and-must-not-throw-or-surface-errors-to-the-ui-use-this-hook-in-layout-tsx-for-the-cattle-tracker-side-menu-link-visibility-and-app-tsx-for-the-tracker-route-guard",
+      "title": "In frontend/src/hooks/useQueries.ts, ensure a useIsCattleTrackerUser() utility hook is present that reads the authenticated user's principal from the identity context and returns a boolean: true if the principal matches the hardcoded value 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', false otherwise. The hook must return false while loading or unauthenticated and must not throw or surface errors to the UI. Use this hook in Layout.tsx (for the 'Cattle Tracker' side menu link visibility) and App.tsx (for the '/tracker' route guard).",
+      "reqIds": [
+        "REQ-119"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-fix-the-cattletrackerrouteguard-for-the-tracker-route-so-that-it-correctly-grants-access-to-the-authenticated-user-whose-principal-string-is-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-the-guard-must-1-while-authentication-state-is-still-loading-render-a-loading-spinner-and-not-redirect-2-only-redirect-to-when-loading-is-complete-and-the-authenticated-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-3-use-the-principal-string-obtained-directly-from-the-internet-identity-context-e-g-identity-getprincipal-totext-for-comparison-do-not-rely-on-any-async-backend-query-that-may-not-have-resolved-yet-ensure-the-comparison-trims-whitespace-and-is-an-exact-string-match",
+      "title": "In frontend/src/App.tsx, fix the CattleTrackerRouteGuard for the '/tracker' route so that it correctly grants access to the authenticated user whose principal string is 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The guard must: (1) while authentication state is still loading, render a loading spinner and NOT redirect; (2) only redirect to '/' when loading is complete AND the authenticated principal does NOT match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) use the principal string obtained directly from the Internet Identity context (e.g. identity?.getPrincipal().toText()) for comparison — do not rely on any async backend query that may not have resolved yet. Ensure the comparison trims whitespace and is an exact string match.",
+      "reqIds": [
+        "REQ-120"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-or-the-equivalent-utility-hook-file-fix-the-useiscattletrackeruser-hook-to-derive-the-owner-principal-check-synchronously-from-the-internet-identity-context-rather-than-from-an-async-backend-query-the-hook-must-1-read-the-principal-string-directly-from-the-identity-object-e-g-identity-getprincipal-totext-2-return-true-immediately-when-the-principal-matches-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-3-return-false-while-loading-or-unauthenticated-4-never-throw-or-surface-errors-to-the-ui",
+      "title": "In frontend/src/hooks/useQueries.ts (or the equivalent utility hook file), fix the useIsCattleTrackerUser() hook to derive the owner principal check synchronously from the Internet Identity context rather than from an async backend query. The hook must: (1) read the principal string directly from the identity object (e.g. identity?.getPrincipal().toText()); (2) return true immediately when the principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) return false while loading or unauthenticated; (4) never throw or surface errors to the UI.",
+      "reqIds": [
+        "REQ-121"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-add-a-prominently-styled-navigation-button-labelled-admin-panel-at-the-very-top-of-the-mobile-side-menu-this-button-must-route-to-tracker-the-cattle-tracker-page-it-must-be-completely-absent-from-the-dom-not-just-hidden-via-css-for-all-users-whose-authenticated-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-and-for-unauthenticated-visitors-the-visibility-check-must-use-the-authenticated-user-s-principal-string-directly-not-an-async-backend-query-while-authentication-state-is-loading-treat-the-button-as-hidden-position-it-above-all-other-side-menu-items-style-it-with-a-bold-attention-grabbing-appearance-consistent-with-the-professional-blue-theme-e-g-a-filled-professional-blue-button-with-white-bold-text-labelled-admin-panel",
+      "title": "In frontend/src/components/Layout.tsx, add a prominently styled navigation button labelled 'ADMIN PANEL' at the very top of the mobile/side menu. This button must route to '/tracker' (the Cattle Tracker page). It must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not an async backend query). While authentication state is loading, treat the button as hidden. Position it above all other side menu items. Style it with a bold, attention-grabbing appearance consistent with the Professional Blue theme (e.g., a filled Professional Blue button with white bold text labelled 'ADMIN PANEL').",
+      "reqIds": [
+        "REQ-122"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -563,6 +945,250 @@
     {
       "id": "AR-44",
       "summary": "Add a dark semi-transparent overlay on the header background image so the 'Pashu Mandi' brand text and navigation links remain clearly readable.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the categoryLabelMap with display label 'Sheep 🐑' and assign it a distinct badge color consistent with the Professional Blue and white theme (e.g., a muted purple or soft lavender that does not clash with existing badge colors for Cow, Buffalo, Goat, and other categories).",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-46",
+      "summary": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep' as a selectable option in the category dropdown with display text 'Sheep 🐑' and value 'Sheep', positioned alongside the existing animal categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "In frontend/src/pages/HomePage.tsx, add 'Sheep' to the category filter dropdown with display text 'Sheep 🐑' and value 'Sheep', so users can filter listings by the Sheep category. The filter value must match the value stored on Sheep listings.",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Add a 'Share' or 'Invite' button that opens the native sharing menu (WhatsApp, Telegram, etc.) with a pre-filled message: 'Check out Pashu Mandi - The most trusted marketplace to buy and sell livestock! Click here to join: [App Link]'. Also add a small banner on the home screen that says: 'Invite a friend and help grow our community!'",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-49",
+      "summary": "In frontend/src/hooks/useInternetIdentity.ts (read-only) and the AuthClient initialization logic that wraps it (e.g., in frontend/src/main.tsx or any writable auth utility), ensure the AuthClient is created with idleOptions that disable automatic logout on idle and that the underlying storage uses localStorage (not sessionStorage) so that the authenticated Internet Identity session persists across page reloads and PWA standalone launches. Specifically, when calling AuthClient.create(), pass `{ idleOptions: { disableIdle: true }, storage: window.localStorage }` (or equivalent persistent storage option available in @dfinity/auth-client) so the delegation chain is stored persistently and survives the PWA being closed and re-opened from the home screen icon.",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "Audit and fix the backend `signUp` function in `backend/main.mo` to ensure that when a new user calls it with a valid display name and mobile number, their profile is correctly persisted in stable storage. The function must return a success result (e.g., `#ok`) for both new registrations and updates to existing profiles. It must not return an error for new callers who have no existing profile.",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-51",
+      "summary": "Review and fix the mobile number validation logic inside the backend `signUp` function. If the current validation (e.g., a character check or length check) incorrectly rejects valid Indian mobile numbers (10-digit numeric strings), relax or correct the validation so that any non-empty string of 10 or more digits is accepted without returning an error.",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-52",
+      "summary": "Audit and fix the backend `signUp` function in `backend/main.mo` to ensure new user registrations are correctly persisted in stable storage. The function must accept a display name (Text) and mobile number (Text), store them in the user profile map keyed by caller principal, and return a success variant (e.g., `#ok(\"Success\")`) for both brand-new callers (no existing profile) and callers updating an existing profile. It must never return an `#err` variant when the inputs are valid and storage succeeds.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-53",
+      "summary": "Fix the mobile number validation logic inside the backend `signUp` function in `backend/main.mo`. Accept any non-empty string of 10 or more numeric digits as a valid mobile number. Remove or relax any overly strict character-by-character or length check that would reject standard 10-digit Indian mobile numbers.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-57",
+      "summary": "Ensure the `AuthClient` used in the app is initialized with `idleOptions: { disableIdle: true }` and persistent storage (`localStorage`) so the Internet Identity delegation chain survives PWA standalone launches, page reloads, and the app being closed and reopened from the home screen. Apply this change in any writable auth initialization file (e.g., a utility wrapper around `useInternetIdentity`) without modifying the read-only `frontend/src/hooks/useInternetIdentity.ts` file.",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-58",
+      "summary": "Audit and fix the backend `signUp` function in `backend/main.mo` to guarantee that any caller with a valid display name and a non-empty mobile number string (10 or more numeric digits) is successfully registered. The function must: (1) accept both new callers (no existing profile) and existing callers updating their profile; (2) store the profile in stable storage keyed by caller principal; (3) return a success variant (e.g. `#ok(\"Success\")`) for all valid inputs; (4) never return an `#err` variant when inputs are valid and storage succeeds. Remove or relax any overly strict validation that would reject standard 10-digit Indian mobile numbers such as '7353370102'.",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-59",
+      "summary": "Implement role-based access control: create separate AdminDashboard and UserDashboard views. Non-admin users must be redirected away from /admin routes to Home or Profile. Only the designated admin principal/identifier can access admin settings and tools. Hide all admin-only UI (user lists, app-editing tools, sensitive settings) from regular users.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-60",
+      "summary": "In the backend (backend/main.mo), define or confirm a hardcoded admin principal constant. Ensure all admin-restricted functions (getPendingListings, approveListing, rejectListing) perform a caller-identity check against this admin principal and return an error for non-admin callers. The admin principal must be the one associated with the app owner's Internet Identity.",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-65",
+      "summary": "Add a backend query function `getAdminPrincipal() : async Principal` (or return it as Text) that returns the hardcoded admin principal. This allows the frontend to determine admin status by comparing the authenticated caller's principal against the returned value without hardcoding the principal string in multiple frontend files. Alternatively, add a `isAdmin() : async Bool` query that returns true if the caller is the admin principal.",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-71",
+      "summary": "In the backend (backend/main.mo), add or verify the isAdmin() query function that returns true if the caller's principal matches the hardcoded admin principal, and false otherwise. Ensure getPendingListings, approveListing, and rejectListing all enforce the admin-only check and return an appropriate error for non-admin callers.",
+      "reqIds": [
+        "REQ-85"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-72",
+      "summary": "When the admin logs in, show a special 'Admin Dashboard' button in the side/nav menu. The admin dashboard should display all user listings and app statistics. Admin is identified by their mobile number (to be configured).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-73",
+      "summary": "In the backend (backend/main.mo), audit and fix the isAdmin() query function to ensure it correctly compares the caller's principal against the hardcoded admin principal and returns true when they match. Verify that the admin principal constant stored in the backend matches the Internet Identity principal of the app owner (the account associated with the admin mobile number). Ensure the function never throws or traps for unauthenticated callers — it must return false for anonymous principals.",
+      "reqIds": [
+        "REQ-86"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-75",
+      "summary": "In frontend/src/components/Layout.tsx, fix the conditional rendering of the 'Admin' navigation link so that it appears in both the desktop header nav and the mobile menu if open, but only when useIsAdmin() returns true. The link must be completely absent from the DOM (not just hidden via CSS or opacity) for non-admin users and unauthenticated visitors. Ensure the hook result is awaited/loaded before deciding — while isAdmin is still loading, treat it as false (do not flash the link).",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-77",
+      "summary": "In backend/main.mo, add or verify the following backend query functions needed by the expanded Admin Dashboard: (1) getTotalListingsCount() : async Nat — returns the count of all listings regardless of status; (2) getApprovedListingsCount() : async Nat — returns the count of listings with status #approved; (3) getTotalUsersCount() : async Nat — returns the count of all registered user profiles. All three functions must be restricted to admin callers only (check against the hardcoded admin principal and return an error or 0 for non-admin callers). If equivalent functions already exist, verify they are correctly gated and return accurate counts.",
+      "reqIds": [
+        "REQ-90"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-78",
+      "summary": "Admin Dashboard: show stats (total user logins, total ads posted), list all animal listings with Approve and Delete buttons, show a list of all registered mobile numbers. Only the admin account can see this dashboard — hidden route/menu item.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "In backend/main.mo, add a backend query function `getTotalLoginsCount() : async Nat` that returns the total number of times users have logged in (i.e., the total count of registered user profiles as a proxy for logins, or a dedicated login-event counter if one exists). This function must be restricted to admin callers only — return 0 or an error for non-admin callers.",
+      "reqIds": [
+        "REQ-91"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-80",
+      "summary": "In backend/main.mo, add a backend query function `getAllListingsAdmin() : async [Listing]` that returns ALL listings regardless of status (pending, approved, rejected) for the admin to manage. This function must be restricted to admin callers only. Also ensure `getTotalListingsCount()` (already present or to be verified) returns the total count of all listings across all statuses.",
+      "reqIds": [
+        "REQ-92"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-81",
+      "summary": "In backend/main.mo, add a backend update function `deleteListing(id: Nat) : async Result` restricted to admin callers that permanently removes a listing from stable storage by its ID. Return an appropriate error if the listing does not exist or the caller is not admin.",
+      "reqIds": [
+        "REQ-93"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-82",
+      "summary": "In backend/main.mo, add a backend query function `getAllMobileNumbers() : async [(Principal, Text)]` restricted to admin callers that returns a list of all registered user principals paired with their stored mobile numbers. Return an error or empty list for non-admin callers.",
+      "reqIds": [
+        "REQ-94"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-83",
+      "summary": "In backend/main.mo, audit and fix the isAdmin() query function to ensure it correctly compares the caller's principal against the hardcoded admin principal and returns true when they match. The function must never throw or trap for unauthenticated or anonymous callers — it must return false in those cases. Verify that the hardcoded admin principal constant in the backend is the correct Internet Identity principal for the app owner (the account used to deploy the canister).",
+      "reqIds": [
+        "REQ-97"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-84",
+      "summary": "Add a 'Users' tab in the Admin Panel listing every user who has logged in, their mobile number, and their last login date.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-85",
+      "summary": "Show counters for total ads posted and total successful logins in the Admin Dashboard.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-86",
+      "summary": "Add a direct 'View All Activity' button in the side menu that opens the admin activity/user tracking data. Only visible to admin.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-87",
+      "summary": "In backend/main.mo, add a `lastLoginTime` field (Int timestamp) to the UserProfile data type. Update the `signUp` function to record the current Time.now() as `lastLoginTime` whenever a user signs up or updates their profile (treating sign-up as a login event). Add a backend query function `getAllUsersWithActivity() : async [(Principal, Text, Int)]` restricted to admin callers that returns each registered user's principal, mobile number, and last login timestamp. Return an empty list for non-admin callers.",
+      "reqIds": [
+        "REQ-102"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-92",
+      "summary": "In frontend/src/App.tsx, ensure the AdminRouteGuard for the '/admin' route correctly uses the `useIsAdmin` hook. When `isAdmin` is still loading, render a loading spinner instead of immediately redirecting. Only redirect to '/' when loading is complete and `isAdmin` is false. This prevents the admin from being incorrectly redirected away from '/admin' due to a brief network delay on initial load.",
+      "reqIds": [
+        "REQ-107"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-93",
+      "summary": "Add a new 'Management' page showing all registered users with phone numbers and all animal listings for review. Add a 'Management' link in the side/nav menu visible only to the user with principal ID: rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-94",
+      "summary": "Add a new 'Owner View' section/page in the main navigation menu, visible only to the user with principal ID rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe. The page displays a table of all registered mobile numbers, a list of all animal ads submitted by users, and a button on each ad to mark it as 'Live' (approved/publicly visible).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-95",
+      "summary": "Create a private 'Cattle Tracker' page at route '/tracker' showing all registered mobile numbers and all animal posts. Add a direct link at the very top of the side menu, visible only to principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. Page must be accessible via /tracker URL regardless of menu visibility.",
       "reqIds": [],
       "status": "pending"
     }

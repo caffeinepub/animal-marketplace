@@ -1,0 +1,22 @@
+{
+  "name": "Pashu Mandi",
+  "short_name": "Pashu Mandi",
+  "description": "Buy and sell animals on Pashu Mandi",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "theme_color": "#10b981",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/assets/generated/goat-logo.dim_64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/generated/logo-icon.dim_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ]
+}

@@ -119,6 +119,7 @@ export interface Message {
 }
 export interface UserProfile {
     bio: string;
+    lastLoginTime: bigint;
     contactInfo?: string;
     displayName: string;
     mobileNumber?: string;
@@ -153,7 +154,12 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createListing(title: string, description: string, price: bigint, category: AnimalCategory, location: string, photoUrls: Array<string>, isVip: boolean): Promise<ListingId>;
     deleteListing(listingId: ListingId): Promise<void>;
+    deleteListingAdmin(listingId: ListingId): Promise<boolean>;
     getAllListings(): Promise<Array<Listing>>;
+    getAllListingsAdmin(): Promise<Array<Listing>>;
+    getAllMobileNumbers(): Promise<Array<[Principal, string]>>;
+    getAllUsersWithActivity(): Promise<Array<[Principal, string, bigint]>>;
+    getApprovedListingsCount(): Promise<bigint>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getConversation(other: Principal): Promise<Array<Message>>;
@@ -161,14 +167,19 @@ export interface backendInterface {
     getMobileNumber(): Promise<string | null>;
     getMyProfile(): Promise<UserProfile | null>;
     getPendingListings(): Promise<Array<Listing>>;
+    getPendingListingsCount(): Promise<bigint>;
     getProfile(principal: Principal): Promise<PublicUserProfile | null>;
+    getTotalListingsCount(): Promise<bigint>;
+    getTotalLoginsCount(): Promise<bigint>;
+    getTotalUsersCount(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     listConversations(): Promise<Array<Principal>>;
     rejectListing(listingId: ListingId): Promise<void>;
     saveCallerUserProfile(displayName: string, bio: string, contactInfo: string | null, mobileNumber: string | null): Promise<void>;
     sendMessage(recipient: Principal, listingId: ListingId | null, text: string): Promise<void>;
-    signUp(displayName: string, mobileNumber: string): Promise<void>;
+    signUp(displayName: string, mobileNumber: string): Promise<string>;
     updateListing(listingId: ListingId, title: string, description: string, price: bigint, category: AnimalCategory, location: string, photoUrls: Array<string>, isActive: boolean, isVip: boolean): Promise<void>;
     upsertProfile(displayName: string, bio: string, contactInfo: string | null): Promise<void>;
 }
@@ -245,6 +256,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteListingAdmin(arg0: ListingId): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteListingAdmin(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteListingAdmin(arg0);
+            return result;
+        }
+    }
     async getAllListings(): Promise<Array<Listing>> {
         if (this.processError) {
             try {
@@ -257,6 +282,62 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getAllListings();
             return from_candid_vec_n5(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAllListingsAdmin(): Promise<Array<Listing>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllListingsAdmin();
+                return from_candid_vec_n5(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllListingsAdmin();
+            return from_candid_vec_n5(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAllMobileNumbers(): Promise<Array<[Principal, string]>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllMobileNumbers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllMobileNumbers();
+            return result;
+        }
+    }
+    async getAllUsersWithActivity(): Promise<Array<[Principal, string, bigint]>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllUsersWithActivity();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllUsersWithActivity();
+            return result;
+        }
+    }
+    async getApprovedListingsCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getApprovedListingsCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getApprovedListingsCount();
+            return result;
         }
     }
     async getCallerUserProfile(): Promise<UserProfile | null> {
@@ -357,6 +438,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n5(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getPendingListingsCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPendingListingsCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPendingListingsCount();
+            return result;
+        }
+    }
     async getProfile(arg0: Principal): Promise<PublicUserProfile | null> {
         if (this.processError) {
             try {
@@ -371,6 +466,48 @@ export class Backend implements backendInterface {
             return from_candid_opt_n22(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getTotalListingsCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTotalListingsCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTotalListingsCount();
+            return result;
+        }
+    }
+    async getTotalLoginsCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTotalLoginsCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTotalLoginsCount();
+            return result;
+        }
+    }
+    async getTotalUsersCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTotalUsersCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTotalUsersCount();
+            return result;
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -383,6 +520,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getUserProfile(arg0);
             return from_candid_opt_n12(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isAdmin();
+            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -455,7 +606,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async signUp(arg0: string, arg1: string): Promise<void> {
+    async signUp(arg0: string, arg1: string): Promise<string> {
         if (this.processError) {
             try {
                 const result = await this.actor.signUp(arg0, arg1);
@@ -530,12 +681,14 @@ function from_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 }
 function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     bio: string;
+    lastLoginTime: bigint;
     contactInfo: [] | [string];
     displayName: string;
     mobileNumber: [] | [string];
     registrationTimestamp: _Time;
 }): {
     bio: string;
+    lastLoginTime: bigint;
     contactInfo?: string;
     displayName: string;
     mobileNumber?: string;
@@ -543,6 +696,7 @@ function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uin
 } {
     return {
         bio: value.bio,
+        lastLoginTime: value.lastLoginTime,
         contactInfo: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.contactInfo)),
         displayName: value.displayName,
         mobileNumber: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.mobileNumber)),

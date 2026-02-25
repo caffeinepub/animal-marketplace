@@ -54,6 +54,7 @@ export interface PublicUserProfile {
 export type Time = bigint;
 export interface UserProfile {
   'bio' : string,
+  'lastLoginTime' : bigint,
   'contactInfo' : [] | [string],
   'displayName' : string,
   'mobileNumber' : [] | [string],
@@ -71,7 +72,15 @@ export interface _SERVICE {
     ListingId
   >,
   'deleteListing' : ActorMethod<[ListingId], undefined>,
+  'deleteListingAdmin' : ActorMethod<[ListingId], boolean>,
   'getAllListings' : ActorMethod<[], Array<Listing>>,
+  'getAllListingsAdmin' : ActorMethod<[], Array<Listing>>,
+  'getAllMobileNumbers' : ActorMethod<[], Array<[Principal, string]>>,
+  'getAllUsersWithActivity' : ActorMethod<
+    [],
+    Array<[Principal, string, bigint]>
+  >,
+  'getApprovedListingsCount' : ActorMethod<[], bigint>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getConversation' : ActorMethod<[Principal], Array<Message>>,
@@ -79,8 +88,13 @@ export interface _SERVICE {
   'getMobileNumber' : ActorMethod<[], [] | [string]>,
   'getMyProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getPendingListings' : ActorMethod<[], Array<Listing>>,
+  'getPendingListingsCount' : ActorMethod<[], bigint>,
   'getProfile' : ActorMethod<[Principal], [] | [PublicUserProfile]>,
+  'getTotalListingsCount' : ActorMethod<[], bigint>,
+  'getTotalLoginsCount' : ActorMethod<[], bigint>,
+  'getTotalUsersCount' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isAdmin' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'listConversations' : ActorMethod<[], Array<Principal>>,
   'rejectListing' : ActorMethod<[ListingId], undefined>,
@@ -89,7 +103,7 @@ export interface _SERVICE {
     undefined
   >,
   'sendMessage' : ActorMethod<[Principal, [] | [ListingId], string], undefined>,
-  'signUp' : ActorMethod<[string, string], undefined>,
+  'signUp' : ActorMethod<[string, string], string>,
   'updateListing' : ActorMethod<
     [
       ListingId,

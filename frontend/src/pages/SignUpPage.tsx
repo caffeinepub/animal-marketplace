@@ -1,169 +1,165 @@
-import { useState } from 'react';
-import { useNavigate, Link } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useSignUp } from '../hooks/useQueries';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { UserPlus, LogIn } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useSignUp } from "../hooks/useQueries";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Loader2, UserPlus } from "lucide-react";
 
 export default function SignUpPage() {
-  const { identity, login, isLoggingIn } = useInternetIdentity();
-  const isAuthenticated = !!identity;
   const navigate = useNavigate();
-  const { mutateAsync: signUp, isPending } = useSignUp();
+  const { identity } = useInternetIdentity();
+  const signUpMutation = useSignUp();
 
-  const [fullName, setFullName] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [errors, setErrors] = useState<{ fullName?: string; mobileNumber?: string }>({});
-
-  const validate = (): boolean => {
-    const newErrors: { fullName?: string; mobileNumber?: string } = {};
-
-    if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required.';
-    }
-
-    if (!mobileNumber.trim()) {
-      newErrors.mobileNumber = 'Mobile number is required.';
-    } else if (!/^\d+$/.test(mobileNumber.trim())) {
-      newErrors.mobileNumber = 'Mobile number must contain digits only.';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const [displayName, setDisplayName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [inlineError, setInlineError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    setInlineError(null);
+
+    // Basic client-side validation
+    const cleaned = mobileNumber.replace(/\D/g, "");
+    if (!displayName.trim()) {
+      setInlineError("Please enter your full name.");
+      return;
+    }
+    if (cleaned.length < 10) {
+      setInlineError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
 
     try {
-      await signUp({ displayName: fullName.trim(), mobileNumber: mobileNumber.trim() });
-      toast.success('Account created successfully! Welcome to Pashu Mandi.');
-      navigate({ to: '/' });
+      await signUpMutation.mutateAsync({ displayName, mobileNumber });
+      // Successful sign-up — navigate home without showing any error
+      navigate({ to: "/" });
     } catch (err) {
-      toast.error('Failed to create account. Please try again.');
+      // Display the exact error message from the backend or mutation
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : "An unexpected error occurred. Please try again.";
+      setInlineError(message);
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-          <UserPlus className="w-8 h-8 text-primary" />
-        </div>
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Login required to sign up
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          Please log in first to create your Pashu Mandi account.
-        </p>
-        <Button onClick={login} disabled={isLoggingIn} className="gap-2">
-          {isLoggingIn ? (
-            <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-          ) : (
-            <LogIn className="w-4 h-4" />
-          )}
-          {isLoggingIn ? 'Logging in...' : 'Login'}
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-12 max-w-md">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-          <UserPlus className="w-8 h-8 text-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Logo / Branding */}
+        <div className="text-center mb-8">
+          <img
+            src="/assets/generated/goat-logo.dim_64x64.png"
+            alt="Pashu Mandi"
+            className="w-16 h-16 mx-auto mb-3 rounded-full object-cover"
+          />
+          <h1 className="text-3xl font-bold text-foreground font-display">
+            Pashu Mandi
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Create your account to buy &amp; sell animals
+          </p>
         </div>
-        <h1 className="font-display text-3xl font-bold text-foreground">Create Account</h1>
-        <p className="text-muted-foreground mt-2">
-          Join Pashu Mandi to post ads and connect with buyers &amp; sellers.
-        </p>
-      </div>
 
-      {/* Form Card */}
-      <div className="bg-card border border-border rounded-2xl p-8 shadow-card">
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-          {/* Full Name */}
-          <div className="space-y-2">
-            <Label htmlFor="fullName">
-              Full Name <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="fullName"
-              type="text"
-              placeholder="e.g. Ahmed Khan"
-              value={fullName}
-              onChange={(e) => {
-                setFullName(e.target.value);
-                if (errors.fullName) setErrors((prev) => ({ ...prev, fullName: undefined }));
-              }}
-              className={errors.fullName ? 'border-destructive focus-visible:ring-destructive' : ''}
-              autoComplete="name"
-              maxLength={80}
-            />
-            {errors.fullName && (
-              <p className="text-sm text-destructive">{errors.fullName}</p>
-            )}
+        {/* Card */}
+        <div className="bg-card border border-border rounded-2xl shadow-card p-8">
+          <div className="flex items-center gap-2 mb-6">
+            <UserPlus className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-semibold text-card-foreground">
+              Create Account
+            </h2>
           </div>
 
-          {/* Mobile Number */}
-          <div className="space-y-2">
-            <Label htmlFor="mobileNumber">
-              Mobile Number <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="mobileNumber"
-              type="tel"
-              placeholder="e.g. 03001234567"
-              value={mobileNumber}
-              onChange={(e) => {
-                setMobileNumber(e.target.value);
-                if (errors.mobileNumber) setErrors((prev) => ({ ...prev, mobileNumber: undefined }));
-              }}
-              className={errors.mobileNumber ? 'border-destructive focus-visible:ring-destructive' : ''}
-              autoComplete="tel"
-              maxLength={15}
-            />
-            {errors.mobileNumber && (
-              <p className="text-sm text-destructive">{errors.mobileNumber}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Digits only, no spaces or dashes (e.g. 03001234567).
-            </p>
-          </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full mt-2"
-            disabled={isPending}
-          >
-            {isPending ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                Creating Account...
+          {/* Not logged in warning */}
+          {!identity && (
+            <div className="mb-5 flex items-start gap-2 rounded-lg bg-warning/10 border border-warning/30 px-4 py-3 text-sm text-warning-foreground">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
+              <span>
+                You must be logged in with Internet Identity before creating an
+                account.
               </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <UserPlus className="w-4 h-4" />
-                Create Account
-              </span>
-            )}
-          </Button>
-        </form>
+            </div>
+          )}
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          Already have an account?{' '}
-          <Link to="/" className="text-primary hover:underline font-medium">
-            Browse listings
-          </Link>
-        </p>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Full Name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="displayName">Full Name</Label>
+              <Input
+                id="displayName"
+                type="text"
+                placeholder="e.g. Ramesh Kumar"
+                value={displayName}
+                onChange={(e) => {
+                  setDisplayName(e.target.value);
+                  setInlineError(null);
+                }}
+                disabled={signUpMutation.isPending}
+                autoComplete="name"
+                required
+              />
+            </div>
+
+            {/* Mobile Number */}
+            <div className="space-y-1.5">
+              <Label htmlFor="mobileNumber">Mobile Number</Label>
+              <Input
+                id="mobileNumber"
+                type="tel"
+                placeholder="e.g. 9876543210"
+                value={mobileNumber}
+                onChange={(e) => {
+                  setMobileNumber(e.target.value);
+                  setInlineError(null);
+                }}
+                disabled={signUpMutation.isPending}
+                autoComplete="tel"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your 10-digit mobile number (digits only).
+              </p>
+            </div>
+
+            {/* Inline error message — shows actual backend/network error text */}
+            {inlineError && (
+              <div className="flex items-start gap-2 rounded-lg bg-destructive/10 border border-destructive/30 px-4 py-3 text-sm text-destructive">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{inlineError}</span>
+              </div>
+            )}
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={signUpMutation.isPending || !identity}
+            >
+              {signUpMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Account…
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          </form>
+
+          {/* Login link */}
+          <p className="mt-5 text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/" })}
+              className="text-primary font-medium hover:underline"
+            >
+              Go to Home
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

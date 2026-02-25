@@ -49,6 +49,7 @@ export const Listing = IDL.Record({
 });
 export const UserProfile = IDL.Record({
   'bio' : IDL.Text,
+  'lastLoginTime' : IDL.Int,
   'contactInfo' : IDL.Opt(IDL.Text),
   'displayName' : IDL.Text,
   'mobileNumber' : IDL.Opt(IDL.Text),
@@ -85,7 +86,20 @@ export const idlService = IDL.Service({
       [],
     ),
   'deleteListing' : IDL.Func([ListingId], [], []),
+  'deleteListingAdmin' : IDL.Func([ListingId], [IDL.Bool], []),
   'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+  'getAllListingsAdmin' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+  'getAllMobileNumbers' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Text))],
+      ['query'],
+    ),
+  'getAllUsersWithActivity' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Text, IDL.Int))],
+      ['query'],
+    ),
+  'getApprovedListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getConversation' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], ['query']),
@@ -93,16 +107,21 @@ export const idlService = IDL.Service({
   'getMobileNumber' : IDL.Func([], [IDL.Opt(IDL.Text)], ['query']),
   'getMyProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getPendingListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+  'getPendingListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
   'getProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(PublicUserProfile)],
       ['query'],
     ),
+  'getTotalListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
+  'getTotalLoginsCount' : IDL.Func([], [IDL.Nat], ['query']),
+  'getTotalUsersCount' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'listConversations' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
   'rejectListing' : IDL.Func([ListingId], [], []),
@@ -116,7 +135,7 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
-  'signUp' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'signUp' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
   'updateListing' : IDL.Func(
       [
         ListingId,
@@ -179,6 +198,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const UserProfile = IDL.Record({
     'bio' : IDL.Text,
+    'lastLoginTime' : IDL.Int,
     'contactInfo' : IDL.Opt(IDL.Text),
     'displayName' : IDL.Text,
     'mobileNumber' : IDL.Opt(IDL.Text),
@@ -215,7 +235,20 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'deleteListing' : IDL.Func([ListingId], [], []),
+    'deleteListingAdmin' : IDL.Func([ListingId], [IDL.Bool], []),
     'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+    'getAllListingsAdmin' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+    'getAllMobileNumbers' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Text))],
+        ['query'],
+      ),
+    'getAllUsersWithActivity' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Text, IDL.Int))],
+        ['query'],
+      ),
+    'getApprovedListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getConversation' : IDL.Func(
@@ -227,16 +260,21 @@ export const idlFactory = ({ IDL }) => {
     'getMobileNumber' : IDL.Func([], [IDL.Opt(IDL.Text)], ['query']),
     'getMyProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getPendingListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+    'getPendingListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(PublicUserProfile)],
         ['query'],
       ),
+    'getTotalListingsCount' : IDL.Func([], [IDL.Nat], ['query']),
+    'getTotalLoginsCount' : IDL.Func([], [IDL.Nat], ['query']),
+    'getTotalUsersCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'isAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'listConversations' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'rejectListing' : IDL.Func([ListingId], [], []),
@@ -250,7 +288,7 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
-    'signUp' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'signUp' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
     'updateListing' : IDL.Func(
         [
           ListingId,

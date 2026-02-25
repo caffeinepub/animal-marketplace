@@ -1,256 +1,585 @@
-import { useGetPendingListings, useApproveListing, useRejectListing } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { type Listing, AnimalCategory } from '../backend';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle, XCircle, Clock, MapPin, Tag, User, Crown, ShieldAlert } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import {
+  useGetAllListingsAdmin,
+  useGetAllMobileNumbers,
+  useGetAllUsersWithActivity,
+  useGetTotalLoginsCount,
+  useGetPendingListings,
+  useApproveListing,
+  useRejectListing,
+  useDeleteListingAdmin,
+  useGetTotalListingsCount,
+  useGetPendingListingsCount,
+  useGetApprovedListingsCount,
+  useGetTotalUsersCount,
+} from "../hooks/useQueries";
+import { ListingStatus } from "../backend";
+import { Principal } from "@dfinity/principal";
+import {
+  ShieldCheck,
+  Users,
+  ListChecks,
+  Clock,
+  CheckCircle,
+  Trash2,
+  ThumbsUp,
+  ThumbsDown,
+  BarChart3,
+  Phone,
+  LogIn,
+  Activity,
+  CalendarClock,
+  Tag,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const CATEGORY_LABELS: Record<AnimalCategory, string> = {
-  [AnimalCategory.dog]: '🐕 Dog',
-  [AnimalCategory.cat]: '🐈 Cat',
-  [AnimalCategory.bird]: '🦜 Bird',
-  [AnimalCategory.fish]: '🐟 Fish',
-  [AnimalCategory.reptile]: '🦎 Reptile',
-  [AnimalCategory.smallAnimal]: '🐹 Small Animal',
-  [AnimalCategory.other]: '🐾 Other',
-  [AnimalCategory.cow]: '🐄 Cow',
-  [AnimalCategory.buffalo]: '🐃 Buffalo',
-  [AnimalCategory.goat]: '🐐 Goat',
-  [AnimalCategory.sheep]: '🐑 Sheep',
-};
-
-function formatPrincipal(principal: { toString(): string }): string {
-  const str = principal.toString();
-  if (str.length <= 16) return str;
-  return `${str.slice(0, 8)}...${str.slice(-6)}`;
-}
-
-function PendingListingCard({ listing }: { listing: Listing }) {
-  const { mutateAsync: approve, isPending: isApproving } = useApproveListing();
-  const { mutateAsync: reject, isPending: isRejecting } = useRejectListing();
-  const isActing = isApproving || isRejecting;
-
-  const handleApprove = async () => {
-    try {
-      await approve(listing.id);
-      toast.success(`"${listing.title}" has been approved and is now live.`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to approve listing.';
-      toast.error(message);
-    }
-  };
-
-  const handleReject = async () => {
-    try {
-      await reject(listing.id);
-      toast.success(`"${listing.title}" has been rejected.`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to reject listing.';
-      toast.error(message);
-    }
-  };
-
-  const firstPhoto = listing.photoUrls[0];
-
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  color: string;
+}) {
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {/* Photo */}
-      <div className="relative aspect-video bg-muted overflow-hidden">
-        {firstPhoto ? (
-          <img
-            src={firstPhoto}
-            alt={listing.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
-            <Tag className="w-12 h-12" />
-          </div>
-        )}
-        {listing.isVip && (
-          <div className="absolute top-2 left-2 flex items-center gap-1 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            <Crown className="w-3 h-3" />
-            VIP
-          </div>
-        )}
-        <div className="absolute top-2 right-2">
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs font-semibold">
-            <Clock className="w-3 h-3 mr-1" />
-            Pending
-          </Badge>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        <div>
-          <h3 className="font-semibold text-foreground text-base leading-tight line-clamp-2">
-            {listing.title}
-          </h3>
-          <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{listing.description}</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Tag className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{CATEGORY_LABELS[listing.category]}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{listing.location}</span>
-          </div>
-          <div className="flex items-center gap-1.5 font-semibold text-primary col-span-2">
-            <span className="text-base">₹{listing.price.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
-          <User className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-mono truncate">{formatPrincipal(listing.owner)}</span>
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Submitted: {new Date(Number(listing.timestamp) / 1_000_000).toLocaleString()}
-        </p>
-
-        {/* Actions */}
-        <div className="flex gap-2 pt-1">
-          <Button
-            onClick={handleApprove}
-            disabled={isActing}
-            className="flex-1 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
-            size="sm"
-          >
-            {isApproving ? (
-              <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            Approve
-          </Button>
-          <Button
-            onClick={handleReject}
-            disabled={isActing}
-            variant="destructive"
-            className="flex-1 gap-2"
-            size="sm"
-          >
-            {isRejecting ? (
-              <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-            ) : (
-              <XCircle className="w-4 h-4" />
-            )}
-            Reject
-          </Button>
-        </div>
+    <div className="bg-white rounded-xl border border-border p-5 flex items-center gap-4 shadow-card">
+      <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
+      <div>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
       </div>
     </div>
   );
 }
 
-export default function AdminDashboardPage() {
-  const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
-  const { data: pendingListings, isLoading, isError } = useGetPendingListings();
-
-  if (!isAuthenticated) {
+function StatusBadge({ status }: { status: ListingStatus }) {
+  if (status === ListingStatus.approved) {
     return (
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
-        <ShieldAlert className="w-16 h-16 text-muted-foreground/30 mb-4" />
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Admin Access Required
-        </h2>
-        <p className="text-muted-foreground max-w-sm">
-          You must be logged in as an admin to access this page.
-        </p>
-      </div>
+      <Badge className="bg-green-100 text-green-700 border-green-200">
+        Approved
+      </Badge>
     );
   }
+  if (status === ListingStatus.rejected) {
+    return (
+      <Badge className="bg-red-100 text-red-700 border-red-200">
+        Rejected
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+      Pending
+    </Badge>
+  );
+}
+
+function formatLastLogin(timestampNs: bigint): string {
+  const ms = Number(timestampNs) / 1_000_000;
+  if (ms === 0) return "Never";
+  try {
+    return new Date(ms).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "Unknown";
+  }
+}
+
+function truncatePrincipal(principal: Principal): string {
+  const str = principal.toString();
+  if (str.length <= 16) return str;
+  return `${str.slice(0, 8)}...${str.slice(-4)}`;
+}
+
+export default function AdminDashboardPage() {
+  const { data: allListings = [], isLoading: listingsLoading } =
+    useGetAllListingsAdmin();
+  const { data: mobileNumbers = [], isLoading: mobileLoading } =
+    useGetAllMobileNumbers();
+  const { data: usersWithActivity = [], isLoading: activityLoading } =
+    useGetAllUsersWithActivity();
+  const { data: totalLogins = BigInt(0) } = useGetTotalLoginsCount();
+  const { data: pendingListings = [], isLoading: pendingLoading } =
+    useGetPendingListings();
+  const { data: totalListingsCount = BigInt(0) } = useGetTotalListingsCount();
+  const { data: pendingCount = BigInt(0) } = useGetPendingListingsCount();
+  const { data: approvedCount = BigInt(0) } = useGetApprovedListingsCount();
+  const { data: totalUsersCount = BigInt(0) } = useGetTotalUsersCount();
+
+  const approveMutation = useApproveListing();
+  const rejectMutation = useRejectListing();
+  const deleteMutation = useDeleteListingAdmin();
+
+  // Build a map of principal -> mobile number for cross-referencing
+  const mobileMap = new Map<string, string>(
+    mobileNumbers.map(([p, m]) => [p.toString(), m])
+  );
+
+  const [activeTab, setActiveTab] = useState<
+    "stats" | "pending" | "all" | "users" | "activity"
+  >("stats");
+
+  const tabs = [
+    { id: "stats" as const, label: "App Statistics", icon: <BarChart3 size={16} /> },
+    {
+      id: "pending" as const,
+      label: `Pending (${Number(pendingCount)})`,
+      icon: <Clock size={16} />,
+    },
+    {
+      id: "all" as const,
+      label: `All Listings (${Number(totalListingsCount)})`,
+      icon: <ListChecks size={16} />,
+    },
+    {
+      id: "users" as const,
+      label: `Registered Users (${Number(totalUsersCount)})`,
+      icon: <Users size={16} />,
+    },
+    {
+      id: "activity" as const,
+      label: `User Activity (${usersWithActivity.length})`,
+      icon: <Activity size={16} />,
+    },
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <ShieldAlert className="w-5 h-5 text-primary" />
-          </div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Admin Dashboard</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <ShieldCheck size={28} className="text-primary" />
         </div>
-        <p className="text-muted-foreground">
-          Review and moderate new listings before they go live on Pashu Mandi.
-        </p>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="bg-primary/5 border border-primary/20 rounded-xl px-5 py-4 mb-8 flex items-center gap-3">
-        <Clock className="w-5 h-5 text-primary shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-foreground">
-            {isLoading
-              ? 'Loading pending listings...'
-              : `${pendingListings?.length ?? 0} listing${(pendingListings?.length ?? 0) !== 1 ? 's' : ''} awaiting review`}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Approve to make a listing public, or reject to remove it from the queue.
+          <h1 className="text-2xl font-display font-bold text-foreground">
+            Admin Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Manage listings, users, and platform statistics
           </p>
         </div>
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-card border border-border rounded-xl overflow-hidden">
-              <Skeleton className="aspect-video w-full" />
-              <div className="p-4 space-y-3">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-9 flex-1" />
-                  <Skeleton className="h-9 flex-1" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === tab.id
+                ? "bg-primary text-white"
+                : "bg-white border border-border text-foreground hover:bg-primary/10 hover:text-primary"
+            }`}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Error State */}
-      {isError && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <ShieldAlert className="w-12 h-12 text-destructive/50 mb-4" />
-          <h3 className="font-semibold text-foreground mb-1">Access Denied</h3>
-          <p className="text-muted-foreground text-sm max-w-sm">
-            You don't have permission to view pending listings. This page is only accessible to the admin.
-          </p>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !isError && pendingListings?.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+      {/* App Statistics Tab */}
+      {activeTab === "stats" && (
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Platform Overview
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <StatCard
+              icon={<ListChecks size={22} className="text-blue-600" />}
+              label="Total Listings"
+              value={Number(totalListingsCount)}
+              color="bg-blue-50"
+            />
+            <StatCard
+              icon={<Tag size={22} className="text-indigo-600" />}
+              label="Total Ads Posted"
+              value={allListings.length}
+              color="bg-indigo-50"
+            />
+            <StatCard
+              icon={<Clock size={22} className="text-yellow-600" />}
+              label="Pending"
+              value={Number(pendingCount)}
+              color="bg-yellow-50"
+            />
+            <StatCard
+              icon={<CheckCircle size={22} className="text-green-600" />}
+              label="Approved"
+              value={Number(approvedCount)}
+              color="bg-green-50"
+            />
+            <StatCard
+              icon={<Users size={22} className="text-purple-600" />}
+              label="Total Users"
+              value={Number(totalUsersCount)}
+              color="bg-purple-50"
+            />
+            <StatCard
+              icon={<LogIn size={22} className="text-primary" />}
+              label="Total Successful Logins"
+              value={Number(totalLogins)}
+              color="bg-primary/10"
+            />
           </div>
-          <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-            All caught up!
-          </h3>
-          <p className="text-muted-foreground max-w-sm">
-            No pending listings to review. New submissions will appear here for your approval.
-          </p>
         </div>
       )}
 
-      {/* Listings Grid */}
-      {!isLoading && !isError && pendingListings && pendingListings.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pendingListings.map((listing) => (
-            <PendingListingCard key={listing.id.toString()} listing={listing} />
-          ))}
+      {/* Pending Listings Tab */}
+      {activeTab === "pending" && (
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Pending Listings
+          </h2>
+          {pendingLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-48 rounded-xl" />
+              ))}
+            </div>
+          ) : pendingListings.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Clock size={48} className="mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No pending listings</p>
+              <p className="text-sm">All listings have been reviewed.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pendingListings.map((listing) => (
+                <div
+                  key={listing.id.toString()}
+                  className="bg-white rounded-xl border border-border p-4 shadow-card"
+                >
+                  {listing.photoUrls.length > 0 && (
+                    <img
+                      src={listing.photoUrls[0]}
+                      alt={listing.title}
+                      className="w-full h-36 object-cover rounded-lg mb-3"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )}
+                  <h3 className="font-semibold text-foreground truncate">
+                    {listing.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground truncate mb-1">
+                    {listing.location}
+                  </p>
+                  <p className="text-primary font-bold mb-3">
+                    ₹{Number(listing.price).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3 break-all">
+                    Owner: {listing.owner.toString().slice(0, 20)}...
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => approveMutation.mutate(listing.id)}
+                      disabled={
+                        approveMutation.isPending &&
+                        approveMutation.variables === listing.id
+                      }
+                    >
+                      <ThumbsUp size={14} className="mr-1" />
+                      {approveMutation.isPending &&
+                      approveMutation.variables === listing.id
+                        ? "Approving..."
+                        : "Approve"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="flex-1"
+                      onClick={() => rejectMutation.mutate(listing.id)}
+                      disabled={
+                        rejectMutation.isPending &&
+                        rejectMutation.variables === listing.id
+                      }
+                    >
+                      <ThumbsDown size={14} className="mr-1" />
+                      {rejectMutation.isPending &&
+                      rejectMutation.variables === listing.id
+                        ? "Rejecting..."
+                        : "Reject"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* All Listings Tab */}
+      {activeTab === "all" && (
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            All Listings Management
+          </h2>
+          {listingsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="h-48 rounded-xl" />
+              ))}
+            </div>
+          ) : allListings.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <ListChecks size={48} className="mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No listings found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allListings.map((listing) => (
+                <div
+                  key={listing.id.toString()}
+                  className="bg-white rounded-xl border border-border p-4 shadow-card"
+                >
+                  {listing.photoUrls.length > 0 && (
+                    <img
+                      src={listing.photoUrls[0]}
+                      alt={listing.title}
+                      className="w-full h-36 object-cover rounded-lg mb-3"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-semibold text-foreground truncate flex-1 mr-2">
+                      {listing.title}
+                    </h3>
+                    <StatusBadge status={listing.status} />
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate mb-1">
+                    {listing.location}
+                  </p>
+                  <p className="text-primary font-bold mb-2">
+                    ₹{Number(listing.price).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3 break-all">
+                    Owner: {listing.owner.toString().slice(0, 20)}...
+                  </p>
+                  <div className="flex gap-2">
+                    {listing.status !== ListingStatus.approved && (
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => approveMutation.mutate(listing.id)}
+                        disabled={approveMutation.isPending}
+                      >
+                        <ThumbsUp size={14} className="mr-1" />
+                        Approve
+                      </Button>
+                    )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="flex-1"
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 size={14} className="mr-1" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Listing?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete "{listing.title}". This
+                            action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-white hover:bg-destructive/90"
+                            onClick={() => deleteMutation.mutate(listing.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Registered Users Tab (Mobile Numbers) */}
+      {activeTab === "users" && (
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Registered Users — Mobile Numbers
+          </h2>
+          {mobileLoading ? (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-14 rounded-xl" />
+              ))}
+            </div>
+          ) : mobileNumbers.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Users size={48} className="mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No registered users with mobile numbers</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-border overflow-hidden shadow-card">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      #
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      Principal ID
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      <div className="flex items-center gap-1">
+                        <Phone size={14} />
+                        Mobile Number
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mobileNumbers.map(([principal, mobile], index) => (
+                    <tr
+                      key={principal.toString()}
+                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {index + 1}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground break-all max-w-xs">
+                        {principal.toString()}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {mobile}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* User Activity Tab */}
+      {activeTab === "activity" && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-foreground">
+              User Activity — Login Tracking
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 border border-primary/20 rounded-lg px-3 py-1.5">
+              <Activity size={14} className="text-primary" />
+              <span>{usersWithActivity.length} users tracked</span>
+            </div>
+          </div>
+
+          {activityLoading ? (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-14 rounded-xl" />
+              ))}
+            </div>
+          ) : usersWithActivity.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Activity size={48} className="mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No user activity data yet</p>
+              <p className="text-sm">Activity will appear once users log in.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-border overflow-x-auto shadow-card">
+              <table className="w-full text-sm min-w-[600px]">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      #
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      Principal ID
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      <div className="flex items-center gap-1">
+                        <Users size={14} />
+                        Name
+                      </div>
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      <div className="flex items-center gap-1">
+                        <Phone size={14} />
+                        Mobile Number
+                      </div>
+                    </th>
+                    <th className="text-left px-4 py-3 font-semibold text-foreground">
+                      <div className="flex items-center gap-1">
+                        <CalendarClock size={14} />
+                        Last Login
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {usersWithActivity.map(([principal, displayName, lastLoginTime], index) => {
+                    const principalStr = principal.toString();
+                    const mobile = mobileMap.get(principalStr) ?? "—";
+                    return (
+                      <tr
+                        key={principalStr}
+                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                      >
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {index + 1}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                          {truncatePrincipal(principal)}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-foreground">
+                          {displayName || "—"}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-foreground">
+                          {mobile}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {formatLastLogin(lastLoginTime)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

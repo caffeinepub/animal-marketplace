@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import {
   useGetCallerUserProfile,
@@ -24,15 +23,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, Edit3, LogIn, Plus, PowerOff } from 'lucide-react';
+import { User, Edit3, LogIn, Plus, PowerOff, LayoutDashboard } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
 import { type Listing } from '../backend';
 
-export default function ProfilePage() {
+export default function UserDashboardPage() {
   const { identity, login, isLoggingIn } = useInternetIdentity();
   const isAuthenticated = !!identity;
-  const navigate = useNavigate();
 
   const { data: profile, isLoading: profileLoading } = useGetCallerUserProfile();
   const { data: allListings = [], isLoading: listingsLoading } = useGetListings();
@@ -90,15 +88,12 @@ export default function ProfilePage() {
     }
   };
 
-  // Suppress unused variable warning for navigate (kept for potential future use)
-  void navigate;
-
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
         <User className="w-16 h-16 text-muted-foreground/30 mb-4" />
         <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Sign in to view your profile
+          Sign in to view your dashboard
         </h2>
         <p className="text-muted-foreground mb-6 max-w-sm">
           Log in to manage your profile and listings.
@@ -116,13 +111,34 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="font-display text-3xl font-bold text-foreground mb-8">My Profile</h1>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Page Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <LayoutDashboard className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="font-display text-2xl font-bold text-foreground">
+              {profileLoading ? (
+                <Skeleton className="h-7 w-48 inline-block" />
+              ) : (
+                <>Welcome back, {profile?.displayName ?? 'there'}!</>
+              )}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Manage your profile and listings from here.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Card */}
+        {/* My Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-card border border-border rounded-xl p-6">
+            <h2 className="font-display font-semibold text-foreground text-lg mb-4">My Profile</h2>
+
             {profileLoading ? (
               <div className="space-y-4">
                 <Skeleton className="w-20 h-20 rounded-full mx-auto" />
@@ -132,7 +148,6 @@ export default function ProfilePage() {
               </div>
             ) : isEditing ? (
               <form onSubmit={handleSaveProfile} className="space-y-4">
-                <h2 className="font-semibold text-foreground">Edit Profile</h2>
                 <div className="space-y-2">
                   <Label htmlFor="editName">
                     Display Name <span className="text-destructive">*</span>
@@ -179,9 +194,9 @@ export default function ProfilePage() {
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl mx-auto mb-4">
                   {profile?.displayName?.charAt(0)?.toUpperCase() ?? <User className="w-8 h-8" />}
                 </div>
-                <h2 className="font-display font-bold text-xl text-foreground">
+                <h3 className="font-display font-bold text-xl text-foreground">
                   {profile?.displayName ?? 'Anonymous'}
-                </h2>
+                </h3>
                 {profile?.bio && (
                   <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
                     {profile.bio}
@@ -209,20 +224,31 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Principal ID */}
-          <div className="bg-muted/50 border border-border rounded-xl p-4 mt-4">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Your Principal ID</p>
-            <p className="text-xs text-foreground font-mono break-all">
-              {myPrincipal}
+          {/* Quick Links */}
+          <div className="bg-card border border-border rounded-xl p-4 mt-4 space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              Quick Actions
             </p>
+            <Link to="/post-ad" className="block">
+              <Button variant="outline" size="sm" className="w-full gap-2 justify-start">
+                <Plus className="w-4 h-4" />
+                Post a New Ad
+              </Button>
+            </Link>
+            <Link to="/messages" className="block">
+              <Button variant="outline" size="sm" className="w-full gap-2 justify-start">
+                <User className="w-4 h-4" />
+                My Messages
+              </Button>
+            </Link>
           </div>
         </div>
 
-        {/* My Listings */}
+        {/* My Ads Section */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-xl font-semibold text-foreground">
-              My Active Listings
+              My Ads
             </h2>
             <Link to="/post-ad">
               <Button size="sm" className="gap-2">
@@ -246,7 +272,10 @@ export default function ProfilePage() {
             </div>
           ) : myListings.length === 0 ? (
             <div className="bg-card border border-border rounded-xl p-10 text-center">
-              <p className="text-muted-foreground mb-4">You have no active listings.</p>
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <p className="text-muted-foreground mb-4">You have no active listings yet.</p>
               <Link to="/post-ad">
                 <Button className="gap-2">
                   <Plus className="w-4 h-4" />

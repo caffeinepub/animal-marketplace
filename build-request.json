@@ -1,39 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Add dark overlay to header background image for text legibility",
+  "title": "Fix /tracker route guard and add ADMIN PANEL side menu button for owner principal",
   "projectName": "Pashu Mandi",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-52",
-      "text": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
+      "id": "REQ-120",
+      "text": "In frontend/src/App.tsx, fix the CattleTrackerRouteGuard for the '/tracker' route so that it correctly grants access to the authenticated user whose principal string is 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The guard must: (1) while authentication state is still loading, render a loading spinner and NOT redirect; (2) only redirect to '/' when loading is complete AND the authenticated principal does NOT match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) use the principal string obtained directly from the Internet Identity context (e.g. identity?.getPrincipal().toText()) for comparison — do not rely on any async backend query that may not have resolved yet. Ensure the comparison trims whitespace and is an exact string match.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "add a dark overlay to the header image so the text 'Pashu Mandi' is easily readable"
+          "I have logged in with my ID rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe, but the /tracker route is still redirecting me to the Home page."
         ]
       },
       "acceptanceCriteria": [
-        "A dark semi-transparent overlay (e.g. bg-black/50 or darker) is applied over the header background image in Layout.tsx.",
-        "The 'Pashu Mandi' brand text is clearly legible (high contrast white text) against the overlaid header image.",
-        "All navigation links in the header remain clearly readable over the overlay.",
-        "The header layout, height, logo, navigation links, and all other structural elements are unchanged.",
-        "The overlay does not obscure interactive elements (links, buttons remain clickable)."
+        "Navigating to /tracker while authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' renders CattleTrackerPage without any redirect.",
+        "While the authentication state is still loading (isAuthenticating), a loading spinner is shown and no redirect occurs.",
+        "Any other authenticated principal navigating to /tracker is redirected to '/'.",
+        "Unauthenticated visitors navigating to /tracker are redirected to '/'."
+      ]
+    },
+    {
+      "id": "REQ-121",
+      "text": "In frontend/src/hooks/useQueries.ts (or the equivalent utility hook file), fix the useIsCattleTrackerUser() hook to derive the owner principal check synchronously from the Internet Identity context rather than from an async backend query. The hook must: (1) read the principal string directly from the identity object (e.g. identity?.getPrincipal().toText()); (2) return true immediately when the principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) return false while loading or unauthenticated; (4) never throw or surface errors to the UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "the /tracker route is still redirecting me to the Home page"
+        ]
+      },
+      "acceptanceCriteria": [
+        "useIsCattleTrackerUser() returns true synchronously once the identity for principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' is available.",
+        "useIsCattleTrackerUser() returns false for any other principal.",
+        "useIsCattleTrackerUser() returns false while authentication is loading.",
+        "No error is thrown or displayed in the UI when the caller is not the owner principal."
+      ]
+    },
+    {
+      "id": "REQ-122",
+      "text": "In frontend/src/components/Layout.tsx, add a prominently styled navigation button labelled 'ADMIN PANEL' at the very top of the mobile/side menu. This button must route to '/tracker' (the Cattle Tracker page). It must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not an async backend query). While authentication state is loading, treat the button as hidden. Position it above all other side menu items. Style it with a bold, attention-grabbing appearance consistent with the Professional Blue theme (e.g., a filled Professional Blue button with white bold text labelled 'ADMIN PANEL').",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Navigation Link: Add a clear, visible button labeled 'ADMIN PANEL' at the top of my side menu immediately."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', the 'ADMIN PANEL' button appears at the very top of the side/mobile menu.",
+        "Clicking 'ADMIN PANEL' navigates to '/tracker'.",
+        "The 'ADMIN PANEL' button is completely absent from the DOM for all other authenticated users and unauthenticated visitors.",
+        "The button is styled with Professional Blue background and white bold text, visually distinct and prominent."
       ]
     }
   ],
   "constraints": [
-    "Do not change the header background image asset (frontend/public/assets/generated/header-bg.dim_1200x300.png).",
-    "Do not alter the header layout, height, logo, or navigation link structure.",
-    "frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and frontend/src/components/ui are read-only and must not be modified."
+    "Do not modify any files listed in frontend.immutablePaths.",
+    "The principal comparison must use the principal string directly from the identity context — do not rely solely on async backend queries that may not resolve before the route guard runs.",
+    "The 'ADMIN PANEL' button must route to '/tracker', not '/admin', as the Cattle Tracker page is the privileged view for this owner principal."
   ],
   "nonGoals": [
-    "Replacing or regenerating the header background image.",
-    "Changing any other page styles or components outside of Layout.tsx.",
-    "Modifying backend logic."
+    "Exposing raw mobile numbers or pending ads data directly in the chat UI.",
+    "Creating any new backend functions for this fix.",
+    "Changing the CattleTrackerPage content or layout.",
+    "Modifying the admin principal or admin dashboard access logic."
   ],
   "imageRequirements": {
     "required": [],

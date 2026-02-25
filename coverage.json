@@ -1,18 +1,40 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T14:42:29.682Z",
+  "generatedAt": "2026-02-25T18:55:17.060Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-52",
-        "summary": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
+        "id": "REQ-120",
+        "summary": "In frontend/src/App.tsx, fix the CattleTrackerRouteGuard for the '/tracker' route so that it correctly grants access to the authenticated user whose principal string is 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The guard must: (1) while authentication state is still loading, render a loading spinner and NOT redirect; (2) only redirect to '/' when loading is complete AND the authenticated principal does NOT match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) use the principal string obtained directly from the Internet Identity context (e.g. identity?.getPrincipal().toText()) for comparison — do not rely on any async backend query that may not have resolved yet. Ensure the comparison trims whitespace and is an exact string match.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-121",
+        "summary": "In frontend/src/hooks/useQueries.ts (or the equivalent utility hook file), fix the useIsCattleTrackerUser() hook to derive the owner principal check synchronously from the Internet Identity context rather than from an async backend query. The hook must: (1) read the principal string directly from the identity object (e.g. identity?.getPrincipal().toText()); (2) return true immediately when the principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) return false while loading or unauthenticated; (4) never throw or surface errors to the UI.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-122",
+        "summary": "In frontend/src/components/Layout.tsx, add a prominently styled navigation button labelled 'ADMIN PANEL' at the very top of the mobile/side menu. This button must route to '/tracker' (the Cattle Tracker page). It must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not an async backend query). While authentication state is loading, treat the button as hidden. Position it above all other side menu items. Style it with a bold, attention-grabbing appearance consistent with the Professional Blue theme (e.g., a filled Professional Blue button with white bold text labelled 'ADMIN PANEL').",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/Layout.tsx"
@@ -28,12 +50,12 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/components/ChatThread.tsx",
     "frontend/src/components/Layout.tsx",
-    "frontend/src/components/PhotoGallery.tsx",
-    "frontend/src/pages/AdminDashboardPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PostAdPage.tsx",
-    "frontend/src/pages/TermsPage.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/ListingDetailPage.tsx",
+    "frontend/src/pages/MessagesPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

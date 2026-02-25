@@ -4,10 +4,10 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import PhotoGallery from '../components/PhotoGallery';
 import { CATEGORY_LABELS, CATEGORY_COLORS, formatPrice } from '../components/ListingCard';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, Calendar, MessageCircle, User, ArrowLeft, Tag } from 'lucide-react';
+import { MapPin, Calendar, MessageCircle, User, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Principal } from '@dfinity/principal';
 
 export default function ListingDetailPage() {
   const { id } = useParams({ from: '/listing/$id' });
@@ -17,7 +17,18 @@ export default function ListingDetailPage() {
 
   const { data: listing, isLoading, error } = useGetListing(id);
   const ownerPrincipal = listing?.owner?.toString();
-  const { data: sellerProfile } = useGetProfile(ownerPrincipal);
+
+  // Convert owner string to Principal object for useGetProfile
+  const ownerPrincipalObj = (() => {
+    if (!ownerPrincipal) return undefined;
+    try {
+      return Principal.fromText(ownerPrincipal);
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const { data: sellerProfile } = useGetProfile(ownerPrincipalObj);
 
   const handleContactSeller = () => {
     if (!isAuthenticated) {

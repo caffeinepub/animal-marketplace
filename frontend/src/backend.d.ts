@@ -37,6 +37,7 @@ export interface Message {
 }
 export interface UserProfile {
     bio: string;
+    lastLoginTime: bigint;
     contactInfo?: string;
     displayName: string;
     mobileNumber?: string;
@@ -70,7 +71,12 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createListing(title: string, description: string, price: bigint, category: AnimalCategory, location: string, photoUrls: Array<string>, isVip: boolean): Promise<ListingId>;
     deleteListing(listingId: ListingId): Promise<void>;
+    deleteListingAdmin(listingId: ListingId): Promise<boolean>;
     getAllListings(): Promise<Array<Listing>>;
+    getAllListingsAdmin(): Promise<Array<Listing>>;
+    getAllMobileNumbers(): Promise<Array<[Principal, string]>>;
+    getAllUsersWithActivity(): Promise<Array<[Principal, string, bigint]>>;
+    getApprovedListingsCount(): Promise<bigint>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getConversation(other: Principal): Promise<Array<Message>>;
@@ -78,14 +84,19 @@ export interface backendInterface {
     getMobileNumber(): Promise<string | null>;
     getMyProfile(): Promise<UserProfile | null>;
     getPendingListings(): Promise<Array<Listing>>;
+    getPendingListingsCount(): Promise<bigint>;
     getProfile(principal: Principal): Promise<PublicUserProfile | null>;
+    getTotalListingsCount(): Promise<bigint>;
+    getTotalLoginsCount(): Promise<bigint>;
+    getTotalUsersCount(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isAdmin(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     listConversations(): Promise<Array<Principal>>;
     rejectListing(listingId: ListingId): Promise<void>;
     saveCallerUserProfile(displayName: string, bio: string, contactInfo: string | null, mobileNumber: string | null): Promise<void>;
     sendMessage(recipient: Principal, listingId: ListingId | null, text: string): Promise<void>;
-    signUp(displayName: string, mobileNumber: string): Promise<void>;
+    signUp(displayName: string, mobileNumber: string): Promise<string>;
     updateListing(listingId: ListingId, title: string, description: string, price: bigint, category: AnimalCategory, location: string, photoUrls: Array<string>, isActive: boolean, isVip: boolean): Promise<void>;
     upsertProfile(displayName: string, bio: string, contactInfo: string | null): Promise<void>;
 }

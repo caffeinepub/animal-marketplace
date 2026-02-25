@@ -3,11 +3,11 @@ import { useGetConversation, useSendMessage, useGetProfile } from '../hooks/useQ
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Send, MessageCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Principal } from '@dfinity/principal';
 
 interface ChatThreadProps {
   recipientPrincipal: string;
@@ -36,8 +36,17 @@ export default function ChatThread({ recipientPrincipal, listingId }: ChatThread
   const scrollRef = useRef<HTMLDivElement>(null);
   const myPrincipal = identity?.getPrincipal().toString();
 
-  const { data: messages = [], isLoading } = useGetConversation(recipientPrincipal);
-  const { data: recipientProfile } = useGetProfile(recipientPrincipal);
+  // Convert string to Principal for hooks that require it
+  const recipientPrincipalObj = (() => {
+    try {
+      return Principal.fromText(recipientPrincipal);
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const { data: messages = [], isLoading } = useGetConversation(recipientPrincipalObj);
+  const { data: recipientProfile } = useGetProfile(recipientPrincipalObj);
   const { mutateAsync: sendMessage, isPending: isSending } = useSendMessage();
 
   // Sort messages by timestamp
@@ -54,11 +63,11 @@ export default function ChatThread({ recipientPrincipal, listingId }: ChatThread
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim() || isSending) return;
+    if (!messageText.trim() || isSending || !recipientPrincipalObj) return;
     try {
       await sendMessage({
-        recipient: recipientPrincipal,
-        listingId,
+        recipient: recipientPrincipalObj,
+        listingId: listingId ?? null,
         text: messageText.trim(),
       });
       setMessageText('');
@@ -68,11 +77,11 @@ export default function ChatThread({ recipientPrincipal, listingId }: ChatThread
   };
 
   const handleQuickReply = async (text: string) => {
-    if (isSending) return;
+    if (isSending || !recipientPrincipalObj) return;
     try {
       await sendMessage({
-        recipient: recipientPrincipal,
-        listingId,
+        recipient: recipientPrincipalObj,
+        listingId: listingId ?? null,
         text,
       });
     } catch {

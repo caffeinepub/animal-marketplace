@@ -1,19 +1,27 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T14:42:29.678Z",
-  "summary": "REQ-52 is fully implemented in frontend/src/components/Layout.tsx. A dark semi-transparent overlay (bg-black/70, which is darker than the required bg-black/50) is applied via an absolutely positioned div with pointer-events-none, ensuring interactive elements remain clickable. The header structure, layout, logo, and navigation links are preserved unchanged. No missing requirements or hallucinated features were identified.",
+  "generatedAt": "2026-02-25T18:55:17.051Z",
+  "summary": "All three requirements (REQ-120, REQ-121, REQ-122) appear to be implemented in the diff. The CattleTrackerRouteGuard in App.tsx uses loginStatus-based loading detection and synchronous principal comparison. useIsCattleTrackerUser() in useQueries.ts reads the principal directly from identity context. Layout.tsx adds the ADMIN PANEL button conditionally based on isCattleTrackerUser. The implementations match the specified requirements.",
   "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.97,
+  "hallucinated_features": [
+    {
+      "description": "ADMIN PANEL button also added to the desktop navigation bar, not just the mobile/side menu",
+      "reason": "REQ-122 specifies the button must be at the very top of the mobile/side menu. The diff shows it was also added to the desktop nav section in Layout.tsx, which was not requested.",
+      "evidence": [
+        "frontend/src/components/Layout.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.82,
   "changed_files": [
     "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/ChatThread.tsx",
     "frontend/src/components/Layout.tsx",
-    "frontend/src/components/PhotoGallery.tsx",
-    "frontend/src/pages/AdminDashboardPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PostAdPage.tsx",
-    "frontend/src/pages/TermsPage.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/ListingDetailPage.tsx",
+    "frontend/src/pages/MessagesPage.tsx",
     "project_state.json"
   ]
 }

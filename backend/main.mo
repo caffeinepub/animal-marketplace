@@ -6,8 +6,10 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
 import Array "mo:core/Array";
+import Char "mo:core/Char";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import Iter "mo:core/Iter";
 
 
 
@@ -44,7 +46,6 @@ actor {
     status : ListingStatus;
   };
 
-  // Public-safe listing type that omits sensitive owner info for anonymous callers
   type PublicListing = {
     id : ListingId;
     owner : Principal;
@@ -74,9 +75,9 @@ actor {
     contactInfo : ?Text;
     registrationTimestamp : Time.Time;
     mobileNumber : ?Text;
+    lastLoginTime : Int;
   };
 
-  // Public profile strips sensitive contact info
   type PublicUserProfile = {
     displayName : Text;
     bio : Text;
@@ -91,8 +92,11 @@ actor {
   let messages = Map.empty<Principal, List.List<Message>>();
 
   var nextListingId : ListingId = 0;
+  var totalLogins : Nat = 0;
 
-  // Listings API
+  public query ({ caller }) func isAdmin() : async Bool {
+    if (AccessControl.isAdmin(accessControlState, caller)) { true } else { false };
+  };
 
   public shared ({ caller }) func createListing(
     title : Text,
@@ -104,7 +108,7 @@ actor {
     isVip : Bool,
   ) : async ListingId {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can create listings");
+      Runtime.trap("Only users can create listings");
     };
 
     let listingId = nextListingId;
@@ -122,7 +126,7 @@ actor {
       timestamp = Time.now();
       isActive = true;
       isVip;
-      status = #pending; // New listings are pending by default
+      status = #pending;
     };
 
     listings.add(listingId, listing);
@@ -131,7 +135,7 @@ actor {
 
   public shared ({ caller }) func approveListing(listingId : ListingId) : async () {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can approve listings");
+      Runtime.trap("Only admin can approve listings");
     };
 
     switch (listings.get(listingId)) {
@@ -145,7 +149,7 @@ actor {
 
   public shared ({ caller }) func rejectListing(listingId : ListingId) : async () {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can reject listings");
+      Runtime.trap("Only admin can reject listings");
     };
 
     switch (listings.get(listingId)) {
@@ -157,11 +161,8 @@ actor {
     };
   };
 
-  // Public query: returns only approved listings, no auth required
   public query func getListings() : async [Listing] {
     let allListings = listings.values().toArray();
-
-    // Filter for approved listings only — pending and rejected must not appear publicly
     let approvedListings = allListings.filter(func(l : Listing) : Bool { l.status == #approved });
 
     let vipListings = approvedListings.filter(func(l : Listing) : Bool { l.isVip });
@@ -178,18 +179,23 @@ actor {
     vipListings.concat(sortedNonVip);
   };
 
-  // Admin-only: returns all pending listings for review
   public query ({ caller }) func getPendingListings() : async [Listing] {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can access pending listings");
+      Runtime.trap("Only admin can access pending listings");
     };
     listings.values().toArray().filter(func(l : Listing) : Bool { l.status == #pending });
   };
 
-  // Admin-only: returns all listings regardless of status
   public query ({ caller }) func getAllListings() : async [Listing] {
     if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can access all listings");
+      Runtime.trap("Only admin can access all listings");
+    };
+    listings.values().toArray();
+  };
+
+  public query ({ caller }) func getAllListingsAdmin() : async [Listing] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access all listings");
     };
     listings.values().toArray();
   };
@@ -206,17 +212,15 @@ actor {
     isVip : Bool,
   ) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can update listings");
+      Runtime.trap("Only users can update listings");
     };
 
     switch (listings.get(listingId)) {
       case (null) { Runtime.trap("Listing not found") };
       case (?existing) {
         if (existing.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Only the owner or an admin can update this listing");
+          Runtime.trap("Only the owner or an admin can update this listing");
         };
-        // When a non-admin owner updates a listing, it goes back to pending for re-review.
-        // Admins updating a listing preserve the current status.
         let newStatus : ListingStatus = if (AccessControl.isAdmin(accessControlState, caller)) {
           existing.status;
         } else {
@@ -243,25 +247,37 @@ actor {
 
   public shared ({ caller }) func deleteListing(listingId : ListingId) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can delete listings");
+      Runtime.trap("Only users can delete listings");
     };
 
     switch (listings.get(listingId)) {
       case (null) { Runtime.trap("Listing not found") };
       case (?existing) {
         if (existing.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Only the owner or an admin can delete this listing");
+          Runtime.trap("Only the owner or an admin can delete this listing");
         };
         listings.remove(listingId);
       };
     };
   };
 
-  // Messaging API
+  public shared ({ caller }) func deleteListingAdmin(listingId : ListingId) : async Bool {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can delete listings");
+    };
+
+    switch (listings.get(listingId)) {
+      case (null) { Runtime.trap("Listing not found") };
+      case (?_) {
+        listings.remove(listingId);
+        true;
+      };
+    };
+  };
 
   public shared ({ caller }) func sendMessage(recipient : Principal, listingId : ?ListingId, text : Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can send messages");
+      Runtime.trap("Only users can send messages");
     };
 
     let newMessage : Message = {
@@ -282,7 +298,7 @@ actor {
 
   public query ({ caller }) func getConversation(other : Principal) : async [Message] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view conversations");
+      Runtime.trap("Only users can view conversations");
     };
 
     let allMessages = List.empty<Message>();
@@ -314,7 +330,7 @@ actor {
 
   public query ({ caller }) func listConversations() : async [Principal] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can list conversations");
+      Runtime.trap("Only users can list conversations");
     };
 
     let partners = List.empty<Principal>();
@@ -335,11 +351,9 @@ actor {
     partners.toArray();
   };
 
-  // User Profile API
-
   public shared ({ caller }) func upsertProfile(displayName : Text, bio : Text, contactInfo : ?Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can create or update profiles");
+      Runtime.trap("Only users can create or update profiles");
     };
 
     let existing = userProfiles.get(caller);
@@ -348,21 +362,29 @@ actor {
       case (?p) { p.registrationTimestamp };
     };
 
+    let now = Time.now();
+
     let profile : UserProfile = {
       displayName;
       bio;
       contactInfo;
       registrationTimestamp;
+      lastLoginTime = now;
       mobileNumber = switch (existing) { case (null) { null }; case (?p) { p.mobileNumber } };
     };
 
     userProfiles.add(caller, profile);
   };
 
-  // signUp is intentionally open to any caller (including guests/anonymous)
-  // so new users can register themselves
-  public shared ({ caller }) func signUp(displayName : Text, mobileNumber : Text) : async () {
+  public shared ({ caller }) func signUp(displayName : Text, mobileNumber : Text) : async Text {
+    let cleanedNumber = cleanNumber(mobileNumber);
+
+    if (not isValid(cleanedNumber)) {
+      Runtime.trap("Invalid mobile number given");
+    };
+
     let existing = userProfiles.get(caller);
+    let now = Time.now();
 
     let profile : UserProfile = switch (existing) {
       case (null) {
@@ -370,8 +392,9 @@ actor {
           displayName;
           bio = "";
           contactInfo = null;
-          registrationTimestamp = Time.now();
-          mobileNumber = ?mobileNumber;
+          registrationTimestamp = now;
+          lastLoginTime = now;
+          mobileNumber = ?cleanedNumber;
         };
       };
       case (?p) {
@@ -380,18 +403,32 @@ actor {
           bio = p.bio;
           contactInfo = p.contactInfo;
           registrationTimestamp = p.registrationTimestamp;
-          mobileNumber = ?mobileNumber;
+          lastLoginTime = now;
+          mobileNumber = ?cleanedNumber;
         };
       };
     };
 
     userProfiles.add(caller, profile);
+
+    "Success";
   };
 
-  // Only the authenticated user can retrieve their own mobile number
+  func isValid(number : Text) : Bool {
+    number.size() >= 10;
+  };
+
+  func cleanNumber(number : Text) : Text {
+    number.toArray().filter(
+      func(c) {
+        c >= '0' and c <= '9';
+      }
+    ).toText();
+  };
+
   public query ({ caller }) func getMobileNumber() : async ?Text {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can get their own mobile number");
+      Runtime.trap("Only users can get their own mobile number");
     };
     switch (userProfiles.get(caller)) {
       case (null) { null };
@@ -399,11 +436,7 @@ actor {
     };
   };
 
-  // Public profile lookup — strips sensitive fields (contactInfo, mobileNumber)
-  // so anonymous callers cannot harvest private contact data
   public query ({ caller }) func getProfile(principal : Principal) : async ?PublicUserProfile {
-    // If the caller is the profile owner or an admin, they may see the full profile via getMyProfile/getUserProfile.
-    // This endpoint intentionally returns only the public subset.
     switch (userProfiles.get(principal)) {
       case (null) { null };
       case (?profile) {
@@ -418,21 +451,21 @@ actor {
 
   public query ({ caller }) func getMyProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view their own profile");
+      Runtime.trap("Only users can view their own profile");
     };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view their profile");
+      Runtime.trap("Only users can view their profile");
     };
     userProfiles.get(caller);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(displayName : Text, bio : Text, contactInfo : ?Text, mobileNumber : ?Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
+      Runtime.trap("Only users can save profiles");
     };
 
     let existing = userProfiles.get(caller);
@@ -441,22 +474,86 @@ actor {
       case (?p) { p.registrationTimestamp };
     };
 
+    let now = Time.now();
+
     let profile : UserProfile = {
       displayName;
       bio;
       contactInfo;
       registrationTimestamp;
+      lastLoginTime = now;
       mobileNumber;
     };
 
     userProfiles.add(caller, profile);
   };
 
-  // Full profile visible only to the owner or an admin
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
+      Runtime.trap("Can only view your own profile");
     };
     userProfiles.get(user);
+  };
+
+  public query ({ caller }) func getTotalListingsCount() : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access total listings count");
+    };
+    listings.size();
+  };
+
+  public query ({ caller }) func getPendingListingsCount() : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access pending listings count");
+    };
+    let allListings = listings.values().toArray();
+    let pendingListings = allListings.filter(func(l : Listing) : Bool { l.status == #pending });
+    pendingListings.size();
+  };
+
+  public query ({ caller }) func getApprovedListingsCount() : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access approved listings count");
+    };
+    let allListings = listings.values().toArray();
+    let approvedListings = allListings.filter(func(l : Listing) : Bool { l.status == #approved });
+    approvedListings.size();
+  };
+
+  public query ({ caller }) func getTotalUsersCount() : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access total user count");
+    };
+    userProfiles.size();
+  };
+
+  public query ({ caller }) func getTotalLoginsCount() : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      0;
+    } else {
+      totalLogins;
+    };
+  };
+
+  public query ({ caller }) func getAllMobileNumbers() : async [(Principal, Text)] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can access mobile numbers");
+    };
+
+    let allEntries = userProfiles.toArray();
+    let nonNullNumbers = allEntries.filter(
+      func((p, profile)) { profile.mobileNumber != null }
+    );
+
+    let resultArray = nonNullNumbers.values().map(
+      func((p, profile)) { (p, switch (profile.mobileNumber) { case (null) { "" }; case (?number) { number } }) }
+    ).toArray();
+
+    resultArray;
+  };
+
+  public query ({ caller }) func getAllUsersWithActivity() : async [(Principal, Text, Int)] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) { return [] };
+    userProfiles.toArray().map(func((principal, profile)) { (principal, profile.displayName, profile.lastLoginTime) });
   };
 };

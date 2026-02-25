@@ -1,23 +1,56 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add dark overlay to header background image for text legibility",
+  "title": "Fix /tracker route guard and add ADMIN PANEL side menu button for owner principal",
   "requirements": [
     {
-      "id": "REQ-52",
-      "summary": "Apply a dark semi-transparent overlay (bg-black/50 or darker) over the header background image in Layout.tsx to ensure the 'Pashu Mandi' brand text and all navigation links are clearly readable with high contrast, while preserving all existing header layout, structure, and interactive elements",
+      "id": "REQ-120",
+      "summary": "Fix CattleTrackerRouteGuard in App.tsx to correctly grant access to owner principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' using synchronous identity check",
       "acceptanceCriteria": [
-        "A dark semi-transparent overlay (e.g. bg-black/50 or darker) is applied over the header background image in Layout.tsx.",
-        "The 'Pashu Mandi' brand text is clearly legible (high contrast white text) against the overlaid header image.",
-        "All navigation links in the header remain clearly readable over the overlay.",
-        "The header layout, height, logo, navigation links, and all other structural elements are unchanged.",
-        "The overlay does not obscure interactive elements (links, buttons remain clickable)."
+        "Navigating to /tracker while authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' renders CattleTrackerPage without any redirect.",
+        "While the authentication state is still loading (isAuthenticating), a loading spinner is shown and no redirect occurs.",
+        "Any other authenticated principal navigating to /tracker is redirected to '/'.",
+        "Unauthenticated visitors navigating to /tracker are redirected to '/'."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Modify the CattleTrackerRouteGuard component to use the Internet Identity context directly for checking the owner principal. Replace any async backend query with a synchronous check: read identity?.getPrincipal().toText() from the useInternetIdentity hook, trim whitespace, and compare against 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. While loginStatus is 'logging-in' or 'idle' (authentication state loading), render a loading spinner and do not redirect. Only redirect to '/' when authentication is complete and the principal does not match the owner principal or when unauthenticated. Ensure the guard uses the useInternetIdentity hook to access identity state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-121",
+      "summary": "Fix useIsCattleTrackerUser hook in useQueries.ts to derive owner principal check synchronously from Internet Identity context",
+      "acceptanceCriteria": [
+        "useIsCattleTrackerUser() returns true synchronously once the identity for principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' is available.",
+        "useIsCattleTrackerUser() returns false for any other principal.",
+        "useIsCattleTrackerUser() returns false while authentication is loading.",
+        "No error is thrown or displayed in the UI when the caller is not the owner principal."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Modify the useIsCattleTrackerUser() hook to remove any async backend query and instead derive the check synchronously from the Internet Identity context. Import and use useInternetIdentity to access the identity object. Read identity?.getPrincipal().toText(), trim whitespace, and compare against 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. Return true immediately when the principal matches. Return false while loginStatus is 'logging-in' or 'idle', when unauthenticated, or when the principal does not match. Ensure the hook never throws errors or surfaces error states to the UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-122",
+      "summary": "Add prominently styled 'ADMIN PANEL' navigation button at the top of the side menu in Layout.tsx for owner principal only",
+      "acceptanceCriteria": [
+        "When authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', the 'ADMIN PANEL' button appears at the very top of the side/mobile menu.",
+        "Clicking 'ADMIN PANEL' navigates to '/tracker'.",
+        "The 'ADMIN PANEL' button is completely absent from the DOM for all other authenticated users and unauthenticated visitors.",
+        "The button is styled with Professional Blue background and white bold text, visually distinct and prominent."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Add or strengthen the dark semi-transparent overlay on the header background image. Locate the header element that uses the background image at frontend/public/assets/generated/header-bg.dim_1200x300.png and ensure it has a child element (typically a div) with a dark overlay class such as 'bg-black/50' or 'bg-black/60' applied. The overlay must be positioned to cover the background image without interfering with the z-index stacking of text and navigation elements. Verify that the 'Pashu Mandi' logo/text and all navigation links remain fully interactive and clearly visible with high contrast against the darkened background. Do not alter the header's layout, dimensions, logo, navigation structure, or any other elements beyond the overlay styling."
+          "description": "Add a new navigation button labeled 'ADMIN PANEL' at the very top of the mobile/side menu navigation section. Use the useIsCattleTrackerUser() hook to conditionally render this button only when the authenticated user's principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The button must be completely absent from the DOM (not just hidden via CSS) for all other users and unauthenticated visitors. While authentication state is loading, treat the button as hidden. Position it above all existing side menu items. Style it with a filled Professional Blue background (bg-blue-600 or equivalent theme color), white text (text-white), bold font weight (font-bold), and sufficient padding/sizing to be visually prominent. The button must route to '/tracker' using Link or navigate. Ensure the visibility check uses the identity principal directly, not an async backend query."
         }
       ]
     }
