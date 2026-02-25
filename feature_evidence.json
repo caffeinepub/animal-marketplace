@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-postadpage-add-a-clearly-labelled-checkbox-or-toggle-option-reading-make-this-a-vip-ad-500-below-the-existing-form-fields-when-this-option-is-selected-set-a-isvip-flag-in-the-form-state-pass-this-flag-through-to-the-paymentmodal-so-the-payment-modal-can-display-the-correct-fee-500-for-vip-ads-199-for-regular-ads-the-vip-option-must-be-styled-consistently-with-the-professional-blue-theme",
-      "featureTitle": "In PostAdPage, add a clearly labelled checkbox or toggle option reading 'Make this a VIP Ad (₹500)' below the existing form fields. When this option is selected, set a `isVip` flag in the form state. Pass this flag through to the PaymentModal so the payment modal can display the correct fee (₹500 for VIP ads, ₹199 for regular ads). The VIP option must be styled consistently with the Professional Blue theme.",
+      "featureId": "feature-in-frontend-src-pages-helplinepage-tsx-update-the-contact-details-section-replace-the-support-email-placeholder-with-the-real-email-address-irfankhansingboard1998-gmail-com-displayed-as-a-styled-readable-text-element-or-mailto-link-and-replace-the-helpline-number-with-two-numbers-7829297025-and-8461207976-retaining-the-available-10-am-6-pm-note-the-layout-and-professional-blue-white-theme-must-remain-unchanged",
+      "featureTitle": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the support email placeholder with the real email address 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the helpline number with two numbers: '7829297025' and '8461207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
       "files": [
-        "frontend/src/pages/PostAdPage.tsx"
+        "frontend/src/pages/HelplinePage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,15 +18,15 @@
         "camera@1.0.0"
       ],
       "testIds": [
-        "REQ-23"
+        "REQ-30"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-paymentmodal-to-accept-and-display-the-correct-posting-fee-based-on-whether-the-listing-is-a-vip-ad-when-isvip-is-true-display-posting-fee-500-and-update-the-upi-qr-code-amount-to-500-when-isvip-is-false-retain-the-existing-199-flow-the-promo-code-discount-feature-should-only-apply-to-non-vip-ads-disable-promo-code-input-when-isvip-is-true-or-show-a-note-that-promo-codes-are-not-applicable-for-vip-ads",
-      "featureTitle": "Update PaymentModal to accept and display the correct posting fee based on whether the listing is a VIP Ad. When isVip is true, display 'Posting Fee: ₹500' and update the UPI QR code amount to ₹500. When isVip is false, retain the existing ₹199 flow. The promo code discount feature should only apply to non-VIP ads (disable promo code input when isVip is true, or show a note that promo codes are not applicable for VIP Ads).",
+      "featureId": "feature-in-the-app-s-footer-within-layout-tsx-or-wherever-the-footer-call-link-is-rendered-update-the-clickable-call-href-to-use-the-primary-helpline-number-7829297025-i-e-href-tel-7829297025-if-the-footer-displays-a-visible-phone-number-label-update-it-to-show-7829297025-8461207976",
+      "featureTitle": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8461207976'.",
       "files": [
-        "frontend/src/components/PaymentModal.tsx"
+        "frontend/src/components/Layout.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -39,49 +39,7 @@
         "camera@1.0.0"
       ],
       "testIds": [
-        "REQ-24"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-listingcard-to-visually-distinguish-vip-listings-render-a-gold-border-e-g-border-yellow-400-or-equivalent-around-the-card-and-display-a-verified-badge-gold-background-white-or-dark-text-prominently-on-the-card-e-g-top-left-or-top-right-corner-overlay-when-the-listing-s-isvip-field-is-true-non-vip-cards-must-remain-visually-unchanged",
-      "featureTitle": "Update ListingCard to visually distinguish VIP listings: render a gold border (e.g. border-yellow-400 or equivalent) around the card and display a 'Verified' badge (gold background, white or dark text) prominently on the card (e.g. top-left or top-right corner overlay) when the listing's `isVip` field is true. Non-VIP cards must remain visually unchanged.",
-      "files": [
-        "frontend/src/components/ListingCard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-25"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-on-the-homepage-add-a-featured-animals-section-above-the-main-listings-grid-this-section-displays-only-vip-listings-isvip-true-as-a-horizontally-scrollable-row-or-a-small-dedicated-grid-the-section-must-have-a-prominent-heading-featured-animals-styled-with-a-gold-accent-e-g-a-gold-star-icon-or-gold-underline-if-there-are-no-vip-listings-this-section-should-be-hidden-entirely-the-main-listings-grid-below-continues-to-show-all-active-listings-vip-first-then-regular-unchanged-in-layout",
-      "featureTitle": "On the HomePage, add a 'Featured Animals' section above the main listings grid. This section displays only VIP listings (isVip === true) as a horizontally scrollable row or a small dedicated grid. The section must have a prominent heading 'Featured Animals' styled with a gold accent (e.g. a gold star icon or gold underline). If there are no VIP listings, this section should be hidden entirely. The main listings grid below continues to show all active listings (VIP first, then regular), unchanged in layout.",
-      "files": [
-        "frontend/src/pages/HomePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-26"
+        "REQ-31"
       ],
       "confidence": "high"
     }

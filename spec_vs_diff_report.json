@@ -1,63 +1,25 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T12:41:41.346Z",
-  "summary": "The diff implements all five requirements (REQ-22 through REQ-26) with good coverage. Backend adds isVip field, migration, sorting, and createListing parameter. Frontend adds VIP checkbox in PostAdPage, PaymentModal updates, ListingCard gold border/Verified badge, and Featured Animals section in HomePage. Minor gaps exist around VIP listing sorting in getListings and the Featured Animals section hiding behavior when filters are active.",
+  "generatedAt": "2026-02-25T13:37:52.145Z",
+  "summary": "Both REQ-30 and REQ-31 appear to be implemented. The diff shows HelplinePage.tsx was updated (though truncated) and Layout.tsx now includes 'tel:7829297025' and '7829297025 / 8461207976' per the frontend-file-summaries.txt description. The HelplinePage.tsx content is truncated so full verification of REQ-30 details is limited, but the file-summaries.txt does not explicitly mention the email or dual phone numbers in HelplinePage. REQ-31 is clearly implemented per the Layout.tsx summary.",
   "missing_requirements": [
     {
-      "id": "REQ-26",
-      "requirement": "The Featured Animals section should be hidden only when there are no VIP listings.",
-      "reason": "Per the frontend-file-summaries.txt, the Featured Animals section is also hidden when filters are active, which is not specified in REQ-26. The spec only states the section should be hidden when there are no VIP listings.",
+      "id": "REQ-30",
+      "requirement": "Update Contact Details section in HelplinePage.tsx: show email 'irfankhansingboard1998@gmail.com', both helpline numbers '7829297025' and '8461207976', and retain 'Available: 10 AM - 6 PM' note.",
+      "reason": "The HelplinePage.tsx diff is truncated and the frontend-file-summaries.txt entry for HelplinePage.tsx does not mention the email address, dual phone numbers, or the 'Available: 10 AM - 6 PM' note. Cannot confirm these changes were made.",
       "evidence": [
-        "frontend/src/pages/HomePage.tsx",
+        "frontend/src/pages/HelplinePage.tsx",
         "frontend-file-summaries.txt"
       ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "Featured Animals section is hidden when search/filter controls are active, not just when there are no VIP listings.",
-      "reason": "The file summary explicitly states the section is hidden when filters are active, but REQ-26 only requires hiding when no VIP listings exist.",
-      "evidence": [
-        "frontend/src/pages/HomePage.tsx",
-        "frontend-file-summaries.txt"
-      ]
-    },
-    {
-      "description": "A gold accent bar is rendered below the listing card image for VIP listings.",
-      "reason": "REQ-25 specifies only a gold border and a Verified badge for VIP cards. The diff adds an additional gold gradient accent bar below the image which was not requested.",
-      "evidence": [
-        "frontend/src/components/ListingCard.tsx"
-      ]
-    },
-    {
-      "description": "PaymentModal title changes to 'VIP Ad Posting Fee' with a Crown icon and a different dialog description for VIP ads.",
-      "reason": "REQ-24 only specifies displaying the correct fee amount, correct UPI QR code amount, and disabling promo codes for VIP ads. Changing the modal title and description text was not specified.",
-      "evidence": [
-        "frontend/src/components/PaymentModal.tsx"
-      ]
-    },
-    {
-      "description": "updateListing backend function also accepts and stores an isVip parameter.",
-      "reason": "The requirements only specify createListing accepting isVip (REQ-22). Extending updateListing to also accept and store isVip was not requested.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/ProfilePage.tsx"
-      ]
-    }
-  ],
-  "confidence": 0.78,
+  "hallucinated_features": [],
+  "confidence": 0.55,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/ListingCard.tsx",
-    "frontend/src/components/PaymentModal.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PostAdPage.tsx",
-    "frontend/src/pages/ProfilePage.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/pages/HelplinePage.tsx",
     "project_state.json"
   ]
 }

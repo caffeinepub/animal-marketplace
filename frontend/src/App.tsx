@@ -9,6 +9,7 @@ import ListingDetailPage from './pages/ListingDetailPage';
 import MessagesPage from './pages/MessagesPage';
 import ProfilePage from './pages/ProfilePage';
 import SignUpPage from './pages/SignUpPage';
+import HelplinePage from './pages/HelplinePage';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
@@ -74,6 +75,12 @@ const signUpRoute = createRoute({
   component: SignUpPage,
 });
 
+const helplineRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/helpline',
+  component: HelplinePage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   postAdRoute,
@@ -82,6 +89,7 @@ const routeTree = rootRoute.addChildren([
   messageThreadRoute,
   profileRoute,
   signUpRoute,
+  helplineRoute,
 ]);
 
 const router = createRouter({ routeTree });

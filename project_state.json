@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 23,
   "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
@@ -9,7 +9,8 @@
     "Category list includes both pets and farm animals: Dogs, Cats, Birds, Fish, Reptiles, Small Animals, Cow, Buffalo, Goat, Sheep, Other",
     "App name is 'Pashu Mandi'; theme uses white background with Professional Blue primary color; currency is ₹ (Rupee)",
     "Posting an ad requires a ₹199 fee paid via UPI (ID: 8431207976king@ybl); listing is only published after payment confirmation",
-    "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section"
+    "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section",
+    "Admin promo code 'FREEADMIN' bypasses payment entirely and sets fee to ₹0; admin secret identifier is 'IrfanKhanDj'"
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -173,6 +174,46 @@
         "REQ-26"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-at-route-helpline-named-customer-helpline-the-page-must-match-the-existing-professional-blue-and-white-theme-used-throughout-the-app-it-must-contain-two-sections-1-a-contact-form-with-fields-full-name-text-input-required-order-id-text-input-optional-labelled-order-id-optional-and-describe-your-issue-textarea-required-plus-a-submit-button-styled-in-professional-blue-form-submission-should-show-a-success-message-e-g-thank-you-we-will-get-back-to-you-shortly-inline-without-navigating-away-and-2-a-contact-details-section-below-the-form-showing-support-email-displayed-as-apna-email-daalein-placeholder-text-as-a-styled-text-element-and-a-helpline-number-with-the-note-available-10-am-6-pm-validate-required-fields-on-submit-and-show-inline-errors-for-empty-required-fields",
+      "title": "Create a new frontend page at route '/helpline' named 'Customer Helpline'. The page must match the existing Professional Blue and white theme used throughout the app. It must contain two sections: (1) a Contact Form with fields — 'Full Name' (text input, required), 'Order ID' (text input, optional, labelled 'Order ID (Optional)'), and 'Describe your Issue' (textarea, required) — plus a 'Submit' button styled in Professional Blue; form submission should show a success message (e.g. 'Thank you! We will get back to you shortly.') inline without navigating away; and (2) a 'Contact Details' section below the form showing: support email displayed as '[Apna Email Daalein]' (placeholder text as a styled text element), and a helpline number with the note 'Available: 10 AM – 6 PM'. Validate required fields on submit and show inline errors for empty required fields.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-navigation-link-labelled-helpline-or-customer-helpline-in-the-app-s-layout-header-layout-tsx-that-routes-to-helpline-consistent-with-the-existing-nav-link-styling-in-professional-blue",
+      "title": "Add a navigation link labelled 'Helpline' (or 'Customer Helpline') in the app's Layout header (Layout.tsx) that routes to '/helpline', consistent with the existing nav link styling in Professional Blue.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-paymentmodal-component-add-support-for-the-special-admin-promo-code-freeadmin-when-the-user-enters-freeadmin-in-the-promo-code-input-field-and-clicks-apply-the-displayed-posting-fee-must-instantly-update-to-0-zero-and-the-payment-steps-qr-code-upi-id-pay-now-button-must-be-hidden-or-replaced-with-a-message-such-as-admin-code-applied-your-ad-is-free-a-single-publish-my-ad-button-styled-in-professional-blue-must-be-shown-instead-clicking-publish-my-ad-must-immediately-call-the-createlisting-backend-function-skipping-any-upi-payment-confirmation-step-and-on-success-close-the-modal-navigate-to-the-home-page-and-show-a-success-toast-message-e-g-ad-posted-successfully-if-the-backend-call-fails-show-an-inline-error-inside-the-modal-without-closing-it-the-freeadmin-code-must-work-for-both-regular-199-and-vip-500-ads-the-existing-promo-code-pashu50-behaviour-for-non-vip-ads-99-discount-must-remain-unchanged",
+      "title": "In the PaymentModal component, add support for the special admin promo code 'FREEADMIN'. When the user enters 'FREEADMIN' in the promo code input field and clicks 'Apply', the displayed posting fee must instantly update to ₹0 (zero), and the payment steps (QR code, UPI ID, Pay Now button) must be hidden or replaced with a message such as 'Admin code applied — your ad is free!'. A single 'Publish My Ad' button (styled in Professional Blue) must be shown instead. Clicking 'Publish My Ad' must immediately call the createListing backend function (skipping any UPI payment confirmation step) and, on success, close the modal, navigate to the home page, and show a success toast message (e.g. 'Ad posted successfully!'). If the backend call fails, show an inline error inside the modal without closing it. The FREEADMIN code must work for both regular (₹199) and VIP (₹500) ads. The existing promo code 'PASHU50' behaviour for non-VIP ads (₹99 discount) must remain unchanged.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-helplinepage-tsx-update-the-contact-details-section-replace-the-support-email-placeholder-with-the-real-email-address-irfankhansingboard1998-gmail-com-displayed-as-a-styled-readable-text-element-or-mailto-link-and-replace-the-helpline-number-with-two-numbers-7829297025-and-8461207976-retaining-the-available-10-am-6-pm-note-the-layout-and-professional-blue-white-theme-must-remain-unchanged",
+      "title": "In frontend/src/pages/HelplinePage.tsx, update the Contact Details section: replace the support email placeholder with the real email address 'irfankhansingboard1998@gmail.com' (displayed as a styled, readable text element or mailto link), and replace the helpline number with two numbers: '7829297025' and '8461207976', retaining the 'Available: 10 AM – 6 PM' note. The layout and Professional Blue/white theme must remain unchanged.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-app-s-footer-within-layout-tsx-or-wherever-the-footer-call-link-is-rendered-update-the-clickable-call-href-to-use-the-primary-helpline-number-7829297025-i-e-href-tel-7829297025-if-the-footer-displays-a-visible-phone-number-label-update-it-to-show-7829297025-8461207976",
+      "title": "In the app's footer (within Layout.tsx or wherever the footer 'Call' link is rendered), update the clickable 'Call' href to use the primary helpline number '7829297025' (i.e., href='tel:7829297025'). If the footer displays a visible phone number label, update it to show '7829297025 / 8461207976'.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -294,6 +335,24 @@
       "reqIds": [
         "REQ-22"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Create a 'Customer Helpline' page with a contact form (Full Name, Order ID (Optional), Describe your Issue) and a 'Contact Details' section showing support email and a helpline number active from 10 AM to 6 PM.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Add a special admin promo code 'FREEADMIN' on the payment/checkout page. When entered, the price instantly becomes ₹0, the payment gateway is skipped entirely, and the user is taken directly to the 'Post Successful' screen. The admin secret code is 'IrfanKhanDj' (internal reference).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Update Helpline page contact details: support email to irfankhansingboard1998@gmail.com, helpline number to 7829297025 / 8461207976. Also update the footer's clickable 'Call' link to use the new helpline number.",
+      "reqIds": [],
       "status": "pending"
     }
   ],

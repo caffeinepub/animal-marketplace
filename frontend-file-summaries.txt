@@ -1,9 +1,9 @@
 {
   "frontend/src/index.css": "Global styles with Professional Blue OKLCH color system replacing the warm amber/green theme; uses Plus Jakarta Sans for headings and Inter for body text, with white backgrounds and high-contrast dark text.",
   "frontend/tailwind.config.js": "Extended Tailwind config updated with Plus Jakarta Sans display font, Professional Blue color palette tokens, and blue-toned card shadow utilities replacing the warm amber shadows.",
-  "frontend/src/App.tsx": "Root app component with TanStack Router setup; adds the new `/signup` route mapped to `SignUpPage` alongside all existing routes.",
+  "frontend/src/App.tsx": "Root app component with TanStack Router setup; adds the new `/helpline` route mapped to `HelplinePage` alongside all existing routes.",
   "frontend/src/hooks/useQueries.ts": "All React Query hooks for backend interactions; updated `useCreateListing` to accept and pass the `isVip` boolean parameter, and `useUpdateListing` to also pass `isVip` to the backend.",
-  "frontend/src/components/Layout.tsx": "App shell with sticky Professional Blue header displaying \"Pashu Mandi\" branding, white text navigation links, responsive mobile menu, and updated footer with the new app name.",
+  "frontend/src/components/Layout.tsx": "App shell with sticky Professional Blue header, navigation links, and a footer that now includes a clickable Call link (href=\"tel:7829297025\") displaying both numbers \"7829297025 / 8461207976\" alongside the existing nav links and attribution.",
   "frontend/src/components/ProfileSetupModal.tsx": "First-login modal dialog prompting new users to enter a display name and optional bio, saved via saveCallerUserProfile.",
   "frontend/src/components/ListingCard.tsx": "Reusable listing card that now renders a gold/amber border and a \"Verified\" badge (with ShieldCheck icon) for VIP listings, and a gold accent bar below the image; non-VIP cards retain their original styling.",
   "frontend/src/components/PhotoGallery.tsx": "Photo carousel with main image display, prev/next navigation, thumbnail strip, error fallbacks, and photo counter overlay.",
@@ -16,5 +16,6 @@
   "frontend/src/lib/utils.ts": "Utility function `cn` combining clsx and tailwind-merge for conditional class name composition.",
   "frontend/src/pages/SignUpPage.tsx": "Sign-up page with all \"PawMarket\" references replaced with \"Pashu Mandi\" and the login-required icon updated to use the primary blue theme.",
   "frontend/index.html": "HTML entry point with updated browser tab title set to \"Pashu Mandi\".",
-  "frontend/src/components/PaymentModal.tsx": "Payment modal updated to accept an `isVip` boolean prop; shows ₹500 fee and gold/amber styling for VIP ads, hides the promo code input for VIP ads with an explanatory note, and retains the full ₹199 promo code flow for regular ads."
+  "frontend/src/components/PaymentModal.tsx": "Payment modal supporting both regular UPI payment flow and a special admin promo code (`FREEADMIN`) that sets the price to ₹0, hides the QR/UPI payment UI, and shows a green \"Publish My Ad — Free\" button that calls `onConfirmPayment` directly without going through the payment confirmation step; the existing `PASHU50` and other promo codes continue to work as before for non-VIP ads.",
+  "frontend/src/pages/HelplinePage.tsx": "Customer Helpline page with a contact form and a Contact Details section now showing the updated support email (irfankhansingboard1998@gmail.com) and two clickable helpline numbers (7829297025 and 8461207976) with the 10 AM–6 PM availability note preserved."
 }

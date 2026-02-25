@@ -3,7 +3,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetMobileNumber } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
-import { Plus, MessageCircle, User, LogIn, LogOut, Menu, X, UserPlus } from 'lucide-react';
+import { Plus, MessageCircle, User, LogIn, LogOut, Menu, X, UserPlus, HeadphonesIcon, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +46,7 @@ export default function Layout({ children }: LayoutProps) {
     { to: '/post-ad', label: 'Post Ad', icon: <Plus className="w-4 h-4" /> },
     { to: '/messages', label: 'Messages', icon: <MessageCircle className="w-4 h-4" /> },
     { to: '/profile', label: 'Profile', icon: <User className="w-4 h-4" /> },
+    { to: '/helpline', label: 'Helpline', icon: <HeadphonesIcon className="w-4 h-4" /> },
   ];
 
   return (
@@ -215,7 +216,15 @@ export default function Layout({ children }: LayoutProps) {
                 <Link to="/" className="hover:text-foreground transition-colors">Browse</Link>
                 <Link to="/post-ad" className="hover:text-foreground transition-colors">Post Ad</Link>
                 <Link to="/messages" className="hover:text-foreground transition-colors">Messages</Link>
+                <Link to="/helpline" className="hover:text-foreground transition-colors">Helpline</Link>
               </nav>
+              <a
+                href="tel:7829297025"
+                className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                7829297025 / 8461207976
+              </a>
             </div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               © {new Date().getFullYear()} Built with{' '}
