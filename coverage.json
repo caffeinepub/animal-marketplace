@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T18:55:17.060Z",
+  "generatedAt": "2026-02-25T22:01:06.924Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,30 +11,30 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-120",
-        "summary": "In frontend/src/App.tsx, fix the CattleTrackerRouteGuard for the '/tracker' route so that it correctly grants access to the authenticated user whose principal string is 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The guard must: (1) while authentication state is still loading, render a loading spinner and NOT redirect; (2) only redirect to '/' when loading is complete AND the authenticated principal does NOT match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) use the principal string obtained directly from the Internet Identity context (e.g. identity?.getPrincipal().toText()) for comparison — do not rely on any async backend query that may not have resolved yet. Ensure the comparison trims whitespace and is an exact string match.",
+        "id": "REQ-158",
+        "summary": "In frontend/src/pages/HomePage.tsx, remove the 'Invite a friend and help grow our community!' informational banner section entirely (including the Share/Invite button and its container). The rest of the HomePage layout, sections (hero, Featured Animals, listings grid, filters), and functionality must remain structurally unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/pages/HomePage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/pages/HomePage.tsx"
         ]
       },
       {
-        "id": "REQ-121",
-        "summary": "In frontend/src/hooks/useQueries.ts (or the equivalent utility hook file), fix the useIsCattleTrackerUser() hook to derive the owner principal check synchronously from the Internet Identity context rather than from an async backend query. The hook must: (1) read the principal string directly from the identity object (e.g. identity?.getPrincipal().toText()); (2) return true immediately when the principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) return false while loading or unauthenticated; (4) never throw or surface errors to the UI.",
+        "id": "REQ-159",
+        "summary": "In frontend/src/components/BottomNav.tsx, replace the current fifth tab ('Account') with a 'Share' tab. The Share tab must display an appropriate share/invite icon (e.g., a share or forward arrow icon) and the label 'Share'. The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised button), 'My Ads' (routes to '/dashboard' for authenticated users), and 'Share' (triggers the Web Share API or clipboard fallback using the existing useWebShare hook). The bottom bar must retain the clean white background and Professional Blue active-state indicator styling.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/BottomNav.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/BottomNav.tsx"
         ]
       },
       {
-        "id": "REQ-122",
-        "summary": "In frontend/src/components/Layout.tsx, add a prominently styled navigation button labelled 'ADMIN PANEL' at the very top of the mobile/side menu. This button must route to '/tracker' (the Cattle Tracker page). It must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not an async backend query). While authentication state is loading, treat the button as hidden. Position it above all other side menu items. Style it with a bold, attention-grabbing appearance consistent with the Professional Blue theme (e.g., a filled Professional Blue button with white bold text labelled 'ADMIN PANEL').",
+        "id": "REQ-160",
+        "summary": "Update the visible version label displayed in the app to 'Version 49'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 49'.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/Layout.tsx"
@@ -50,12 +50,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/ChatThread.tsx",
+    "frontend/src/components/BottomNav.tsx",
     "frontend/src/components/Layout.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/ListingDetailPage.tsx",
-    "frontend/src/pages/MessagesPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

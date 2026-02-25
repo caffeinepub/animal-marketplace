@@ -1,26 +1,27 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 73,
-  "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
+  "projectStateVersion": 99,
+  "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Animal Pashu Bazar'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
     "Media uploads required for ad photos",
     "Real-time or async chat between buyer and seller per listing",
     "Category list includes both pets and farm animals: Dogs, Cats, Birds, Fish, Reptiles, Small Animals, Cow, Buffalo, Goat, Sheep, Other",
-    "App name is 'Pashu Mandi'; theme uses white background with Professional Blue primary color; currency is ₹ (Rupee)",
     "Posting an ad requires a ₹199 fee paid via UPI (ID: 8431207976king@ybl); listing is only published after payment confirmation",
     "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section",
     "Admin promo code 'FREEADMIN' bypasses payment entirely and sets fee to ₹0; admin secret identifier is 'IrfanKhanDj'",
     "Admin approval workflow: new listings start in 'pending' state and are only publicly visible after admin approval from the admin dashboard",
-    "PWA standalone mode: Auth session persistence must be set to 'LOCAL'; Service Worker must handle navigation requests correctly in standalone/Add-to-Home-Screen mode"
+    "PWA standalone mode: Auth session persistence must be set to 'LOCAL'; Service Worker must handle navigation requests correctly in standalone/Add-to-Home-Screen mode",
+    "Navigation is being migrated from a top header nav bar to a Bottom Navigation Bar (OLX-style) with tabs: Home, Chats, Sell, My Ads, Account"
   ],
   "known_issues": [
     "PWA 'Add to Home Screen': login session not persisting and/or login button fails in standalone mode",
     "'Create Account' feature failing with 'Failed to create account' error; backend registration/signUp logic not saving new users correctly; possible mobile number validation conflict; API not returning success status for new registrations",
     "Admin Dashboard not appearing in side menu for admin user — Admin Panel button still not visible despite multiple fix attempts; admin identification via mobile number not yet working",
-    "Cattle Tracker page (/tracker) is redirecting the owner principal (rhoqt-xhqg1-...) to the Home page instead of granting access — route guard or principal comparison logic is broken"
+    "Cattle Tracker page (/tracker) is redirecting the owner principal (rhoqt-xhqg1-...) to the Home page instead of granting access — route guard or principal comparison logic is broken",
+    "'Actor not available' error when trying to create an account — backend actor/connection not initialized or unavailable at sign-up time"
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-design-and-apply-a-warm-nature-inspired-visual-theme-across-the-entire-app-earthy-tones-greens-ambers-warm-neutrals-friendly-typography-card-based-layouts-for-listings-and-a-consistent-header-navigation-bar-the-style-should-feel-trustworthy-and-approachable-for-an-animal-marketplace",
@@ -701,6 +702,226 @@
         "REQ-122"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-goat-logo-image-used-as-the-header-logo-in-frontend-src-components-layout-tsx-with-the-newly-uploaded-logo-image-saved-as-frontend-public-assets-generated-app-logo-dim-64x64-png-render-it-as-a-round-image-rounded-full-matching-the-header-height-replacing-the-existing-logo-asset-reference-all-other-header-elements-brand-text-navigation-links-overlay-background-must-remain-structurally-unchanged",
+      "title": "Replace the current goat logo image used as the header logo in frontend/src/components/Layout.tsx with the newly uploaded logo image saved as 'frontend/public/assets/generated/app-logo.dim_64x64.png'. Render it as a round image (rounded-full) matching the header height, replacing the existing logo asset reference. All other header elements (brand text, navigation links, overlay, background) must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-123"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-favicon-app-icon-in-frontend-index-html-to-reference-the-new-logo-image-at-assets-generated-app-logo-dim-64x64-png-update-the-link-rel-icon-tag-so-the-browser-tab-and-pwa-app-icon-display-the-new-logo",
+      "title": "Update the favicon/app icon in frontend/index.html to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png'. Update the <link rel='icon'> tag so the browser tab and PWA app icon display the new logo.",
+      "reqIds": [
+        "REQ-124"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-pwa-manifest-at-frontend-public-manifest-json-to-reference-the-new-logo-image-at-assets-generated-app-logo-dim-64x64-png-in-the-icons-array-replacing-the-previous-goat-logo-icon-reference",
+      "title": "Update the PWA manifest at frontend/public/manifest.json to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png' in the icons array, replacing the previous goat logo icon reference.",
+      "reqIds": [
+        "REQ-125"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-37-if-the-version-string-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-update-it-to-read-version-37",
+      "title": "Update the visible version label displayed in the app to 'Version 37'. If the version string appears in the footer, header, or any other visible UI element within Layout.tsx or any page component, update it to read 'Version 37'.",
+      "reqIds": [
+        "REQ-126"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-replace-the-current-header-background-image-with-the-newly-uploaded-image-asset-saved-as-frontend-public-assets-generated-header-bg-dim-1200x300-png-set-it-as-the-header-s-background-image-ensure-the-pashu-mandi-brand-text-and-all-navigation-links-remain-clearly-legible-over-the-new-image-by-applying-a-sufficient-dark-semi-transparent-overlay-e-g-bg-black-50-or-bg-black-60-and-keeping-the-text-color-white-or-high-contrast-the-header-layout-height-navigation-links-logo-and-all-other-header-elements-must-remain-structurally-unchanged",
+      "title": "In frontend/src/components/Layout.tsx, replace the current header background image with the newly uploaded image asset (saved as 'frontend/public/assets/generated/header-bg.dim_1200x300.png'). Set it as the header's background image. Ensure the 'Pashu Mandi' brand text and all navigation links remain clearly legible over the new image by applying a sufficient dark semi-transparent overlay (e.g. bg-black/50 or bg-black/60) and keeping the text color white or high-contrast. The header layout, height, navigation links, logo, and all other header elements must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-127"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-38-if-the-version-string-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-update-it-to-read-version-38",
+      "title": "Update the visible version label displayed in the app to 'Version 38'. If the version string appears in the footer, header, or any other visible UI element within Layout.tsx or any page component, update it to read 'Version 38'.",
+      "reqIds": [
+        "REQ-128"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-replace-the-current-header-logo-image-with-the-newly-uploaded-logo-image-saved-as-frontend-public-assets-generated-app-logo-dim-64x64-png-render-it-as-a-round-image-rounded-full-matching-the-header-height-replacing-the-existing-logo-asset-reference-all-other-header-elements-brand-text-navigation-links-overlay-background-must-remain-structurally-unchanged",
+      "title": "In frontend/src/components/Layout.tsx, replace the current header logo image with the newly uploaded logo image saved as 'frontend/public/assets/generated/app-logo.dim_64x64.png'. Render it as a round image (rounded-full) matching the header height, replacing the existing logo asset reference. All other header elements (brand text, navigation links, overlay, background) must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-129",
+        "REQ-147"
+      ],
+      "version": 2
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-39-if-the-version-string-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-update-it-to-read-version-39",
+      "title": "Update the visible version label displayed in the app to 'Version 39'. If the version string appears in the footer, header, or any other visible UI element within Layout.tsx or any page component, update it to read 'Version 39'.",
+      "reqIds": [
+        "REQ-132"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-homepage-tsx-replace-the-current-hero-banner-background-image-with-the-newly-uploaded-image-asset-saved-as-frontend-public-assets-generated-home-hero-dim-1200x600-png-set-it-as-the-hero-section-s-background-image-ensure-all-text-and-ui-elements-overlaid-on-the-hero-remain-clearly-legible-by-applying-a-sufficient-dark-semi-transparent-overlay-if-needed-the-rest-of-the-homepage-layout-sections-and-functionality-must-remain-structurally-unchanged",
+      "title": "In frontend/src/pages/HomePage.tsx, replace the current hero/banner background image with the newly uploaded image asset saved as 'frontend/public/assets/generated/home-hero.dim_1200x600.png'. Set it as the hero section's background image. Ensure all text and UI elements overlaid on the hero remain clearly legible by applying a sufficient dark semi-transparent overlay if needed. The rest of the HomePage layout, sections, and functionality must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-133",
+        "REQ-143"
+      ],
+      "version": 2
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-40-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-40",
+      "title": "Update the visible version label displayed in the app to 'Version 40'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 40'.",
+      "reqIds": [
+        "REQ-136"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-app-s-display-name-from-pashu-mandi-to-pashu-mandi-online-everywhere-it-appears-in-the-frontend-1-the-html-title-in-frontend-index-html-2-the-brand-logo-text-in-the-header-in-frontend-src-components-layout-tsx-3-the-pwa-manifest-name-and-short-name-fields-in-frontend-public-manifest-json-4-the-web-share-api-title-string-in-frontend-src-hooks-usewebshare-ts-or-wherever-the-share-title-is-set-and-5-any-other-visible-branding-strings-across-all-page-components-e-g-termspage-helplinepage-signuppage-backend-strings-and-data-are-not-affected",
+      "title": "Update the app's display name from 'Pashu Mandi' to 'Pashu Mandi Online' everywhere it appears in the frontend: (1) the HTML <title> in frontend/index.html, (2) the brand/logo text in the header in frontend/src/components/Layout.tsx, (3) the PWA manifest 'name' and 'short_name' fields in frontend/public/manifest.json, (4) the Web Share API title string in frontend/src/hooks/useWebShare.ts or wherever the share title is set, and (5) any other visible branding strings across all page components (e.g. TermsPage, HelplinePage, SignUpPage). Backend strings and data are not affected.",
+      "reqIds": [
+        "REQ-137"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-a-new-round-header-logo-image-for-pashu-mandi-online-that-highlights-the-brand-replace-the-current-header-logo-in-frontend-src-components-layout-tsx-with-the-newly-generated-logo-asset-saved-as-frontend-public-assets-generated-app-logo-dim-64x64-png-render-it-as-a-round-image-rounded-full-matching-the-header-height-also-update-the-favicon-reference-in-frontend-index-html-and-the-icons-entry-in-frontend-public-manifest-json-to-use-the-new-logo-asset",
+      "title": "Generate a new round header logo image for 'Pashu Mandi Online' that highlights the brand. Replace the current header logo in frontend/src/components/Layout.tsx with the newly generated logo asset (saved as 'frontend/public/assets/generated/app-logo.dim_64x64.png'). Render it as a round image (rounded-full) matching the header height. Also update the favicon reference in frontend/index.html and the icons entry in frontend/public/manifest.json to use the new logo asset.",
+      "reqIds": [
+        "REQ-138"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-41-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-41",
+      "title": "Update the visible version label displayed in the app to 'Version 41'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 41'.",
+      "reqIds": [
+        "REQ-139",
+        "REQ-142"
+      ],
+      "version": 2
+    },
+    {
+      "id": "feature-update-the-app-s-display-name-from-pashu-mandi-online-to-animal-pashu-bazar-everywhere-it-appears-in-the-frontend-1-the-html-title-in-frontend-index-html-2-the-brand-logo-text-in-the-header-in-frontend-src-components-layout-tsx-3-the-pwa-manifest-name-and-short-name-fields-in-frontend-public-manifest-json-4-the-web-share-api-title-string-in-frontend-src-hooks-usewebshare-ts-or-wherever-the-share-title-is-set-and-5-any-other-visible-branding-strings-across-all-page-components-e-g-termspage-helplinepage-signuppage-userdashboardpage-backend-strings-and-data-are-not-affected",
+      "title": "Update the app's display name from 'Pashu Mandi Online' to 'Animal Pashu Bazar' everywhere it appears in the frontend: (1) the HTML <title> in frontend/index.html, (2) the brand/logo text in the header in frontend/src/components/Layout.tsx, (3) the PWA manifest 'name' and 'short_name' fields in frontend/public/manifest.json, (4) the Web Share API title string in frontend/src/hooks/useWebShare.ts or wherever the share title is set, and (5) any other visible branding strings across all page components (e.g. TermsPage, HelplinePage, SignUpPage, UserDashboardPage). Backend strings and data are not affected.",
+      "reqIds": [
+        "REQ-140"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-a-new-round-header-logo-image-for-animal-pashu-bazar-that-highlights-the-brand-replace-the-current-header-logo-in-frontend-src-components-layout-tsx-with-the-newly-generated-logo-asset-saved-as-frontend-public-assets-generated-app-logo-dim-64x64-png-render-it-as-a-round-image-rounded-full-matching-the-header-height-also-update-the-favicon-reference-in-frontend-index-html-and-the-icons-entry-in-frontend-public-manifest-json-to-use-the-new-logo-asset",
+      "title": "Generate a new round header logo image for 'Animal Pashu Bazar' that highlights the brand. Replace the current header logo in frontend/src/components/Layout.tsx with the newly generated logo asset (saved as 'frontend/public/assets/generated/app-logo.dim_64x64.png'). Render it as a round image (rounded-full) matching the header height. Also update the favicon reference in frontend/index.html and the icons entry in frontend/public/manifest.json to use the new logo asset.",
+      "reqIds": [
+        "REQ-141"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-44-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-44",
+      "title": "Update the visible version label displayed in the app to 'Version 44'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 44'.",
+      "reqIds": [
+        "REQ-144"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-homepage-tsx-replace-the-current-hero-banner-background-image-with-the-newly-uploaded-image-asset-saved-as-frontend-public-assets-generated-home-hero-dim-1200x600-png-set-it-as-the-hero-section-s-background-image-ensure-all-text-and-ui-elements-overlaid-on-the-hero-remain-clearly-legible-by-applying-a-sufficient-dark-semi-transparent-overlay-if-needed-the-application-name-animal-pashu-bazar-and-all-other-branding-strings-must-remain-unchanged-the-rest-of-the-homepage-layout-sections-and-functionality-must-remain-structurally-unchanged",
+      "title": "In frontend/src/pages/HomePage.tsx, replace the current hero/banner background image with the newly uploaded image asset saved as 'frontend/public/assets/generated/home-hero.dim_1200x600.png'. Set it as the hero section's background image. Ensure all text and UI elements overlaid on the hero remain clearly legible by applying a sufficient dark semi-transparent overlay if needed. The application name 'Animal Pashu Bazar' and all other branding strings must remain unchanged. The rest of the HomePage layout, sections, and functionality must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-145"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-45-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-45",
+      "title": "Update the visible version label displayed in the app to 'Version 45'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 45'.",
+      "reqIds": [
+        "REQ-146",
+        "REQ-150"
+      ],
+      "version": 2
+    },
+    {
+      "id": "feature-in-frontend-src-pages-signuppage-tsx-and-frontend-src-hooks-usequeries-ts-fix-the-actor-not-available-error-that-occurs-when-a-user-attempts-to-create-an-account-the-root-cause-is-that-the-backend-actor-is-not-yet-initialized-or-available-when-the-signup-mutation-is-called-add-a-guard-in-the-usesignup-mutation-in-usequeries-ts-that-waits-for-the-actor-to-be-available-before-attempting-to-call-the-backend-signup-function-if-the-actor-is-null-or-undefined-at-call-time-throw-a-user-friendly-error-message-such-as-connection-not-ready-please-wait-a-moment-and-try-again-rather-than-propagating-the-raw-actor-not-available-error-in-signuppage-tsx-display-this-error-inline-beneath-the-submit-button-additionally-in-the-signuppage-component-disable-the-create-account-button-while-the-actor-is-still-initializing-optionally-showing-a-brief-loading-spinner-state-so-users-cannot-submit-before-the-backend-connection-is-established",
+      "title": "In frontend/src/pages/SignUpPage.tsx and frontend/src/hooks/useQueries.ts, fix the 'Actor not available' error that occurs when a user attempts to create an account. The root cause is that the backend actor is not yet initialized or available when the signUp mutation is called. Add a guard in the useSignUp mutation (in useQueries.ts) that waits for the actor to be available before attempting to call the backend signUp function. If the actor is null or undefined at call time, throw a user-friendly error message such as 'Connection not ready. Please wait a moment and try again.' rather than propagating the raw 'Actor not available' error. In SignUpPage.tsx, display this error inline beneath the submit button. Additionally, in the SignUpPage component, disable the 'Create Account' button while the actor is still initializing, optionally showing a brief loading/spinner state, so users cannot submit before the backend connection is established.",
+      "reqIds": [
+        "REQ-151"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-47-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-47",
+      "title": "Update the visible version label displayed in the app to 'Version 47'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 47'.",
+      "reqIds": [
+        "REQ-153"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-hooks-usequeries-ts-and-frontend-src-pages-signuppage-tsx-audit-and-fix-the-actor-not-available-error-during-account-creation-ensure-the-usesignup-mutation-checks-that-the-actor-is-fully-initialized-before-calling-the-backend-signup-function-if-the-actor-is-null-or-undefined-at-call-time-throw-the-user-friendly-error-connection-not-ready-please-wait-a-moment-and-try-again-in-signuppage-tsx-disable-the-create-account-button-while-the-actor-is-initializing-and-display-any-error-inline-beneath-the-submit-button-additionally-ensure-the-actor-is-created-and-cached-immediately-after-auth-state-resolves-authenticated-or-anonymous-so-it-is-never-undefined-during-the-sign-up-flow",
+      "title": "In frontend/src/hooks/useQueries.ts and frontend/src/pages/SignUpPage.tsx, audit and fix the 'Actor not available' error during account creation. Ensure the useSignUp mutation checks that the actor is fully initialized before calling the backend signUp function. If the actor is null or undefined at call time, throw the user-friendly error 'Connection not ready. Please wait a moment and try again.' In SignUpPage.tsx, disable the 'Create Account' button while the actor is initializing and display any error inline beneath the submit button. Additionally, ensure the actor is created and cached immediately after auth state resolves (authenticated or anonymous) so it is never undefined during the sign-up flow.",
+      "reqIds": [
+        "REQ-154"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-app-navigation-to-use-a-fixed-bottom-navigation-bar-instead-of-the-current-top-side-navigation-the-bottom-bar-must-contain-exactly-five-tabs-with-icons-and-labels-home-routes-to-chats-routes-to-messages-sell-routes-to-post-ad-styled-prominently-e-g-a-raised-or-highlighted-center-button-my-ads-routes-to-dashboard-for-authenticated-users-or-prompts-login-for-unauthenticated-and-account-routes-to-profile-for-authenticated-users-or-signup-for-unauthenticated-the-bottom-bar-must-be-visible-on-all-pages-fixed-to-the-bottom-of-the-viewport-with-a-clean-white-background-and-professional-blue-active-state-indicator-the-existing-top-side-hamburger-menu-and-its-navigation-links-for-regular-user-routes-must-be-removed-or-hidden-to-avoid-duplication-admin-owner-specific-links-admin-panel-cattle-tracker-etc-may-remain-in-a-top-header-or-be-accessible-via-the-account-tab-for-privileged-users",
+      "title": "Redesign the app navigation to use a fixed Bottom Navigation Bar instead of the current top/side navigation. The bottom bar must contain exactly five tabs with icons and labels: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently, e.g. a raised or highlighted center button), 'My Ads' (routes to '/dashboard' for authenticated users, or prompts login for unauthenticated), and 'Account' (routes to '/profile' for authenticated users, or '/signup' for unauthenticated). The bottom bar must be visible on all pages, fixed to the bottom of the viewport, with a clean white background and Professional Blue active-state indicator. The existing top/side hamburger menu and its navigation links (for regular user routes) must be removed or hidden to avoid duplication — admin/owner-specific links (Admin Panel, Cattle Tracker, etc.) may remain in a top header or be accessible via the Account tab for privileged users.",
+      "reqIds": [
+        "REQ-155"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-components-layout-tsx-to-remove-the-current-header-background-image-the-tiger-animal-photo-and-replace-it-with-a-clean-solid-professional-blue-1d4ed8-header-background-no-background-image-no-overlay-the-header-must-display-the-animal-pashu-bazar-round-logo-image-frontend-public-assets-generated-app-logo-dim-64x64-png-and-the-brand-text-animal-pashu-bazar-in-white-with-a-minimal-olx-style-clean-appearance-admin-owner-only-navigation-links-that-were-previously-in-the-header-may-remain-in-the-header-for-privileged-users-remove-the-dark-semi-transparent-overlay-since-there-is-no-longer-a-background-image",
+      "title": "Update frontend/src/components/Layout.tsx to remove the current header background image (the tiger/animal photo) and replace it with a clean, solid Professional Blue (#1D4ED8) header background — no background image, no overlay. The header must display the 'Animal Pashu Bazar' round logo image (frontend/public/assets/generated/app-logo.dim_64x64.png) and the brand text 'Animal Pashu Bazar' in white, with a minimal OLX-style clean appearance. Admin/owner-only navigation links that were previously in the header may remain in the header for privileged users. Remove the dark semi-transparent overlay since there is no longer a background image.",
+      "reqIds": [
+        "REQ-156"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-48-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-48",
+      "title": "Update the visible version label displayed in the app to 'Version 48'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 48'.",
+      "reqIds": [
+        "REQ-157"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-homepage-tsx-remove-the-invite-a-friend-and-help-grow-our-community-informational-banner-section-entirely-including-the-share-invite-button-and-its-container-the-rest-of-the-homepage-layout-sections-hero-featured-animals-listings-grid-filters-and-functionality-must-remain-structurally-unchanged",
+      "title": "In frontend/src/pages/HomePage.tsx, remove the 'Invite a friend and help grow our community!' informational banner section entirely (including the Share/Invite button and its container). The rest of the HomePage layout, sections (hero, Featured Animals, listings grid, filters), and functionality must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-158"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-replace-the-current-fifth-tab-account-with-a-share-tab-the-share-tab-must-display-an-appropriate-share-invite-icon-e-g-a-share-or-forward-arrow-icon-and-the-label-share-the-updated-bottom-navigation-bar-must-have-exactly-five-tabs-in-this-order-home-routes-to-chats-routes-to-messages-sell-routes-to-post-ad-styled-prominently-as-the-center-raised-button-my-ads-routes-to-dashboard-for-authenticated-users-and-share-triggers-the-web-share-api-or-clipboard-fallback-using-the-existing-usewebshare-hook-the-bottom-bar-must-retain-the-clean-white-background-and-professional-blue-active-state-indicator-styling",
+      "title": "In frontend/src/components/BottomNav.tsx, replace the current fifth tab ('Account') with a 'Share' tab. The Share tab must display an appropriate share/invite icon (e.g., a share or forward arrow icon) and the label 'Share'. The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised button), 'My Ads' (routes to '/dashboard' for authenticated users), and 'Share' (triggers the Web Share API or clipboard fallback using the existing useWebShare hook). The bottom bar must retain the clean white background and Professional Blue active-state indicator styling.",
+      "reqIds": [
+        "REQ-159"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-49-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-49",
+      "title": "Update the visible version label displayed in the app to 'Version 49'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 49'.",
+      "reqIds": [
+        "REQ-160"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -1191,10 +1412,156 @@
       "summary": "Create a private 'Cattle Tracker' page at route '/tracker' showing all registered mobile numbers and all animal posts. Add a direct link at the very top of the side menu, visible only to principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. Page must be accessible via /tracker URL regardless of menu visibility.",
       "reqIds": [],
       "status": "pending"
+    },
+    {
+      "id": "AR-96",
+      "summary": "Change the application logo to a new user-uploaded image (attached by user). Update the header logo and app icon/favicon to use this new image.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-97",
+      "summary": "Change the header background image of the application to a new user-uploaded image. Update the app version label to 'Version 38'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-98",
+      "summary": "Change the application logo to a new user-uploaded image. Update the header logo in Layout.tsx and the app icon/favicon in index.html. Update the app version label to 'Version 39'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-100",
+      "summary": "Update the favicon/app icon in frontend/index.html to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png'. Update the <link rel='icon'> tag so the browser tab and PWA app icon display the new logo.",
+      "reqIds": [
+        "REQ-130"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-101",
+      "summary": "Update the PWA manifest at frontend/public/manifest.json to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png' in the icons array, replacing any previous logo icon reference.",
+      "reqIds": [
+        "REQ-131"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-102",
+      "summary": "Replace the current home screen (HomePage) background/hero image with a new user-uploaded photo. Update the app version label to 'Version 39'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-104",
+      "summary": "Update the visible version label displayed in the app to 'Version 39'. If the version string appears in the footer, header, or any other visible UI element within Layout.tsx or any page component, update it to read 'Version 39'.",
+      "reqIds": [
+        "REQ-134"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-105",
+      "summary": "Update the Quick Links section in the app to include high-priority options: 'My Ads', 'Verify Payment', and 'Contact Support', placed at the top of the Quick Links list.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-106",
+      "summary": "Update the visible version label displayed in the app to 'Version 40'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-107",
+      "summary": "In frontend/src/pages/HomePage.tsx (or wherever the 'Quick Links' section is rendered), add three new high-priority quick link items — 'My Ads' (routes to '/dashboard' or '/profile'), 'Verify Payment' (routes to '/helpline' or a dedicated verification page, using the helpline contact as the support channel), and 'Contact Support' (routes to '/helpline') — and place them at the very top of the Quick Links list, above any existing quick link items. Each new link must be styled consistently with the existing Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-135"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-108",
+      "summary": "Change the app's display name from 'Pashu Mandi' to 'Pashu Mandi Online' everywhere it appears (HTML page title, header/navigation bar brand text, logo text, manifest name, and any other visible branding strings across all pages). Also update the header logo to highlight the brand. Push as next version.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-109",
+      "summary": "Change the app's display name from 'Pashu Mandi Online' to 'Animal Pashu Bazar' everywhere it appears (HTML page title, header/navigation bar brand text, logo text, PWA manifest name/short_name, Web Share API title, and any other visible branding strings across all pages). Update the header logo/branding to reflect the new name. Push as Version 41.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-110",
+      "summary": "Replace the current home screen (HomePage) hero/background image with a new user-uploaded photo. Update the app version label to 'Version 44'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-111",
+      "summary": "Replace the current home screen (HomePage) hero/background image with a new user-uploaded photo. Update the app version label to 'Version 45'. Do not change the application name.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-112",
+      "summary": "Change the application logo with a new user-uploaded image. Update the header logo in Layout.tsx and the app icon/favicon in index.html and manifest.json. Push as Version 45.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-114",
+      "summary": "Update the favicon/app icon in frontend/index.html to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png'. Update the <link rel='icon'> tag so the browser tab and PWA app icon display the new logo.",
+      "reqIds": [
+        "REQ-148"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-115",
+      "summary": "Update the PWA manifest at frontend/public/manifest.json to reference the new logo image at '/assets/generated/app-logo.dim_64x64.png' in the icons array, replacing the previous logo icon reference.",
+      "reqIds": [
+        "REQ-149"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-116",
+      "summary": "Fix 'Actor not available' error when creating an account — backend connection issue preventing account creation. Update version label to 'Version 47'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-118",
+      "summary": "In frontend/src/hooks/useActor.ts (or the equivalent actor initialization logic), ensure the actor is correctly created and cached as soon as the Internet Identity authentication state is resolved (either authenticated or anonymous). The actor must never remain in an undefined/null state after the auth client has finished initializing. If the actor creation fails, retry or surface a clear error. Ensure the actor instance is stable and does not become unavailable between renders during the sign-up flow.",
+      "reqIds": [
+        "REQ-152"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-119",
+      "summary": "Professional OLX-style redesign: change the app theme to a clean white background, remove the tiger/animal header background image, and move the navigation to a Bottom Bar with icons for 'Home', 'Chats', 'Sell', 'My Ads', and 'Account'. Header should be clean like OLX.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-120",
+      "summary": "Update the visible version label displayed in the app to 'Version 48'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-121",
+      "summary": "Redesign home screen OLX-style: remove the large 'Invite a friend' share banner from the middle of the screen, add a small 'Share'/'Invite' icon as the 5th tab in the Bottom Navigation Bar (replacing 'Account' or repositioning tabs), so the Bottom Bar has: Home, Chats, Sell (+), My Ads, Share. Update version label to 'Version 49'.",
+      "reqIds": [],
+      "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Pashu Mandi",
+  "projectName": "Animal Pashu Bazar",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -15,7 +15,7 @@ const terms = [
   {
     icon: <Info className="w-6 h-6 text-primary" />,
     title: 'Platform Disclaimer',
-    text: 'Pashu Mandi is only a platform; we are not responsible for any fraud between buyer and seller.',
+    text: 'Animal Pashu Bazar is only a platform; we are not responsible for any fraud between buyer and seller.',
   },
   {
     icon: <ShieldCheck className="w-6 h-6 text-primary" />,
@@ -37,7 +37,7 @@ export default function TermsPage() {
             Terms &amp; Conditions
           </h1>
           <p className="text-muted-foreground text-sm">
-            Please read these terms carefully before using Pashu Mandi.
+            Please read these terms carefully before using Animal Pashu Bazar.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8">
-          By using Pashu Mandi, you agree to abide by these terms and conditions.
+          By using Animal Pashu Bazar, you agree to abide by these terms and conditions.
         </p>
       </div>
     </div>

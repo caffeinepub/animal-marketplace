@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the `/tracker` route guard so the owner principal can access it without being redirected, and add an "ADMIN PANEL" button at the top of the side menu visible only to the owner principal.
+**Goal:** OLX-style home screen cleanup for Animal Pashu Bazar — remove the invite banner from the home page, replace the Account tab with a Share tab in the bottom navigation, and update the displayed version to Version 49.
 
 **Planned changes:**
-- Fix `CattleTrackerRouteGuard` in `App.tsx` to show a loading spinner while auth is loading, grant access when the authenticated principal matches `rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe`, and redirect all others to `/`
-- Fix `useIsCattleTrackerUser()` hook to synchronously derive the owner check directly from the identity context principal string instead of an async backend query
-- Add an "ADMIN PANEL" button at the very top of the side/mobile menu in `Layout.tsx`, styled with a Professional Blue background and white bold text, routing to `/tracker`, visible only when the authenticated principal matches the owner principal and completely absent from the DOM for all other users
+- Remove the "Invite a friend and help grow our community!" banner (including its Share/Invite button and container) from `HomePage.tsx`
+- In `BottomNav.tsx`, replace the "Account" tab with a "Share" tab that triggers the Web Share API (with clipboard fallback) using the existing `useWebShare` hook; final tab order: Home, Chats, Sell, My Ads, Share
+- Update the visible version label to "Version 49" wherever it appears in the UI (footer, header, or layout components)
 
-**User-visible outcome:** The owner principal can navigate to `/tracker` without being redirected, and sees a prominent "ADMIN PANEL" button at the top of the side menu. All other users see no change.
+**User-visible outcome:** The home page no longer shows the invite banner between sections, the bottom navigation bar now has a Share tab instead of Account, and the app displays Version 49.

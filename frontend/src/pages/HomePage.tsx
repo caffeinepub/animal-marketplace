@@ -1,13 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useGetListings } from '../hooks/useQueries';
-import { useWebShare } from '../hooks/useWebShare';
 import ListingCard from '../components/ListingCard';
 import { AnimalCategory } from '../backend';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, MapPin, X, Crown, Share2, Users } from 'lucide-react';
+import { Search, MapPin, X, Crown } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
 const ALL_CATEGORIES = 'all';
@@ -42,41 +41,6 @@ const FARM_CATEGORIES: AnimalCategory[] = [
   AnimalCategory.goat,
   AnimalCategory.sheep,
 ];
-
-function InviteBanner() {
-  const { share } = useWebShare();
-
-  const handleShare = () => {
-    share({
-      title: 'Pashu Mandi',
-      text: 'Check out Pashu Mandi - The most trusted marketplace to buy and sell livestock! Click here to join:',
-      url: window.location.origin,
-    });
-  };
-
-  return (
-    <section className="container mx-auto px-4 pt-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl bg-primary/8 border border-primary/20 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/15 shrink-0">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <p className="text-sm sm:text-base font-semibold text-primary">
-            Invite a friend and help grow our community!
-          </p>
-        </div>
-        <Button
-          onClick={handleShare}
-          size="sm"
-          className="shrink-0 gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          <Share2 className="w-4 h-4" />
-          Share Pashu Mandi
-        </Button>
-      </div>
-    </section>
-  );
-}
 
 export default function HomePage() {
   const { data: listings = [], isLoading } = useGetListings();
@@ -127,11 +91,11 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="aspect-[3/1] md:aspect-[4/1] max-h-80 w-full overflow-hidden">
           <img
-            src="/assets/generated/hero-banner.dim_1200x400.png"
-            alt="Buy and sell animals on Pashu Mandi"
-            className="w-full h-full object-cover"
+            src="/assets/1772053120433.png"
+            alt="Buy and sell animals on Animal Pashu Bazar"
+            className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent flex items-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center">
             <div className="container mx-auto px-4">
               <h1 className="font-display text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-2">
                 Buy &amp; Sell Animals<br />on Pashu Mandi
@@ -148,9 +112,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Invite Banner */}
-      <InviteBanner />
 
       {/* Search & Filters */}
       <section className="bg-card border-b border-border sticky top-16 z-40 shadow-xs mt-4">

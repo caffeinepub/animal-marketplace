@@ -1,7 +1,7 @@
 {
-  "name": "Pashu Mandi",
-  "short_name": "Pashu Mandi",
-  "description": "Buy and sell animals on Pashu Mandi",
+  "name": "Animal Pashu Bazar",
+  "short_name": "Animal Pashu Bazar",
+  "description": "Buy and sell animals on Animal Pashu Bazar",
   "display": "standalone",
   "start_url": "/",
   "scope": "/",
@@ -9,13 +9,8 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/assets/generated/goat-logo.dim_64x64.png",
+      "src": "/assets/generated/app-logo.dim_64x64.png",
       "sizes": "64x64",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/generated/logo-icon.dim_128x128.png",
-      "sizes": "128x128",
       "type": "image/png"
     }
   ]

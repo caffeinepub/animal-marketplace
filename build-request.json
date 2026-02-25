@@ -1,77 +1,81 @@
 {
   "kind": "build_request",
-  "title": "Fix /tracker route guard and add ADMIN PANEL side menu button for owner principal",
-  "projectName": "Pashu Mandi",
-  "priority": "high",
+  "title": "OLX-style home screen redesign: remove invite banner, replace Account tab with Share tab, update to Version 49",
+  "projectName": "Animal Pashu Bazar",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-120",
-      "text": "In frontend/src/App.tsx, fix the CattleTrackerRouteGuard for the '/tracker' route so that it correctly grants access to the authenticated user whose principal string is 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'. The guard must: (1) while authentication state is still loading, render a loading spinner and NOT redirect; (2) only redirect to '/' when loading is complete AND the authenticated principal does NOT match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) use the principal string obtained directly from the Internet Identity context (e.g. identity?.getPrincipal().toText()) for comparison — do not rely on any async backend query that may not have resolved yet. Ensure the comparison trims whitespace and is an exact string match.",
+      "id": "REQ-158",
+      "text": "In frontend/src/pages/HomePage.tsx, remove the 'Invite a friend and help grow our community!' informational banner section entirely (including the Share/Invite button and its container). The rest of the HomePage layout, sections (hero, Featured Animals, listings grid, filters), and functionality must remain structurally unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "I have logged in with my ID rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe, but the /tracker route is still redirecting me to the Home page."
+          "Remove the large 'Invite a friend' share box from the middle of the screen."
         ]
       },
       "acceptanceCriteria": [
-        "Navigating to /tracker while authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' renders CattleTrackerPage without any redirect.",
-        "While the authentication state is still loading (isAuthenticating), a loading spinner is shown and no redirect occurs.",
-        "Any other authenticated principal navigating to /tracker is redirected to '/'.",
-        "Unauthenticated visitors navigating to /tracker are redirected to '/'."
+        "The 'Invite a friend and help grow our community!' banner is no longer rendered anywhere on the HomePage.",
+        "No share/invite button or banner container appears between the hero section and the Featured Animals section.",
+        "All other HomePage sections (hero, Featured Animals, listings grid, search/filter controls) remain intact and functional."
       ]
     },
     {
-      "id": "REQ-121",
-      "text": "In frontend/src/hooks/useQueries.ts (or the equivalent utility hook file), fix the useIsCattleTrackerUser() hook to derive the owner principal check synchronously from the Internet Identity context rather than from an async backend query. The hook must: (1) read the principal string directly from the identity object (e.g. identity?.getPrincipal().toText()); (2) return true immediately when the principal matches 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'; (3) return false while loading or unauthenticated; (4) never throw or surface errors to the UI.",
+      "id": "REQ-159",
+      "text": "In frontend/src/components/BottomNav.tsx, replace the current fifth tab ('Account') with a 'Share' tab. The Share tab must display an appropriate share/invite icon (e.g., a share or forward arrow icon) and the label 'Share'. The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised button), 'My Ads' (routes to '/dashboard' for authenticated users), and 'Share' (triggers the Web Share API or clipboard fallback using the existing useWebShare hook). The bottom bar must retain the clean white background and Professional Blue active-state indicator styling.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "the /tracker route is still redirecting me to the Home page"
+          "Add a small 'Share' or 'Invite' icon to the existing Bottom Navigation Bar.",
+          "Ensure the Bottom Bar now has: Home, Chats, Sell (+), My Ads, and Share."
         ]
       },
       "acceptanceCriteria": [
-        "useIsCattleTrackerUser() returns true synchronously once the identity for principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' is available.",
-        "useIsCattleTrackerUser() returns false for any other principal.",
-        "useIsCattleTrackerUser() returns false while authentication is loading.",
-        "No error is thrown or displayed in the UI when the caller is not the owner principal."
+        "The Bottom Navigation Bar contains exactly five tabs: Home, Chats, Sell, My Ads, and Share.",
+        "The 'Account' tab is no longer present in the Bottom Navigation Bar.",
+        "The 'Share' tab displays a recognizable share/invite icon and the label 'Share'.",
+        "Clicking the 'Share' tab invokes the Web Share API (navigator.share) with the app name, invite text, and the app's root URL; falls back to clipboard copy with a toast notification if navigator.share is unavailable.",
+        "The 'Sell' tab remains styled prominently (raised or highlighted center button) and routes to '/post-ad'.",
+        "The 'Home', 'Chats', and 'My Ads' tabs remain functional and route to their respective pages.",
+        "The active tab is highlighted with the Professional Blue active-state indicator.",
+        "The bottom bar retains the clean white background and is fixed to the bottom of the viewport on all pages."
       ]
     },
     {
-      "id": "REQ-122",
-      "text": "In frontend/src/components/Layout.tsx, add a prominently styled navigation button labelled 'ADMIN PANEL' at the very top of the mobile/side menu. This button must route to '/tracker' (the Cattle Tracker page). It must be completely absent from the DOM (not just hidden via CSS) for all users whose authenticated principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' and for unauthenticated visitors. The visibility check must use the authenticated user's principal string directly (not an async backend query). While authentication state is loading, treat the button as hidden. Position it above all other side menu items. Style it with a bold, attention-grabbing appearance consistent with the Professional Blue theme (e.g., a filled Professional Blue button with white bold text labelled 'ADMIN PANEL').",
+      "id": "REQ-160",
+      "text": "Update the visible version label displayed in the app to 'Version 49'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 49'.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Navigation Link: Add a clear, visible button labeled 'ADMIN PANEL' at the top of my side menu immediately."
+          "Keep the theme clean white and update to Version 49."
         ]
       },
       "acceptanceCriteria": [
-        "When authenticated as 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe', the 'ADMIN PANEL' button appears at the very top of the side/mobile menu.",
-        "Clicking 'ADMIN PANEL' navigates to '/tracker'.",
-        "The 'ADMIN PANEL' button is completely absent from the DOM for all other authenticated users and unauthenticated visitors.",
-        "The button is styled with Professional Blue background and white bold text, visually distinct and prominent."
+        "The version label reads 'Version 49' wherever it is displayed in the app UI.",
+        "No other visible version string remains showing a different version number."
       ]
     }
   ],
   "constraints": [
     "Do not modify any files listed in frontend.immutablePaths.",
-    "The principal comparison must use the principal string directly from the identity context — do not rely solely on async backend queries that may not resolve before the route guard runs.",
-    "The 'ADMIN PANEL' button must route to '/tracker', not '/admin', as the Cattle Tracker page is the privileged view for this owner principal."
+    "The Web Share functionality in the Share tab must reuse the existing useWebShare hook logic.",
+    "The Bottom Navigation Bar must remain visible on all pages, fixed to the bottom of the viewport.",
+    "All other HomePage sections and functionality must remain unchanged after removing the invite banner.",
+    "The overall Professional Blue and white clean theme must remain unchanged."
   ],
   "nonGoals": [
-    "Exposing raw mobile numbers or pending ads data directly in the chat UI.",
-    "Creating any new backend functions for this fix.",
-    "Changing the CattleTrackerPage content or layout.",
-    "Modifying the admin principal or admin dashboard access logic."
+    "No changes to the backend.",
+    "No changes to the 'Account' routing logic for other parts of the app beyond the BottomNav tab replacement.",
+    "No redesign of any page other than removing the invite banner from HomePage and updating BottomNav.",
+    "No changes to admin/owner-specific privileged navigation links in the header."
   ],
   "imageRequirements": {
     "required": [],

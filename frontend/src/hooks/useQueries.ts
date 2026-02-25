@@ -12,7 +12,6 @@ export function useIsManagementUser(): boolean {
   const { identity, loginStatus } = useInternetIdentity();
 
   try {
-    // Treat both 'initializing' and 'logging-in' as loading states
     if (loginStatus === "initializing" || loginStatus === "logging-in" || !identity) {
       return false;
     }
@@ -30,7 +29,6 @@ export function useIsOwnerUser(): boolean {
   const { identity, loginStatus } = useInternetIdentity();
 
   try {
-    // Treat both 'initializing' and 'logging-in' as loading states
     if (loginStatus === "initializing" || loginStatus === "logging-in" || !identity) {
       return false;
     }
@@ -44,16 +42,10 @@ export function useIsOwnerUser(): boolean {
 
 const CATTLE_TRACKER_PRINCIPAL = "rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe";
 
-/**
- * Returns true synchronously once the identity for the cattle tracker principal
- * is available. Returns false while auth is loading (initializing or logging-in),
- * when unauthenticated, or when the principal does not match.
- */
 export function useIsCattleTrackerUser(): boolean {
   const { identity, loginStatus } = useInternetIdentity();
 
   try {
-    // Treat both 'initializing' and 'logging-in' as loading states — do not return true yet
     if (loginStatus === "initializing" || loginStatus === "logging-in" || !identity) {
       return false;
     }
@@ -63,10 +55,6 @@ export function useIsCattleTrackerUser(): boolean {
   }
 }
 
-/**
- * Returns true while the auth state is still being determined (initializing or logging-in).
- * Use this to prevent premature redirects in route guards.
- */
 export function useIsAuthLoading(): boolean {
   const { loginStatus } = useInternetIdentity();
   return loginStatus === "initializing" || loginStatus === "logging-in";
@@ -263,7 +251,7 @@ export function useDeleteListingAdmin() {
 
   return useMutation({
     mutationFn: async (listingId: ListingId) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.deleteListingAdmin(listingId);
     },
     onSuccess: () => {
@@ -320,7 +308,7 @@ export function useCreateListing() {
       photoUrls: string[];
       isVip: boolean;
     }) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.createListing(
         params.title,
         params.description,
@@ -358,7 +346,7 @@ export function useUpdateListing() {
       isActive: boolean;
       isVip: boolean;
     }) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.updateListing(
         params.listingId,
         params.title,
@@ -385,7 +373,7 @@ export function useDeleteListing() {
 
   return useMutation({
     mutationFn: async (listingId: ListingId) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.deleteListing(listingId);
     },
     onSuccess: () => {
@@ -403,7 +391,7 @@ export function useApproveListing() {
 
   return useMutation({
     mutationFn: async (listingId: ListingId) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.approveListing(listingId);
     },
     onSuccess: () => {
@@ -422,7 +410,7 @@ export function useRejectListing() {
 
   return useMutation({
     mutationFn: async (listingId: ListingId) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.rejectListing(listingId);
     },
     onSuccess: () => {
@@ -501,7 +489,7 @@ export function useSaveCallerUserProfile() {
       contactInfo: string | null;
       mobileNumber: string | null;
     }) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.saveCallerUserProfile(
         params.displayName,
         params.bio,
@@ -526,13 +514,36 @@ export function useUpsertProfile() {
       bio: string;
       contactInfo: string | null;
     }) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.upsertProfile(params.displayName, params.bio, params.contactInfo);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
       queryClient.invalidateQueries({ queryKey: ["myProfile"] });
     },
+  });
+}
+
+// ─── Mobile Number ────────────────────────────────────────────────────────────
+
+/**
+ * Fetches the caller's own mobile number from the backend.
+ * Used by PostAdPage to check whether the user has completed sign-up.
+ */
+export function useGetMobileNumber() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<string | null>({
+    queryKey: ["mobileNumber"],
+    queryFn: async () => {
+      if (!actor) return null;
+      try {
+        return await actor.getMobileNumber();
+      } catch {
+        return null;
+      }
+    },
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -585,7 +596,7 @@ export function useSendMessage() {
       listingId: bigint | null;
       text: string;
     }) => {
-      if (!actor) throw new Error("Actor not available");
+      if (!actor) throw new Error("Connection not ready. Please wait a moment and try again.");
       return actor.sendMessage(params.recipient, params.listingId, params.text);
     },
     onSuccess: (_data, variables) => {
@@ -600,41 +611,25 @@ export function useSendMessage() {
 // ─── Sign Up ──────────────────────────────────────────────────────────────────
 
 export function useSignUp() {
-  const { actor } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: { displayName: string; mobileNumber: string }) => {
-      if (!actor) throw new Error("Actor not available");
+      // Guard: actor must be available before calling the backend
+      if (!actor || actorFetching) {
+        throw new Error("Connection not ready. Please wait a moment and try again.");
+      }
       return actor.signUp(params.displayName, params.mobileNumber);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
       queryClient.invalidateQueries({ queryKey: ["myProfile"] });
-      queryClient.invalidateQueries({ queryKey: ["allMobileNumbers"] });
+      queryClient.invalidateQueries({ queryKey: ["mobileNumber"] });
       queryClient.invalidateQueries({ queryKey: ["totalUsersCount"] });
     },
   });
 }
-
-export function useGetMobileNumber() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<string | null>({
-    queryKey: ["mobileNumber"],
-    queryFn: async () => {
-      if (!actor) return null;
-      try {
-        return await actor.getMobileNumber();
-      } catch {
-        return null;
-      }
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// ─── My Listings ──────────────────────────────────────────────────────────────
 
 export function useGetMyListings() {
   const { actor, isFetching } = useActor();
