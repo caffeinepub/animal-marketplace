@@ -52,7 +52,7 @@ export default function ListingCard({ listing, className }: ListingCardProps) {
       to="/listing/$id"
       params={{ id: listing.id.toString() }}
       className={cn(
-        'group block bg-card rounded-xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5',
+        'group block bg-white rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5',
         isVip
           ? 'border-2 border-amber-400 shadow-[0_0_0_1px_rgba(251,191,36,0.3),0_4px_16px_rgba(251,191,36,0.2)] hover:shadow-[0_0_0_1px_rgba(251,191,36,0.5),0_8px_24px_rgba(251,191,36,0.3)]'
           : 'border border-border shadow-card hover:shadow-card-hover',
@@ -60,7 +60,7 @@ export default function ListingCard({ listing, className }: ListingCardProps) {
       )}
     >
       {/* Image */}
-      <div className="aspect-[4/3] bg-muted overflow-hidden relative">
+      <div className="aspect-[4/3] bg-muted overflow-hidden relative rounded-t-2xl">
         {primaryPhoto ? (
           <img
             src={primaryPhoto}
@@ -103,7 +103,7 @@ export default function ListingCard({ listing, className }: ListingCardProps) {
       )}
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 bg-white">
         <h3 className="font-semibold text-foreground text-sm leading-snug line-clamp-2 mb-1 group-hover:text-primary transition-colors">
           {listing.title}
         </h3>

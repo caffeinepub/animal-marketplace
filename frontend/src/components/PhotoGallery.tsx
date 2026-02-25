@@ -14,7 +14,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="aspect-[16/9] bg-muted rounded-xl flex items-center justify-center">
+      <div className="aspect-[16/9] bg-muted rounded-2xl flex items-center justify-center">
         <div className="text-center text-muted-foreground">
           <ImageOff className="w-12 h-12 mx-auto mb-2 opacity-40" />
           <p className="text-sm">No photos available</p>
@@ -30,7 +30,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
   return (
     <div className="space-y-3">
       {/* Main Image */}
-      <div className="relative aspect-[16/9] bg-muted rounded-xl overflow-hidden">
+      <div className="relative aspect-[16/9] bg-muted rounded-2xl overflow-hidden">
         {imgError[currentIndex] ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-center text-muted-foreground">
@@ -53,7 +53,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-card/80 backdrop-blur-sm hover:bg-card shadow-xs rounded-full"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white shadow-xs rounded-full"
               onClick={() => goTo(currentIndex - 1)}
               disabled={currentIndex === 0}
             >
@@ -62,7 +62,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-card/80 backdrop-blur-sm hover:bg-card shadow-xs rounded-full"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white shadow-xs rounded-full"
               onClick={() => goTo(currentIndex + 1)}
               disabled={currentIndex === photos.length - 1}
             >
@@ -73,7 +73,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
 
         {/* Counter */}
         {photos.length > 1 && (
-          <div className="absolute bottom-2 right-2 bg-card/80 backdrop-blur-sm text-xs px-2 py-1 rounded-full text-foreground">
+          <div className="absolute bottom-2 right-2 bg-white text-xs px-2 py-1 rounded-full text-foreground shadow-xs">
             {currentIndex + 1} / {photos.length}
           </div>
         )}
@@ -87,7 +87,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
               key={index}
               onClick={() => goTo(index)}
               className={cn(
-                'shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
+                'shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all',
                 index === currentIndex
                   ? 'border-primary shadow-xs'
                   : 'border-transparent opacity-60 hover:opacity-100'

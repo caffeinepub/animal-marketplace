@@ -1,11 +1,37 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T22:01:06.915Z",
-  "summary": "All three requirements appear to be implemented. REQ-158 (remove invite banner from HomePage) is confirmed by the file summary and truncated diff. REQ-159 (replace Account tab with Share tab in BottomNav) is fully visible in the diff with correct tabs, useWebShare hook usage, and styling. REQ-160 (update version to 'Version 49') is confirmed in the Layout.tsx file summary. No significant missing requirements or hallucinated features were found.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.95,
+  "generatedAt": "2026-02-25T23:08:14.268Z",
+  "summary": "The diff implements most of the required changes for Version 55. REQ-184, REQ-185, REQ-186, REQ-187, and REQ-190 are addressed. REQ-188 and REQ-189 require verification across multiple page files, but the diff only shows partial evidence for these.",
+  "missing_requirements": [
+    {
+      "id": "REQ-188",
+      "requirement": "Audit all page-level components (PostAdPage.tsx, ListingDetailPage.tsx, MessagesPage.tsx, ProfilePage.tsx, UserDashboardPage.tsx, SignUpPage.tsx, and others) for full-width/full-height containers with inadvertent pointer-events that may conflict with the bottom nav z-index.",
+      "reason": "The diff only shows HomePage.tsx was modified for pointer-events fixes. There is no evidence in the diff that PostAdPage.tsx, ListingDetailPage.tsx, MessagesPage.tsx, ProfilePage.tsx, UserDashboardPage.tsx, or SignUpPage.tsx were audited or modified to add pointer-events: none to decorative containers.",
+      "evidence": [
+        "frontend/src/pages/HomePage.tsx",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "id": "REQ-189",
+      "requirement": "Verify that the 'Actor not available' comprehensive fix is still intact in useActor.ts, useQueries.ts, SignUpPage.tsx, and App.tsx. Re-apply if any regression is detected.",
+      "reason": "The diff does not include any modifications to frontend/src/hooks/useActor.ts or frontend/src/pages/SignUpPage.tsx. While the file summary for useQueries.ts and App.tsx mentions waitForActor retry logic and CattleTrackerRouteGuard reading principal from identity, there is no direct diff evidence showing these files were verified or touched in this version.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "ProfilePage.tsx version label still reads 'Version 54' rather than 'Version 55'",
+      "reason": "The frontend-file-summaries.txt explicitly states the ProfilePage.tsx version label was updated to Version 54, which contradicts REQ-190 requiring all version strings to read 'Version 55'. This was not corrected in the diff.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    }
+  ],
+  "confidence": 0.72,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/BottomNav.tsx",

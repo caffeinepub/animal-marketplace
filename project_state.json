@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 99,
+  "projectStateVersion": 111,
   "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Animal Pashu Bazar'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
@@ -19,9 +19,10 @@
     "'Create Account' feature failing with 'Failed to create account' error; backend registration/signUp logic not saving new users correctly; possible mobile number validation conflict; API not returning success status for new registrations",
     "Admin Dashboard not appearing in side menu for admin user — Admin Panel button still not visible despite multiple fix attempts; admin identification via mobile number not yet working",
     "Cattle Tracker page (/tracker) is redirecting the owner principal (rhoqt-xhqg1-...) to the Home page instead of granting access — route guard or principal comparison logic is broken",
-    "'Actor not available' error when trying to create an account — backend actor/connection not initialized or unavailable at sign-up time"
+    "'Actor not available' error when trying to create an account — backend actor/connection not initialized or unavailable at sign-up time",
+    "Bottom Navigation Bar z-index issue: Account, My Ads, and Chats buttons are not clickable due to overlapping layers/transparent containers blocking pointer events"
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-design-and-apply-a-warm-nature-inspired-visual-theme-across-the-entire-app-earthy-tones-greens-ambers-warm-neutrals-friendly-typography-card-based-layouts-for-listings-and-a-consistent-header-navigation-bar-the-style-should-feel-trustworthy-and-approachable-for-an-animal-marketplace",
@@ -922,6 +923,222 @@
         "REQ-160"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-postadpage-tsx-replace-the-plain-text-input-for-location-with-an-olx-style-location-picker-component-when-the-user-taps-clicks-the-location-field-display-a-modal-or-bottom-sheet-overlay-not-an-inline-dropdown-that-gets-hidden-behind-the-mobile-keyboard-containing-1-a-search-input-at-the-top-labelled-search-city-area-or-neighbourhood-with-a-search-icon-2-a-use-current-location-row-below-the-search-input-with-a-gps-target-icon-in-professional-blue-and-the-label-use-current-location-in-professional-blue-text-clicking-this-row-triggers-the-browser-geolocation-api-navigator-geolocation-getcurrentposition-to-fetch-the-user-s-approximate-city-and-state-and-populates-the-location-field-3-a-choose-state-section-heading-below-4-an-all-in-india-option-in-professional-blue-and-5-the-full-list-of-all-indian-states-and-union-territories-as-tappable-rows-each-with-a-right-arrow-chevron-selecting-any-state-or-all-in-india-sets-the-location-field-value-and-closes-the-overlay-the-overlay-must-render-above-the-mobile-keyboard-implement-it-as-a-fixed-full-screen-or-bottom-anchored-sheet-with-its-own-scrollable-area-so-the-keyboard-does-not-cover-the-list-typing-in-the-search-input-filters-the-state-list-in-real-time",
+      "title": "In frontend/src/pages/PostAdPage.tsx, replace the plain text input for 'Location' with an OLX-style location picker component. When the user taps/clicks the location field, display a modal or bottom-sheet overlay (not an inline dropdown that gets hidden behind the mobile keyboard) containing: (1) a search input at the top labelled 'Search city, area or neighbourhood' with a search icon; (2) a 'Use current location' row below the search input, with a GPS/target icon in Professional Blue and the label 'Use current location' in Professional Blue text — clicking this row triggers the Browser Geolocation API (navigator.geolocation.getCurrentPosition) to fetch the user's approximate city and state and populates the location field; (3) a 'CHOOSE STATE' section heading below; (4) an 'All in India' option in Professional Blue; and (5) the full list of all Indian states and union territories as tappable rows, each with a right-arrow chevron. Selecting any state or 'All in India' sets the location field value and closes the overlay. The overlay must render above the mobile keyboard — implement it as a fixed full-screen or bottom-anchored sheet with its own scrollable area so the keyboard does not cover the list. Typing in the search input filters the state list in real time.",
+      "reqIds": [
+        "REQ-161"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-also-apply-the-same-olx-style-location-picker-from-req-161-to-the-location-filter-field-on-frontend-src-pages-homepage-tsx-so-that-clicking-the-location-filter-input-opens-the-same-modal-overlay-with-geolocation-search-and-indian-state-list-selecting-a-state-populates-the-location-filter-and-triggers-the-existing-client-side-filter-logic",
+      "title": "Also apply the same OLX-style location picker (from REQ-161) to the location filter field on frontend/src/pages/HomePage.tsx so that clicking the location filter input opens the same modal overlay with geolocation, search, and Indian state list. Selecting a state populates the location filter and triggers the existing client-side filter logic.",
+      "reqIds": [
+        "REQ-162"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-50-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-50",
+      "title": "Update the visible version label displayed in the app to 'Version 50'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 50'.",
+      "reqIds": [
+        "REQ-163"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-profile-account-page-frontend-src-pages-profilepage-tsx-to-match-the-olx-style-layout-shown-in-the-uploaded-screenshot-the-page-must-display-1-a-user-avatar-circle-using-the-user-s-display-name-initials-as-a-placeholder-if-no-photo-and-the-user-s-display-name-prominently-at-the-top-2-a-vertically-stacked-list-of-menu-items-each-as-a-full-width-tappable-row-with-a-left-icon-a-title-subtitle-and-a-right-arrow-chevron-the-items-must-be-buy-packages-my-orders-subtitle-packages-orders-billing-and-invoices-icon-credit-card-wishlist-subtitle-view-your-liked-items-here-icon-heart-settings-subtitle-privacy-and-logout-icon-gear-cog-clicking-this-shows-a-logout-option-or-navigates-to-a-settings-sub-section-help-support-subtitle-help-center-and-legal-terms-icon-people-support-routes-to-helpline-and-select-language-subtitle-english-icon-globe-clicking-shows-a-simple-modal-or-inline-selector-with-english-as-the-only-option-for-now-3-dividers-between-each-row-the-page-background-must-be-white-row-titles-in-dark-near-black-text-subtitles-in-gray-all-consistent-with-the-professional-blue-and-white-theme-the-existing-profile-edit-functionality-display-name-bio-and-my-ads-listings-must-be-preserved-either-integrate-them-above-the-menu-list-or-as-a-separate-accessible-section-remove-any-raw-form-fields-that-were-previously-shown-directly-on-the-page-in-favour-of-this-olx-style-menu-layout",
+      "title": "Redesign the Profile/Account page (frontend/src/pages/ProfilePage.tsx) to match the OLX-style layout shown in the uploaded screenshot. The page must display: (1) a user avatar circle (using the user's display name initials as a placeholder if no photo) and the user's display name prominently at the top; (2) a vertically stacked list of menu items, each as a full-width tappable row with a left icon, a title + subtitle, and a right-arrow chevron — the items must be: 'Buy Packages & My Orders' (subtitle: 'Packages, orders, billing and invoices', icon: credit card), 'Wishlist' (subtitle: 'View your liked items here', icon: heart), 'Settings' (subtitle: 'Privacy and logout', icon: gear/cog — clicking this shows a logout option or navigates to a settings sub-section), 'Help & Support' (subtitle: 'Help center and legal terms', icon: people/support — routes to '/helpline'), and 'Select Language / भाषा चुनें' (subtitle: 'English', icon: globe — clicking shows a simple modal or inline selector with 'English' as the only option for now); (3) dividers between each row. The page background must be white, row titles in dark near-black text, subtitles in gray, all consistent with the Professional Blue and white theme. The existing profile edit functionality (display name, bio) and 'My Ads' listings must be preserved — either integrate them above the menu list or as a separate accessible section. Remove any raw form fields that were previously shown directly on the page in favour of this OLX-style menu layout.",
+      "reqIds": [
+        "REQ-164"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-restore-the-fifth-tab-to-account-replacing-the-current-share-tab-the-updated-bottom-navigation-bar-must-have-exactly-five-tabs-in-this-order-home-routes-to-chats-routes-to-messages-sell-routes-to-post-ad-styled-prominently-as-the-center-raised-highlighted-button-with-a-icon-my-ads-routes-to-dashboard-for-authenticated-users-or-signup-for-unauthenticated-and-account-routes-to-profile-for-authenticated-users-or-signup-for-unauthenticated-the-account-tab-must-use-a-person-user-icon-and-the-label-account-the-active-tab-indicator-must-use-professional-blue-the-bottom-bar-must-retain-the-clean-white-background-styling",
+      "title": "In frontend/src/components/BottomNav.tsx, restore the fifth tab to 'Account' (replacing the current 'Share' tab). The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised/highlighted button with a '+' icon), 'My Ads' (routes to '/dashboard' for authenticated users, or '/signup' for unauthenticated), and 'Account' (routes to '/profile' for authenticated users, or '/signup' for unauthenticated). The 'Account' tab must use a person/user icon and the label 'Account'. The active tab indicator must use Professional Blue. The bottom bar must retain the clean white background styling.",
+      "reqIds": [
+        "REQ-165"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-ensure-the-header-background-is-a-clean-solid-professional-blue-1d4ed8-with-no-background-image-and-no-overlay-the-header-must-show-the-animal-pashu-bazar-round-logo-frontend-public-assets-generated-app-logo-dim-64x64-png-and-the-brand-text-animal-pashu-bazar-in-white-remove-any-remaining-references-to-the-tiger-animal-photo-background-image-or-any-css-background-image-property-on-the-header-admin-owner-only-navigation-links-for-privileged-users-may-remain-in-the-header",
+      "title": "In frontend/src/components/Layout.tsx, ensure the header background is a clean solid Professional Blue (#1D4ED8) with no background image and no overlay. The header must show the 'Animal Pashu Bazar' round logo (frontend/public/assets/generated/app-logo.dim_64x64.png) and the brand text 'Animal Pashu Bazar' in white. Remove any remaining references to the tiger/animal photo background image or any CSS background-image property on the header. Admin/owner-only navigation links for privileged users may remain in the header.",
+      "reqIds": [
+        "REQ-166"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-51-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-51",
+      "title": "Update the visible version label displayed in the app to 'Version 51'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 51'.",
+      "reqIds": [
+        "REQ-168"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-52-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-52",
+      "title": "Update the visible version label displayed in the app to 'Version 52'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 52'.",
+      "reqIds": [
+        "REQ-169"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-frontend-src-pages-profilepage-tsx-to-the-olx-style-account-page-layout-the-page-must-display-1-a-user-avatar-circle-showing-the-user-s-display-name-initials-and-the-display-name-prominently-at-the-top-2-a-vertically-stacked-list-of-full-width-tappable-menu-rows-each-with-a-left-icon-title-subtitle-and-right-arrow-chevron-in-this-order-buy-packages-subtitle-packages-orders-billing-and-invoices-icon-credit-card-wishlist-subtitle-view-your-liked-items-here-icon-heart-settings-subtitle-privacy-and-logout-icon-gear-cog-clicking-this-reveals-a-logout-option-help-support-subtitle-help-center-and-legal-terms-icon-people-support-routes-to-helpline-and-select-language-subtitle-english-icon-globe-clicking-shows-a-simple-modal-with-english-as-the-only-selectable-option-3-horizontal-dividers-between-each-row-page-background-must-be-white-row-titles-in-dark-near-black-text-subtitles-in-gray-consistent-with-the-professional-blue-and-white-theme-the-existing-my-ads-section-listing-the-user-s-active-listings-with-a-deactivate-option-and-the-edit-profile-functionality-display-name-and-bio-must-be-preserved-accessible-from-above-the-menu-list-or-via-a-tappable-row-button-remove-any-raw-form-fields-that-were-previously-shown-directly-on-the-page",
+      "title": "Redesign frontend/src/pages/ProfilePage.tsx to the OLX-style Account page layout. The page must display: (1) a user avatar circle showing the user's display name initials and the display name prominently at the top; (2) a vertically stacked list of full-width tappable menu rows, each with a left icon, title, subtitle, and right-arrow chevron, in this order: 'Buy Packages' (subtitle: 'Packages, orders, billing and invoices', icon: credit card), 'Wishlist' (subtitle: 'View your liked items here', icon: heart), 'Settings' (subtitle: 'Privacy and logout', icon: gear/cog — clicking this reveals a logout option), 'Help & Support' (subtitle: 'Help center and legal terms', icon: people/support — routes to /helpline), and 'Select Language / भाषा चुनें' (subtitle: 'English', icon: globe — clicking shows a simple modal with 'English' as the only selectable option); (3) horizontal dividers between each row. Page background must be white, row titles in dark near-black text, subtitles in gray, consistent with the Professional Blue and white theme. The existing 'My Ads' section (listing the user's active listings with a deactivate option) and the 'Edit Profile' functionality (display name and bio) must be preserved, accessible from above the menu list or via a tappable row/button. Remove any raw form fields that were previously shown directly on the page.",
+      "reqIds": [
+        "REQ-170"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-helplinepage-tsx-add-a-prominently-styled-call-admin-for-ad-approval-button-in-the-contact-details-section-the-button-must-use-a-tel-link-pointing-to-the-primary-admin-phone-number-8431207976-i-e-href-tel-8431207976-style-the-button-in-professional-blue-consistent-with-the-rest-of-the-page-the-button-must-be-clearly-labelled-call-admin-for-ad-approval-and-must-be-visible-without-scrolling-past-the-contact-form",
+      "title": "In frontend/src/pages/HelplinePage.tsx, add a prominently styled 'Call Admin for Ad Approval' button in the Contact Details section. The button must use a tel: link pointing to the primary admin phone number '8431207976' (i.e., href='tel:8431207976'). Style the button in Professional Blue consistent with the rest of the page. The button must be clearly labelled 'Call Admin for Ad Approval' and must be visible without scrolling past the contact form.",
+      "reqIds": [
+        "REQ-171"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refactor-frontend-src-pages-postadpage-tsx-to-implement-a-professional-5-step-ad-posting-flow-with-a-step-progress-indicator-at-the-top-the-five-steps-are-step-1-details-title-description-category-fields-step-2-photos-the-existing-file-upload-control-with-up-to-5-images-with-an-illustration-and-the-message-uploading-more-photos-increases-your-chance-of-closing-a-deal-plus-take-a-picture-folders-upload-options-styled-as-large-blue-tiles-matching-the-olx-screenshot-step-3-price-price-input-field-and-the-vip-ad-checkbox-toggle-step-4-location-the-existing-olx-style-location-picker-modal-overlay-step-5-review-submit-a-summary-of-all-entered-details-title-description-category-photos-thumbnails-price-vip-status-location-with-a-post-now-button-at-the-bottom-that-triggers-the-existing-paymentmodal-flow-each-step-must-show-a-next-button-professional-blue-full-width-at-the-bottom-to-advance-and-a-back-arrow-or-back-button-to-return-to-the-previous-step-the-step-progress-indicator-must-show-the-current-step-number-and-step-name-all-existing-validation-logic-the-paymentmodal-vip-ad-flag-and-the-admin-approval-toast-must-remain-intact",
+      "title": "Refactor frontend/src/pages/PostAdPage.tsx to implement a professional 5-step ad posting flow with a step progress indicator at the top. The five steps are: Step 1 — 'Details' (title, description, category fields); Step 2 — 'Photos' (the existing file upload control with up to 5 images, with an illustration and the message 'Uploading more photos increases your chance of closing a deal', plus 'Take a Picture' / 'Folders' upload options styled as large blue tiles matching the OLX screenshot); Step 3 — 'Price' (price input field and the VIP ad checkbox toggle); Step 4 — 'Location' (the existing OLX-style location picker modal/overlay); Step 5 — 'Review & Submit' (a summary of all entered details — title, description, category, photos thumbnails, price, VIP status, location — with a 'Post Now' button at the bottom that triggers the existing PaymentModal flow). Each step must show a 'Next' button (Professional Blue, full-width at the bottom) to advance, and a back arrow or 'Back' button to return to the previous step. The step progress indicator must show the current step number and step name. All existing validation logic, the PaymentModal, VIP ad flag, and the admin approval toast must remain intact.",
+      "reqIds": [
+        "REQ-172"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-perform-a-comprehensive-fix-for-the-actor-not-available-error-in-frontend-src-hooks-useactor-ts-and-frontend-src-hooks-usequeries-ts-ensure-the-backend-actor-is-created-and-cached-immediately-after-the-internet-identity-auth-state-resolves-both-authenticated-and-anonymous-states-so-it-is-never-null-or-undefined-during-normal-app-operation-including-the-sign-up-flow-and-admin-dashboard-access-in-the-usesignup-mutation-and-any-other-mutation-that-calls-the-backend-add-a-guard-that-checks-actor-availability-before-invoking-the-backend-function-if-the-actor-is-still-null-at-call-time-retry-for-up-to-3-seconds-polling-and-only-throw-the-user-friendly-error-connection-not-ready-please-wait-a-moment-and-try-again-if-the-actor-remains-unavailable-after-the-wait-in-frontend-src-pages-signuppage-tsx-disable-the-create-account-button-and-show-a-connecting-label-while-the-actor-is-initializing-in-frontend-src-app-tsx-ensure-the-adminrouteguard-for-admin-renders-a-loading-spinner-while-the-isadmin-query-is-still-loading-and-only-redirects-to-when-loading-is-complete-and-isadmin-is-false-preventing-incorrect-redirects-due-to-actor-query-initialization-delays",
+      "title": "Perform a comprehensive fix for the 'Actor not available' error in frontend/src/hooks/useActor.ts and frontend/src/hooks/useQueries.ts. Ensure the backend actor is created and cached immediately after the Internet Identity auth state resolves (both authenticated and anonymous states), so it is never null or undefined during normal app operation including the sign-up flow and admin dashboard access. In the useSignUp mutation and any other mutation that calls the backend, add a guard that checks actor availability before invoking the backend function — if the actor is still null at call time, retry for up to 3 seconds (polling), and only throw the user-friendly error 'Connection not ready. Please wait a moment and try again.' if the actor remains unavailable after the wait. In frontend/src/pages/SignUpPage.tsx, disable the 'Create Account' button and show a 'Connecting...' label while the actor is initializing. In frontend/src/App.tsx, ensure the AdminRouteGuard for /admin renders a loading spinner while the isAdmin query is still loading and only redirects to '/' when loading is complete and isAdmin is false, preventing incorrect redirects due to actor/query initialization delays.",
+      "reqIds": [
+        "REQ-173"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-a-new-round-header-logo-image-for-animal-pashu-bazar-featuring-a-tiger-or-lion-face-illustration-consistent-with-the-round-tiger-lion-logo-shown-in-the-uploaded-screenshots-on-a-professional-blue-or-white-circular-background-save-it-as-frontend-public-assets-generated-app-logo-dim-64x64-png-update-the-header-logo-reference-in-frontend-src-components-layout-tsx-to-use-this-new-asset-rendered-as-a-round-image-rounded-full-matching-the-header-height-also-update-the-favicon-reference-in-frontend-index-html-and-the-icons-entry-in-frontend-public-manifest-json-to-use-the-new-logo-asset",
+      "title": "Generate a new round header logo image for 'Animal Pashu Bazar' featuring a tiger or lion face illustration (consistent with the round tiger/lion logo shown in the uploaded screenshots) on a Professional Blue or white circular background. Save it as 'frontend/public/assets/generated/app-logo.dim_64x64.png'. Update the header logo reference in frontend/src/components/Layout.tsx to use this new asset, rendered as a round image (rounded-full) matching the header height. Also update the favicon reference in frontend/index.html and the icons entry in frontend/public/manifest.json to use the new logo asset.",
+      "reqIds": [
+        "REQ-174"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-confirm-and-enforce-the-clean-white-ui-theme-and-bottom-navigation-bar-configuration-in-frontend-src-components-layout-tsx-ensure-the-header-background-is-a-solid-professional-blue-1d4ed8-with-no-background-image-in-frontend-src-components-bottomnav-tsx-ensure-the-bottom-navigation-bar-has-exactly-five-tabs-in-this-order-home-routes-to-chats-routes-to-messages-sell-routes-to-post-ad-styled-as-a-raised-highlighted-center-button-with-a-icon-my-ads-routes-to-dashboard-for-authenticated-users-or-signup-for-unauthenticated-and-account-routes-to-profile-for-authenticated-users-or-signup-for-unauthenticated-the-active-tab-indicator-must-use-professional-blue-the-bottom-bar-must-have-a-clean-white-background-all-page-backgrounds-must-be-white-or-very-light-neutral",
+      "title": "Confirm and enforce the clean white UI theme and bottom navigation bar configuration. In frontend/src/components/Layout.tsx, ensure the header background is a solid Professional Blue (#1D4ED8) with no background image. In frontend/src/components/BottomNav.tsx, ensure the bottom navigation bar has exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled as a raised/highlighted center button with a '+' icon), 'My Ads' (routes to '/dashboard' for authenticated users or '/signup' for unauthenticated), and 'Account' (routes to '/profile' for authenticated users or '/signup' for unauthenticated). The active tab indicator must use Professional Blue. The bottom bar must have a clean white background. All page backgrounds must be white or very light neutral.",
+      "reqIds": [
+        "REQ-175"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-frontend-src-pages-signuppage-tsx-into-a-clean-olx-style-login-signup-screen-the-page-must-have-a-white-background-and-display-1-the-animal-pashu-bazar-round-logo-image-frontend-public-assets-generated-app-logo-dim-64x64-png-centered-at-the-top-followed-by-the-app-name-animal-pashu-bazar-as-a-heading-2-three-prominent-login-option-buttons-stacked-vertically-continue-with-phone-triggers-the-existing-internet-identity-login-flow-or-navigates-to-the-phone-name-registration-form-continue-with-google-display-only-button-styled-consistently-no-functional-oauth-clicking-shows-a-toast-such-as-google-login-coming-soon-and-continue-with-facebook-display-only-button-styled-consistently-clicking-shows-a-toast-such-as-facebook-login-coming-soon-3-at-the-bottom-of-the-page-a-checkbox-row-reading-by-continuing-you-agree-to-our-terms-and-conditions-where-terms-and-conditions-is-a-clickable-link-routing-to-terms-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme-white-background-professional-blue-1d4ed8-for-primary-buttons-dark-near-black-text-for-labels",
+      "title": "Redesign frontend/src/pages/SignUpPage.tsx into a clean OLX-style login/signup screen. The page must have a white background and display: (1) the 'Animal Pashu Bazar' round logo image (frontend/public/assets/generated/app-logo.dim_64x64.png) centered at the top, followed by the app name 'Animal Pashu Bazar' as a heading; (2) three prominent login option buttons stacked vertically — 'Continue with Phone' (triggers the existing Internet Identity login flow or navigates to the phone/name registration form), 'Continue with Google' (display-only button, styled consistently, no functional OAuth — clicking shows a toast such as 'Google login coming soon'), and 'Continue with Facebook' (display-only button, styled consistently — clicking shows a toast such as 'Facebook login coming soon'); (3) at the bottom of the page, a checkbox row reading 'By continuing, you agree to our Terms and Conditions' where 'Terms and Conditions' is a clickable link routing to '/terms'. The page must be styled consistently with the existing Professional Blue and white theme — white background, Professional Blue (#1D4ED8) for primary buttons, dark near-black text for labels.",
+      "reqIds": [
+        "REQ-176"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-perform-a-comprehensive-fix-for-the-actor-not-available-error-in-frontend-src-hooks-useactor-ts-and-frontend-src-hooks-usequeries-ts-so-that-all-users-including-new-sign-ups-and-the-admin-accessing-tracker-can-successfully-connect-to-the-backend-specifically-1-ensure-the-backend-actor-is-created-and-cached-immediately-after-the-internet-identity-auth-state-resolves-both-authenticated-and-anonymous-states-so-it-is-never-null-or-undefined-during-normal-operation-2-in-the-usesignup-mutation-and-all-other-backend-calling-mutations-add-a-guard-that-polls-for-actor-availability-for-up-to-3-seconds-before-throwing-the-user-friendly-error-connection-not-ready-please-wait-a-moment-and-try-again-if-the-actor-remains-unavailable-3-in-frontend-src-pages-signuppage-tsx-disable-the-submit-button-and-show-a-connecting-label-while-the-actor-is-initializing-so-users-cannot-submit-before-the-backend-connection-is-ready-4-ensure-the-cattletrackerrouteguard-in-frontend-src-app-tsx-reads-the-principal-string-directly-from-the-internet-identity-context-identity-getprincipal-totext-and-only-redirects-when-loading-is-complete-and-the-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-rendering-a-loading-spinner-while-auth-state-is-still-loading-to-prevent-false-redirects",
+      "title": "Perform a comprehensive fix for the 'Actor not available' error in frontend/src/hooks/useActor.ts and frontend/src/hooks/useQueries.ts so that all users — including new sign-ups and the admin accessing /tracker — can successfully connect to the backend. Specifically: (1) ensure the backend actor is created and cached immediately after the Internet Identity auth state resolves (both authenticated and anonymous states), so it is never null or undefined during normal operation; (2) in the useSignUp mutation and all other backend-calling mutations, add a guard that polls for actor availability for up to 3 seconds before throwing the user-friendly error 'Connection not ready. Please wait a moment and try again.' if the actor remains unavailable; (3) in frontend/src/pages/SignUpPage.tsx, disable the submit button and show a 'Connecting...' label while the actor is initializing so users cannot submit before the backend connection is ready; (4) ensure the CattleTrackerRouteGuard in frontend/src/App.tsx reads the principal string directly from the Internet Identity context (identity?.getPrincipal().toText()) and only redirects when loading is complete and the principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe' — rendering a loading spinner while auth state is still loading to prevent false redirects.",
+      "reqIds": [
+        "REQ-177"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-53-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-53",
+      "title": "Update the visible version label displayed in the app to 'Version 53'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 53'.",
+      "reqIds": [
+        "REQ-178"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-redesign-the-center-sell-tab-button-to-be-larger-and-circular-floating-visibly-above-the-bottom-navigation-bar-the-button-must-1-be-circular-with-a-diameter-larger-than-the-standard-tab-icons-e-g-56-64px-2-have-a-two-tone-colorful-border-professional-blue-1d4ed8-on-the-inner-ring-and-yellow-gold-fbbf24-or-equivalent-as-an-outer-decorative-ring-mimicking-the-olx-floating-sell-button-style-3-float-above-the-bar-by-being-positioned-with-a-negative-top-offset-e-g-20px-to-28px-so-it-visually-rises-above-the-navigation-bar-4-display-a-prominent-icon-and-the-label-sell-beneath-it-5-use-a-solid-professional-blue-1d4ed8-fill-for-the-button-background-with-white-text-icon-the-rest-of-the-bottom-bar-home-chats-my-ads-account-tabs-must-remain-unchanged-in-layout-and-styling",
+      "title": "In frontend/src/components/BottomNav.tsx, redesign the center 'Sell' tab button to be larger and circular, floating visibly above the bottom navigation bar. The button must: (1) be circular with a diameter larger than the standard tab icons (e.g., 56–64px); (2) have a two-tone colorful border — Professional Blue (#1D4ED8) on the inner ring and yellow/gold (#FBBF24 or equivalent) as an outer decorative ring — mimicking the OLX floating sell button style; (3) float above the bar by being positioned with a negative top offset (e.g., -20px to -28px) so it visually rises above the navigation bar; (4) display a prominent '+' icon and the label 'Sell' beneath it; (5) use a solid Professional Blue (#1D4ED8) fill for the button background with white text/icon. The rest of the bottom bar (Home, Chats, My Ads, Account tabs) must remain unchanged in layout and styling.",
+      "reqIds": [
+        "REQ-179"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-modern-rounded-corners-globally-across-all-interactive-ui-elements-in-the-frontend-specifically-1-all-buttons-including-primary-secondary-outline-and-destructive-variants-must-use-rounded-full-or-at-minimum-rounded-xl-border-radius-12px-2-all-text-input-fields-and-textarea-elements-must-use-rounded-xl-border-radius-12px-3-all-image-frames-and-photo-thumbnails-including-listing-card-images-photo-previews-in-postadpage-and-photogallery-must-use-rounded-xl-or-rounded-2xl-4-all-modal-dialog-containers-must-use-rounded-2xl-apply-these-changes-consistently-in-frontend-src-index-css-global-input-button-styles-frontend-tailwind-config-js-default-border-radius-tokens-and-directly-in-listingcard-tsx-postadpage-tsx-paymentmodal-tsx-locationpickermodal-tsx-and-any-other-component-with-hard-coded-square-corners",
+      "title": "Apply modern rounded corners globally across all interactive UI elements in the frontend. Specifically: (1) all buttons (including primary, secondary, outline, and destructive variants) must use rounded-full or at minimum rounded-xl (border-radius ≥ 12px); (2) all text input fields and textarea elements must use rounded-xl (border-radius ≥ 12px); (3) all image frames and photo thumbnails — including listing card images, photo previews in PostAdPage, and PhotoGallery — must use rounded-xl or rounded-2xl; (4) all modal/dialog containers must use rounded-2xl. Apply these changes consistently in frontend/src/index.css (global input/button styles), frontend/tailwind.config.js (default border-radius tokens), and directly in ListingCard.tsx, PostAdPage.tsx, PaymentModal.tsx, LocationPickerModal.tsx, and any other component with hard-coded square corners.",
+      "reqIds": [
+        "REQ-180"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-all-transparent-or-semi-transparent-backgrounds-throughout-the-frontend-to-use-solid-colors-specifically-1-all-page-backgrounds-must-be-solid-white-ffffff-remove-any-rgba-or-transparent-background-declarations-on-page-level-containers-2-all-dropdown-menus-select-option-lists-and-popover-combobox-panels-must-have-a-solid-white-background-so-text-is-always-legible-3-the-locationpickermodal-overlay-content-panel-must-use-a-solid-white-background-4-any-card-component-with-a-transparent-or-semi-transparent-background-must-be-updated-to-solid-white-5-ensure-no-z-index-stacking-issues-cause-one-element-to-bleed-through-another-apply-fixes-in-frontend-src-index-css-frontend-tailwind-config-js-locationpickermodal-tsx-and-any-page-component-with-transparent-backgrounds",
+      "title": "Fix all transparent or semi-transparent backgrounds throughout the frontend to use solid colors. Specifically: (1) all page backgrounds must be solid white (#FFFFFF) — remove any rgba or transparent background declarations on page-level containers; (2) all dropdown menus, select option lists, and popover/combobox panels must have a solid white background so text is always legible; (3) the LocationPickerModal overlay content panel must use a solid white background; (4) any card component with a transparent or semi-transparent background must be updated to solid white; (5) ensure no z-index stacking issues cause one element to bleed through another. Apply fixes in frontend/src/index.css, frontend/tailwind.config.js, LocationPickerModal.tsx, and any page/component with transparent backgrounds.",
+      "reqIds": [
+        "REQ-181"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-perform-a-final-comprehensive-audit-and-fix-for-the-actor-not-available-error-in-frontend-src-hooks-useactor-ts-and-frontend-src-hooks-usequeries-ts-to-ensure-the-admin-principal-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe-can-reliably-access-the-tracker-page-and-all-other-users-can-complete-sign-up-without-encountering-this-error-the-fix-must-1-ensure-the-backend-actor-is-created-and-cached-immediately-after-internet-identity-auth-state-resolves-both-authenticated-and-anonymous-states-never-remaining-null-undefined-2-in-the-usesignup-mutation-and-all-backend-calling-mutations-poll-for-actor-availability-for-up-to-3-seconds-before-throwing-connection-not-ready-please-wait-a-moment-and-try-again-3-in-signuppage-tsx-keep-the-submit-button-disabled-with-a-connecting-label-while-the-actor-is-still-initializing-4-ensure-the-cattletrackerrouteguard-in-app-tsx-reads-the-principal-string-directly-from-identity-getprincipal-totext-shows-a-loading-spinner-while-auth-is-loading-and-only-redirects-to-when-loading-is-complete-and-the-principal-does-not-match-rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe",
+      "title": "Perform a final comprehensive audit and fix for the 'Actor not available' error in frontend/src/hooks/useActor.ts and frontend/src/hooks/useQueries.ts to ensure the admin (principal 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe') can reliably access the /tracker page and all other users can complete sign-up without encountering this error. The fix must: (1) ensure the backend actor is created and cached immediately after Internet Identity auth state resolves (both authenticated and anonymous states), never remaining null/undefined; (2) in the useSignUp mutation and all backend-calling mutations, poll for actor availability for up to 3 seconds before throwing 'Connection not ready. Please wait a moment and try again.'; (3) in SignUpPage.tsx, keep the submit button disabled with a 'Connecting...' label while the actor is still initializing; (4) ensure the CattleTrackerRouteGuard in App.tsx reads the principal string directly from identity?.getPrincipal().toText(), shows a loading spinner while auth is loading, and only redirects to '/' when loading is complete and the principal does not match 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe'.",
+      "reqIds": [
+        "REQ-182"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-54-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-54",
+      "title": "Update the visible version label displayed in the app to 'Version 54'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 54'.",
+      "reqIds": [
+        "REQ-183"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-set-z-index-999-e-g-tailwind-class-z-999-on-the-bottom-navigation-bar-s-root-container-element-so-it-renders-above-all-other-page-content-overlays-and-background-elements",
+      "title": "In frontend/src/components/BottomNav.tsx, set z-index: 999 (e.g., Tailwind class z-[999]) on the bottom navigation bar's root container element so it renders above all other page content, overlays, and background elements.",
+      "reqIds": [
+        "REQ-184"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-explicitly-set-pointer-events-auto-and-position-relative-or-ensure-no-override-on-each-of-the-five-tab-buttons-home-chats-sell-my-ads-and-account-so-that-all-tap-click-interactions-are-reliably-received-regardless-of-overlapping-layers",
+      "title": "In frontend/src/components/BottomNav.tsx, explicitly set pointer-events: auto and position: relative (or ensure no override) on each of the five tab buttons — Home, Chats, Sell, My Ads, and Account — so that all tap/click interactions are reliably received regardless of overlapping layers.",
+      "reqIds": [
+        "REQ-185"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-bottomnav-tsx-apply-z-index-999-and-isolation-isolate-to-the-floating-circular-sell-button-specifically-ensuring-it-also-floats-above-all-other-elements-and-receives-pointer-events-correctly",
+      "title": "In frontend/src/components/BottomNav.tsx, apply z-index: 999 and isolation: isolate to the floating circular 'Sell' button specifically, ensuring it also floats above all other elements and receives pointer events correctly.",
+      "reqIds": [
+        "REQ-186"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-and-frontend-src-pages-homepage-tsx-audit-all-decorative-background-containers-including-any-hero-image-containers-header-background-layers-and-any-full-viewport-overlay-divs-apply-pointer-events-none-tailwind-pointer-events-none-to-every-purely-decorative-or-background-layer-element-so-they-cannot-intercept-clicks-intended-for-interactive-elements-beneath-or-above-them",
+      "title": "In frontend/src/components/Layout.tsx and frontend/src/pages/HomePage.tsx, audit all decorative background containers (including any hero image containers, header background layers, and any full-viewport overlay divs). Apply pointer-events: none (Tailwind: pointer-events-none) to every purely decorative or background-layer element so they cannot intercept clicks intended for interactive elements beneath or above them.",
+      "reqIds": [
+        "REQ-187"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-55-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-55",
+      "title": "Update the visible version label displayed in the app to 'Version 55'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 55'.",
+      "reqIds": [
+        "REQ-190"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -1557,6 +1774,108 @@
       "id": "AR-121",
       "summary": "Redesign home screen OLX-style: remove the large 'Invite a friend' share banner from the middle of the screen, add a small 'Share'/'Invite' icon as the 5th tab in the Bottom Navigation Bar (replacing 'Account' or repositioning tabs), so the Bottom Bar has: Home, Chats, Sell (+), My Ads, Share. Update version label to 'Version 49'.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-122",
+      "summary": "Update the Location input field to OLX style: clicking it shows a dropdown with 'Use current location' (GPS icon, uses Browser Geolocation API to auto-fetch city/state), followed by a list of all Indian states. Fix UI so dropdown appears above the mobile keyboard. Update version label to 'Version 50'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-123",
+      "summary": "Redesign the 'Account' tab (Profile page) OLX-style with sections: 'Buy Packages & My Orders', 'Wishlist', 'Settings', 'Help & Support', and 'Select Language'. Update version label to 'Version 51'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-124",
+      "summary": "Restore the Bottom Navigation Bar 5th tab back to 'Account' (routes to '/profile' for authenticated users or '/signup' for unauthenticated), replacing the current 'Share' tab. Tabs must be: Home, Chats, Sell (+), My Ads, Account.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-128",
+      "summary": "In frontend/src/hooks/useQueries.ts and frontend/src/hooks/useActor.ts, perform a comprehensive fix for the 'Actor not available' error. Ensure the backend actor is always initialized immediately after the Internet Identity auth state resolves (both authenticated and anonymous states). The actor must be created synchronously once auth state is known and must never remain null or undefined during normal app operation. In the useSignUp mutation, add a guard that checks actor availability before calling the backend — if the actor is still null at call time, wait up to 3 seconds for it to become available (polling or awaiting the query client), and only throw 'Connection not ready. Please wait a moment and try again.' if the actor remains unavailable after the wait. In frontend/src/pages/SignUpPage.tsx, disable the 'Create Account' button and show a brief 'Connecting...' label while the actor is initializing, so users cannot submit before the backend connection is established.",
+      "reqIds": [
+        "REQ-167"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-129",
+      "summary": "Update the visible version label displayed in the app to 'Version 52'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-130",
+      "summary": "Redesign the Profile/Account page (OLX-style) to include: user avatar with initials, and menu items for 'Buy Packages', 'Wishlist', 'Settings' (with logout), 'Help & Support' (routes to /helpline), and 'Select Language'. Consistent with Professional Blue and white theme.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-131",
+      "summary": "In the Help & Support / Helpline page, add a 'Call Admin for Ad Approval' button that links directly to the admin phone number (tel: link).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-132",
+      "summary": "Implement a 5-step ad posting flow in PostAdPage: Step 1 - Details (title, description, category), Step 2 - Photos (upload), Step 3 - Price, Step 4 - Location (OLX-style picker), Step 5 - Review & Submit. Each step shown as a progress indicator.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-133",
+      "summary": "Fix the 'Actor not available' error comprehensively so users can log in, create accounts, and the admin can access the admin dashboard without connection errors.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-134",
+      "summary": "Ensure the app uses a clean white theme, the round tiger/lion logo image, and a bottom navigation bar with exactly five tabs: Home, Chats, Sell (+), My Ads, and Account.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-135",
+      "summary": "Create an OLX-style clean white login/signup screen with the 'Animal Pashu Bazar' round logo at the top, login option buttons ('Continue with Phone', 'Continue with Google', 'Continue with Facebook'), and a Terms & Conditions checkbox at the bottom saying 'By continuing, you agree to our Terms and Conditions'. Update version label to 'Version 53'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-136",
+      "summary": "Comprehensive fix for 'Actor not available' error during sign-up/login so users can access their accounts and the /tracker dashboard is accessible after fixing the backend connection. Version 53.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-137",
+      "summary": "Update the center '+' Sell button in the bottom navigation bar to be larger and circular, floating slightly above the bar with a colorful border (blue and yellow) like OLX. Ensure modern rounded corners on all buttons, input boxes, and image frames. Fix any transparent backgrounds to use solid white on all pages and dropdowns. Confirm the 'Actor not available' error is permanently fixed. Update version label to 'Version 54'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-138",
+      "summary": "Fix z-index issue in Bottom Navigation Bar: set high z-index (999) on the bottom nav bar and Sell button, ensure tiger background/transparent containers have pointer-events: none so they don't block clicks, ensure Account/My Ads/Chats buttons have pointer-events: auto. Confirm Actor not available fix is active. Update version label to 'Version 55'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-143",
+      "summary": "Audit all page-level components (HomePage.tsx, PostAdPage.tsx, ListingDetailPage.tsx, MessagesPage.tsx, ProfilePage.tsx, UserDashboardPage.tsx, SignUpPage.tsx, and any other pages that render behind the bottom nav bar) for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events: none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav.",
+      "reqIds": [
+        "REQ-188"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-144",
+      "summary": "Verify that the 'Actor not available' comprehensive fix implemented in previous versions (polling for actor availability for up to 3 seconds, throwing 'Connection not ready. Please wait a moment and try again.' if unavailable, and the CattleTrackerRouteGuard reading the principal directly from identity?.getPrincipal().toText()) is still intact and active in frontend/src/hooks/useActor.ts, frontend/src/hooks/useQueries.ts, frontend/src/pages/SignUpPage.tsx, and frontend/src/App.tsx. If any regression is detected, re-apply the fix. No backend changes are required.",
+      "reqIds": [
+        "REQ-189"
+      ],
       "status": "pending"
     }
   ],

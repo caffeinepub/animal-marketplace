@@ -304,7 +304,7 @@ export default function UserDashboardPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Deactivate Listing?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This will hide "{listing.title}" from the marketplace. You can reactivate it later.
+                            This will hide "{listing.title}" from the marketplace.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

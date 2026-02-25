@@ -2,12 +2,12 @@ import { useState, useMemo } from 'react';
 import { useGetListings } from '../hooks/useQueries';
 import ListingCard from '../components/ListingCard';
 import { AnimalCategory } from '../backend';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, MapPin, X, Crown } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import LocationPickerModal from '../components/LocationPickerModal';
 
 const ALL_CATEGORIES = 'all';
 
@@ -47,6 +47,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
   const [locationFilter, setLocationFilter] = useState('');
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const activeListings = useMemo(
     () => listings.filter((l) => l.isActive),
@@ -71,6 +72,7 @@ export default function HomePage() {
 
       const matchesLocation =
         !locationFilter ||
+        locationFilter === 'All in India' ||
         listing.location.toLowerCase().includes(locationFilter.toLowerCase());
 
       return matchesSearch && matchesCategory && matchesLocation;
@@ -95,8 +97,12 @@ export default function HomePage() {
             alt="Buy and sell animals on Animal Pashu Bazar"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center">
-            <div className="container mx-auto px-4">
+          {/* Overlay is purely decorative — pointer-events-none so it never blocks clicks */}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent flex items-center"
+            style={{ pointerEvents: 'none' }}
+          >
+            <div className="container mx-auto px-4" style={{ pointerEvents: 'auto' }}>
               <h1 className="font-display text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-2">
                 Buy &amp; Sell Animals<br />on Pashu Mandi
               </h1>
@@ -120,11 +126,12 @@ export default function HomePage() {
             {/* Search */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
+              <input
+                type="text"
                 placeholder="Search animals, breeds..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="w-full pl-9 pr-3 py-2 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -156,16 +163,41 @@ export default function HomePage() {
               </SelectContent>
             </Select>
 
-            {/* Location Filter */}
-            <div className="relative w-full sm:w-44">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Location..."
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            {/* Location Filter — OLX-style tappable button */}
+            <button
+              type="button"
+              onClick={() => setIsLocationModalOpen(true)}
+              className={`relative w-full sm:w-44 flex items-center gap-2 px-3 py-2 rounded-md border text-sm text-left transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${
+                locationFilter
+                  ? 'border-primary text-foreground bg-background'
+                  : 'border-border text-muted-foreground bg-background'
+              } hover:border-primary`}
+            >
+              <MapPin className="w-4 h-4 shrink-0 text-muted-foreground" />
+              <span className="flex-1 truncate">
+                {locationFilter || 'Location…'}
+              </span>
+              {locationFilter && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocationFilter('');
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.stopPropagation();
+                      setLocationFilter('');
+                    }
+                  }}
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear location filter"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </span>
+              )}
+            </button>
 
             {/* Reset */}
             {hasFilters && (
@@ -238,38 +270,40 @@ export default function HomePage() {
               src="/assets/generated/empty-state.dim_400x300.png"
               alt="No listings found"
               className="w-48 h-36 object-contain mb-6 opacity-70"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
-            <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-              {hasFilters ? 'No listings match your filters' : 'No listings yet'}
-            </h3>
-            <p className="text-muted-foreground max-w-sm mb-6">
+            <p className="text-xl font-semibold text-gray-700 mb-2">No listings found</p>
+            <p className="text-gray-400 text-sm max-w-xs">
               {hasFilters
                 ? 'Try adjusting your search or filters to find what you\'re looking for.'
-                : 'Be the first to post an animal listing on Pashu Mandi!'}
+                : 'Be the first to post an animal listing!'}
             </p>
-            {hasFilters ? (
-              <Button variant="outline" onClick={resetFilters}>
+            {hasFilters && (
+              <Button variant="outline" className="mt-4" onClick={resetFilters}>
                 Clear Filters
               </Button>
-            ) : (
-              <Link to="/post-ad">
-                <Button>Post Your Ad</Button>
-              </Link>
             )}
           </div>
         ) : (
-          <>
-            <p className="text-sm text-muted-foreground mb-4">
-              {filteredListings.length} listing{filteredListings.length !== 1 ? 's' : ''} found
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredListings.map((listing) => (
-                <ListingCard key={listing.id.toString()} listing={listing} />
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredListings.map((listing) => (
+              <ListingCard key={listing.id.toString()} listing={listing} />
+            ))}
+          </div>
         )}
       </section>
+
+      {/* Location Picker Modal */}
+      <LocationPickerModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelect={(loc) => {
+          setLocationFilter(loc === 'All in India' ? '' : loc);
+          setIsLocationModalOpen(false);
+        }}
+      />
     </div>
   );
 }

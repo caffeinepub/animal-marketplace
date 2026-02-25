@@ -1,17 +1,24 @@
 {
   "name": "Animal Pashu Bazar",
-  "short_name": "Animal Pashu Bazar",
-  "description": "Buy and sell animals on Animal Pashu Bazar",
-  "display": "standalone",
+  "short_name": "Pashu Bazar",
+  "description": "Buy and Sell Animals Across India",
   "start_url": "/",
-  "scope": "/",
-  "theme_color": "#10b981",
+  "display": "standalone",
   "background_color": "#ffffff",
+  "theme_color": "#1D4ED8",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/assets/generated/app-logo.dim_64x64.png",
+      "src": "assets/generated/app-logo.dim_64x64.png",
       "sizes": "64x64",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/generated/logo-icon.dim_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate, Link } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useCreateListing, useGetMobileNumber } from '../hooks/useQueries';
 import { AnimalCategory } from '../backend';
@@ -7,44 +7,44 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LogIn, ImagePlus, UserPlus, X, Camera, Crown, Clock } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import {
+  ArrowLeft,
+  Camera,
+  FolderOpen,
+  MapPin,
+  ChevronDown,
+  X,
+  Loader2,
+  CheckCircle,
+  Image as ImageIcon,
+} from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
+import LocationPickerModal from '../components/LocationPickerModal';
 
-const PET_CATEGORIES: AnimalCategory[] = [
-  AnimalCategory.dog,
-  AnimalCategory.cat,
-  AnimalCategory.bird,
-  AnimalCategory.fish,
-  AnimalCategory.reptile,
-  AnimalCategory.smallAnimal,
-  AnimalCategory.other,
+const STEPS = [
+  { id: 1, name: 'Details' },
+  { id: 2, name: 'Photos' },
+  { id: 3, name: 'Price' },
+  { id: 4, name: 'Location' },
+  { id: 5, name: 'Review' },
 ];
 
-const FARM_CATEGORIES: AnimalCategory[] = [
-  AnimalCategory.cow,
-  AnimalCategory.buffalo,
-  AnimalCategory.goat,
-  AnimalCategory.sheep,
+const CATEGORIES = [
+  { value: AnimalCategory.cow, label: '🐄 Cow' },
+  { value: AnimalCategory.buffalo, label: '🐃 Buffalo' },
+  { value: AnimalCategory.goat, label: '🐐 Goat' },
+  { value: AnimalCategory.sheep, label: '🐑 Sheep' },
+  { value: AnimalCategory.dog, label: '🐕 Dog' },
+  { value: AnimalCategory.cat, label: '🐈 Cat' },
+  { value: AnimalCategory.bird, label: '🐦 Bird' },
+  { value: AnimalCategory.fish, label: '🐟 Fish' },
+  { value: AnimalCategory.reptile, label: '🦎 Reptile' },
+  { value: AnimalCategory.smallAnimal, label: '🐹 Small Animal' },
+  { value: AnimalCategory.other, label: '🐾 Other' },
 ];
-
-const CATEGORY_LABELS: Record<AnimalCategory, string> = {
-  [AnimalCategory.dog]: '🐕 Dogs',
-  [AnimalCategory.cat]: '🐈 Cats',
-  [AnimalCategory.bird]: '🦜 Birds',
-  [AnimalCategory.fish]: '🐟 Fish',
-  [AnimalCategory.reptile]: '🦎 Reptiles',
-  [AnimalCategory.smallAnimal]: '🐹 Small Animals',
-  [AnimalCategory.other]: '🐾 Other',
-  [AnimalCategory.cow]: '🐄 Cow',
-  [AnimalCategory.buffalo]: '🐃 Buffalo',
-  [AnimalCategory.goat]: '🐐 Goat',
-  [AnimalCategory.sheep]: '🐑 Sheep',
-};
-
-const MAX_PHOTOS = 5;
 
 function readFileAsDataURL(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -55,472 +55,494 @@ function readFileAsDataURL(file: File): Promise<string> {
   });
 }
 
-interface PendingListingData {
-  title: string;
-  description: string;
-  price: bigint;
-  category: AnimalCategory;
-  location: string;
-  photoUrls: string[];
-  isVip: boolean;
-}
-
 export default function PostAdPage() {
-  const { identity, login, isLoggingIn } = useInternetIdentity();
-  const isAuthenticated = !!identity;
   const navigate = useNavigate();
-  const { mutateAsync: createListing, isPending } = useCreateListing();
-  const { data: mobileNumber, isLoading: mobileLoading } = useGetMobileNumber();
+  const { identity } = useInternetIdentity();
+  const createListing = useCreateListing();
+  const { data: mobileNumber } = useGetMobileNumber();
 
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [category, setCategory] = useState<AnimalCategory | ''>('');
-  const [location, setLocation] = useState('');
   const [photoDataUrls, setPhotoDataUrls] = useState<string[]>([]);
-  const [photoError, setPhotoError] = useState('');
-  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
+  const [price, setPrice] = useState('');
   const [isVip, setIsVip] = useState(false);
-
-  // Payment modal state
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [pendingListingData, setPendingListingData] = useState<PendingListingData | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [location, setLocation] = useState('');
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  if (!identity) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-6">
+        <h2 className="text-xl font-bold text-gray-800">Login Required</h2>
+        <p className="text-gray-500 text-center">Please login to post an ad.</p>
+        <Button onClick={() => navigate({ to: '/signup' })}>Login / Sign Up</Button>
+      </div>
+    );
+  }
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
+  if (!mobileNumber) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-6">
+        <h2 className="text-xl font-bold text-gray-800">Complete Your Profile</h2>
+        <p className="text-gray-500 text-center">Please complete sign-up with your mobile number before posting an ad.</p>
+        <Button onClick={() => navigate({ to: '/signup' })}>Complete Sign Up</Button>
+      </div>
+    );
+  }
 
-    const totalAfter = photoDataUrls.length + files.length;
-    if (totalAfter > MAX_PHOTOS) {
-      setPhotoError(`You can upload a maximum of ${MAX_PHOTOS} photos. Please remove some before adding more.`);
-      e.target.value = '';
-      return;
-    }
+  const handlePhotoSelect = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const remaining = 5 - photoDataUrls.length;
+    if (remaining <= 0) return;
+    const newFiles = Array.from(files).slice(0, remaining);
 
-    setPhotoError('');
     setIsProcessingFiles(true);
-
     try {
-      const dataUrls = await Promise.all(files.map(readFileAsDataURL));
+      const dataUrls = await Promise.all(newFiles.map(readFileAsDataURL));
       setPhotoDataUrls((prev) => [...prev, ...dataUrls]);
     } catch {
-      toast.error('Failed to read one or more image files. Please try again.');
+      toast.error('Failed to read image files. Please try again.');
     } finally {
       setIsProcessingFiles(false);
-      e.target.value = '';
     }
   };
 
   const removePhoto = (index: number) => {
     setPhotoDataUrls((prev) => prev.filter((_, i) => i !== index));
-    setPhotoError('');
   };
 
-  // Step 1: Validate form and open payment modal
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!title.trim() || !description.trim() || !price || !category || !location.trim()) {
-      toast.error('Please fill in all required fields.');
-      return;
+  const validateStep = (step: number): boolean => {
+    if (step === 1) {
+      if (!title.trim()) { toast.error('Please enter a title'); return false; }
+      if (!description.trim()) { toast.error('Please enter a description'); return false; }
+      if (!category) { toast.error('Please select a category'); return false; }
     }
-
-    const priceNum = parseFloat(price);
-    if (isNaN(priceNum) || priceNum < 0) {
-      toast.error('Please enter a valid price.');
-      return;
+    if (step === 3) {
+      if (!price || isNaN(Number(price)) || Number(price) < 0) {
+        toast.error('Please enter a valid price');
+        return false;
+      }
     }
-
-    if (photoDataUrls.length === 0) {
-      setPhotoError('Please upload at least one photo.');
-      return;
+    if (step === 4) {
+      if (!location.trim()) { toast.error('Please select a location'); return false; }
     }
-
-    // Store form data and open payment modal
-    setPendingListingData({
-      title: title.trim(),
-      description: description.trim(),
-      price: BigInt(Math.round(priceNum)),
-      category: category as AnimalCategory,
-      location: location.trim(),
-      photoUrls: photoDataUrls,
-      isVip,
-    });
-    setSubmitError(null);
-    setIsPaymentModalOpen(true);
+    return true;
   };
 
-  // Step 2: Called after user confirms payment in modal
+  const handleNext = () => {
+    if (!validateStep(currentStep)) return;
+    setCurrentStep((s) => Math.min(s + 1, 5));
+  };
+
+  const handleBack = () => {
+    setCurrentStep((s) => Math.max(s - 1, 1));
+  };
+
+  const handlePostNow = () => {
+    setPaymentModalOpen(true);
+  };
+
   const handleConfirmPayment = async () => {
-    if (!pendingListingData) return;
-
-    setSubmitError(null);
+    setPaymentModalOpen(false);
+    setIsSubmitting(true);
     try {
-      await createListing(pendingListingData);
-      setIsPaymentModalOpen(false);
-      setPendingListingData(null);
-      toast.success(
-        'Your ad has been submitted and is pending admin approval. It will appear publicly once approved.',
-        { duration: 6000 }
-      );
-      navigate({ to: '/' });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to post listing. Please try again.';
-      setSubmitError(message);
+      await createListing.mutateAsync({
+        title: title.trim(),
+        description: description.trim(),
+        price: BigInt(Math.round(Number(price))),
+        category: category as AnimalCategory,
+        location: location.trim(),
+        photoUrls: photoDataUrls,
+        isVip,
+      });
+
+      toast.success('🎉 Ad posted! Awaiting admin approval.', { duration: 5000 });
+      navigate({ to: '/dashboard' });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to post ad. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleCloseModal = () => {
-    if (isPending) return;
-    setIsPaymentModalOpen(false);
-    setSubmitError(null);
-  };
-
-  // Not logged in
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
-        <ImagePlus className="w-16 h-16 text-muted-foreground/30 mb-4" />
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Sign in to post an ad
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          You need to be logged in to create a listing on Pashu Mandi.
-        </p>
-        <Button onClick={login} disabled={isLoggingIn} className="gap-2">
-          {isLoggingIn ? (
-            <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-          ) : (
-            <LogIn className="w-4 h-4" />
-          )}
-          {isLoggingIn ? 'Logging in...' : 'Login to Post'}
-        </Button>
-      </div>
-    );
-  }
-
-  // Logged in but no mobile number — prompt sign-up
-  if (!mobileLoading && !mobileNumber) {
-    return (
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-5">
-          <UserPlus className="w-10 h-10 text-primary" />
-        </div>
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Complete your sign-up first
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          You need to create an account with your name and mobile number before posting an ad. It only takes a moment!
-        </p>
-        <Button asChild className="gap-2">
-          <Link to="/signup">
-            <UserPlus className="w-4 h-4" />
-            Create Account
-          </Link>
-        </Button>
-      </div>
-    );
-  }
-
-  const postingFee = isVip ? 500 : 199;
+  const categoryLabel = CATEGORIES.find((c) => c.value === category)?.label || '';
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold text-foreground">Post an Ad</h1>
-          <p className="text-muted-foreground mt-1">
-            Fill in the details below to list your animal for sale.
-          </p>
-        </div>
-
-        {/* Pending approval notice */}
-        <div className="mb-6 flex items-start gap-3 rounded-xl px-5 py-3 bg-blue-50 border border-blue-200">
-          <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">Admin Approval Required</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              All new ads are reviewed by our admin before going live. This usually takes a short time.
-            </p>
+    <div className="bg-white min-h-screen flex flex-col">
+      {/* Step Header */}
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="flex items-center gap-3 px-4 py-3">
+          {currentStep > 1 ? (
+            <button onClick={handleBack} className="p-1 hover:bg-gray-100 rounded-full">
+              <ArrowLeft className="h-5 w-5 text-gray-700" />
+            </button>
+          ) : (
+            <button onClick={() => navigate({ to: '/' })} className="p-1 hover:bg-gray-100 rounded-full">
+              <ArrowLeft className="h-5 w-5 text-gray-700" />
+            </button>
+          )}
+          <div className="flex-1">
+            <h1 className="text-base font-bold text-gray-900">
+              {currentStep === 1 && 'Ad Details'}
+              {currentStep === 2 && 'Upload your photos'}
+              {currentStep === 3 && 'Set your price'}
+              {currentStep === 4 && 'Confirm your location'}
+              {currentStep === 5 && 'Review your details'}
+            </h1>
           </div>
+          <span className="text-xs text-gray-400 font-medium">{currentStep}/5</span>
         </div>
 
-        {/* Posting fee notice */}
-        <div className={`mb-6 flex items-center gap-3 rounded-xl px-5 py-3 transition-all duration-200 ${
-          isVip
-            ? 'bg-amber-50 border-2 border-amber-300'
-            : 'bg-primary/5 border border-primary/20'
-        }`}>
-          <span className="text-2xl">{isVip ? '👑' : '💳'}</span>
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              Posting Fee:{' '}
-              <span className={isVip ? 'text-amber-600' : 'text-primary'}>
-                ₹{postingFee}
-              </span>
-              {isVip && (
-                <span className="ml-2 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                  VIP
-                </span>
-              )}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {isVip
-                ? 'Your ad will be featured at the top with a gold border and Verified badge.'
-                : 'A one-time fee of ₹199 is required to publish your ad. Payment via UPI.'}
-            </p>
-          </div>
+        {/* Step Progress Bar */}
+        <div className="flex px-4 pb-3 gap-1">
+          {STEPS.map((step) => (
+            <div
+              key={step.id}
+              className={`h-1 flex-1 rounded-full transition-colors ${
+                step.id <= currentStep ? 'bg-primary' : 'bg-gray-200'
+              }`}
+            />
+          ))}
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Info */}
-          <div className="bg-card border border-border rounded-xl p-6 space-y-5">
-            <h2 className="font-semibold text-foreground">Basic Information</h2>
-
-            <div className="space-y-2">
-              <Label htmlFor="title">
-                Title <span className="text-destructive">*</span>
+      {/* Step Content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Step 1: Details */}
+        {currentStep === 1 && (
+          <div className="px-4 py-5 space-y-5">
+            <div>
+              <Label htmlFor="title" className="text-sm font-semibold text-gray-700">
+                Ad Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
-                placeholder="e.g. Murrah Buffalo, 5 years old"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                required
+                placeholder="e.g. Healthy Murrah Buffalo for sale"
                 maxLength={100}
+                className="mt-1"
               />
+              <p className="text-xs text-gray-400 mt-1 text-right">{title.length}/100</p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="category">
-                  Category <span className="text-destructive">*</span>
-                </Label>
-                <Select value={category} onValueChange={(v) => setCategory(v as AnimalCategory)}>
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Pets</SelectLabel>
-                      {PET_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {CATEGORY_LABELS[cat]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectSeparator />
-                    <SelectGroup>
-                      <SelectLabel>Farm Animals</SelectLabel>
-                      {FARM_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {CATEGORY_LABELS[cat]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">
-                  Price (₹) <span className="text-destructive">*</span>
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">₹</span>
-                  <Input
-                    id="price"
-                    type="number"
-                    placeholder="0"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    required
-                    min={0}
-                    className="pl-7"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">
-                Location <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="location"
-                placeholder="e.g. Lahore, Punjab"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-                maxLength={100}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">
-                Description <span className="text-destructive">*</span>
+            <div>
+              <Label htmlFor="description" className="text-sm font-semibold text-gray-700">
+                Description <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="description"
-                placeholder="Describe the animal — age, breed, health, reason for selling..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                required
-                rows={4}
-                maxLength={1000}
+                placeholder="Describe what you are selling. Include condition, features and reason for selling."
+                rows={5}
+                maxLength={2000}
+                className="mt-1"
               />
-              <p className="text-xs text-muted-foreground text-right">
-                {description.length}/1000
+              <p className="text-xs text-gray-400 mt-1 text-right">{description.length}/2000</p>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-gray-700">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Select value={category} onValueChange={(v) => setCategory(v as AnimalCategory)}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select animal category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-gray-400">* Required Fields</p>
+          </div>
+        )}
+
+        {/* Step 2: Photos */}
+        {currentStep === 2 && (
+          <div className="px-4 py-5">
+            {/* Illustration */}
+            <div className="flex flex-col items-center py-6">
+              <div className="flex items-end gap-2 mb-4">
+                <div className="w-16 h-16 bg-yellow-100 border-4 border-yellow-400 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="h-8 w-8 text-yellow-600" />
+                </div>
+                <div className="w-20 h-20 bg-yellow-100 border-4 border-yellow-400 rounded-lg flex items-center justify-center -mb-1">
+                  <ImageIcon className="h-10 w-10 text-yellow-600" />
+                </div>
+                <div className="w-16 h-16 bg-yellow-100 border-4 border-yellow-400 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="h-8 w-8 text-yellow-600" />
+                </div>
+              </div>
+              <p className="text-center text-base font-semibold text-gray-800 max-w-xs">
+                Uploading more photos increases your chance of closing a deal
               </p>
             </div>
-          </div>
 
-          {/* Photos */}
-          <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-foreground">Photos</h2>
-              <span className="text-xs text-muted-foreground">
-                {photoDataUrls.length}/{MAX_PHOTOS} photos
-              </span>
-            </div>
-
-            {/* Hidden file input */}
+            {/* Hidden file inputs */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              multiple
+              className="hidden"
+              onChange={(e) => handlePhotoSelect(e.target.files)}
+            />
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/*"
               multiple
               className="hidden"
-              onChange={handleFileChange}
+              onChange={(e) => handlePhotoSelect(e.target.files)}
             />
 
-            {/* Upload button */}
-            {photoDataUrls.length < MAX_PHOTOS && (
-              <button
-                type="button"
-                onClick={handleUploadClick}
-                disabled={isProcessingFiles}
-                className="w-full border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-3 text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessingFiles ? (
-                  <span className="animate-spin w-8 h-8 border-2 border-current border-t-transparent rounded-full" />
-                ) : (
-                  <Camera className="w-8 h-8" />
-                )}
-                <div className="text-center">
-                  <p className="font-medium text-sm">
-                    {isProcessingFiles ? 'Processing...' : 'Upload Photos'}
-                  </p>
-                  <p className="text-xs mt-0.5">
-                    JPEG, PNG or WebP · Max {MAX_PHOTOS} photos
-                  </p>
-                </div>
-              </button>
+            {photoDataUrls.length < 5 && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  disabled={isProcessingFiles}
+                  className="bg-primary text-white rounded-xl flex flex-col items-center justify-center py-8 gap-3 hover:bg-primary/90 transition-colors disabled:opacity-60"
+                >
+                  <Camera className="h-10 w-10" />
+                  <span className="text-sm font-bold tracking-wide">TAKE A PICTURE</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isProcessingFiles}
+                  className="bg-primary text-white rounded-xl flex flex-col items-center justify-center py-8 gap-3 hover:bg-primary/90 transition-colors disabled:opacity-60"
+                >
+                  <FolderOpen className="h-10 w-10" />
+                  <span className="text-sm font-bold tracking-wide">FOLDERS</span>
+                </button>
+              </div>
             )}
 
-            {/* Photo previews */}
+            {isProcessingFiles && (
+              <div className="flex items-center justify-center gap-2 py-3 text-gray-500">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm">Processing photos...</span>
+              </div>
+            )}
+
+            {/* Photo Previews */}
             {photoDataUrls.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {photoDataUrls.map((url, index) => (
-                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-border group">
-                    <img
-                      src={url}
-                      alt={`Photo ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                    <img src={url} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                     {index === 0 && (
                       <span className="absolute bottom-0 left-0 right-0 bg-primary/80 text-white text-[10px] font-semibold text-center py-0.5">
                         Cover
                       </span>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index)}
-                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-foreground/70 text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label="Remove photo"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
                   </div>
                 ))}
               </div>
             )}
 
-            {photoError && (
-              <p className="text-sm text-destructive">{photoError}</p>
+            {photoDataUrls.length === 0 && !isProcessingFiles && (
+              <p className="text-center text-xs text-gray-400 mt-2">No photos added yet (optional)</p>
+            )}
+            {photoDataUrls.length > 0 && (
+              <p className="text-center text-xs text-gray-400 mt-2">{photoDataUrls.length}/5 photos added</p>
             )}
           </div>
+        )}
 
-          {/* VIP Ad Option */}
-          <div className={`rounded-xl p-5 border-2 transition-all duration-200 cursor-pointer ${
-            isVip
-              ? 'bg-amber-50 border-amber-400 shadow-[0_0_0_1px_rgba(251,191,36,0.2)]'
-              : 'bg-card border-border hover:border-amber-300'
-          }`}
-            onClick={() => setIsVip((v) => !v)}
-          >
-            <div className="flex items-start gap-4">
-              <Checkbox
-                id="isVip"
-                checked={isVip}
-                onCheckedChange={(checked) => setIsVip(!!checked)}
-                onClick={(e) => e.stopPropagation()}
-                className="mt-0.5 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
-              />
-              <div className="flex-1 min-w-0">
-                <label
-                  htmlFor="isVip"
-                  className="flex items-center gap-2 font-semibold text-foreground cursor-pointer mb-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Crown className="w-4 h-4 text-amber-500" />
-                  Make this a VIP Ad
-                  <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                    ₹500
-                  </span>
-                </label>
-                <p className="text-sm text-muted-foreground">
-                  VIP ads appear at the top of the listings with a gold border, crown icon, and "Verified" badge — get more visibility and sell faster.
+        {/* Step 3: Price */}
+        {currentStep === 3 && (
+          <div className="px-4 py-5 space-y-5">
+            <div>
+              <Label htmlFor="price" className="text-sm font-semibold text-gray-700">
+                Price (₹) <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">₹</span>
+                <Input
+                  id="price"
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0"
+                  min="0"
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            <div className="border border-gray-200 rounded-xl p-4 bg-yellow-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-gray-900">VIP Ad</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Feature your ad at the top of search results</p>
+                </div>
+                <Switch
+                  checked={isVip}
+                  onCheckedChange={setIsVip}
+                />
+              </div>
+              {isVip && (
+                <div className="mt-3 pt-3 border-t border-yellow-200">
+                  <p className="text-xs text-yellow-700 font-medium">
+                    ✨ VIP ads get 5x more visibility and appear at the top!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Location */}
+        {currentStep === 4 && (
+          <div className="px-4 py-5">
+            <button
+              type="button"
+              onClick={() => setLocationModalOpen(true)}
+              className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-gray-700">Location</p>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {location || 'Select your location'}
+                  </p>
+                </div>
+              </div>
+              <ChevronDown className="h-4 w-4 text-gray-400" />
+            </button>
+
+            {location && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+                <p className="text-sm text-green-700 font-medium">{location}</p>
+              </div>
+            )}
+
+            <LocationPickerModal
+              isOpen={locationModalOpen}
+              onClose={() => setLocationModalOpen(false)}
+              onSelect={(loc) => {
+                setLocation(loc);
+                setLocationModalOpen(false);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Step 5: Review */}
+        {currentStep === 5 && (
+          <div className="px-4 py-5 space-y-4">
+            {/* Photos preview */}
+            {photoDataUrls.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {photoDataUrls.map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt={`Photo ${i + 1}`}
+                    className="w-20 h-20 rounded-lg object-cover shrink-0 border border-gray-200"
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Details */}
+            <div className="space-y-3">
+              <div className="border-b border-gray-100 pb-3">
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Title</p>
+                <p className="text-sm font-semibold text-gray-900 mt-1">{title}</p>
+              </div>
+              <div className="border-b border-gray-100 pb-3">
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Description</p>
+                <p className="text-sm text-gray-700 mt-1 line-clamp-3">{description}</p>
+              </div>
+              <div className="border-b border-gray-100 pb-3">
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Category</p>
+                <p className="text-sm font-semibold text-gray-900 mt-1">{categoryLabel}</p>
+              </div>
+              <div className="border-b border-gray-100 pb-3">
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Price</p>
+                <p className="text-sm font-semibold text-gray-900 mt-1">
+                  ₹{Number(price).toLocaleString()}
+                  {isVip && (
+                    <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
+                      VIP
+                    </span>
+                  )}
                 </p>
+              </div>
+              <div className="border-b border-gray-100 pb-3">
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Location</p>
+                <p className="text-sm font-semibold text-gray-900 mt-1">{location}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Photos</p>
+                <p className="text-sm text-gray-700 mt-1">{photoDataUrls.length} photo(s) added</p>
               </div>
             </div>
           </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            disabled={isPending || isProcessingFiles}
-          >
-            {isPending ? (
-              <>
-                <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                Submitting...
-              </>
-            ) : (
-              `Continue to Payment — ₹${postingFee}`
-            )}
-          </Button>
-        </form>
+        )}
       </div>
 
+      {/* Bottom Action Button */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-100 px-4 py-3 pb-safe">
+        {currentStep < 5 ? (
+          <Button
+            onClick={handleNext}
+            className="w-full h-12 text-base font-bold rounded-xl bg-primary hover:bg-primary/90"
+          >
+            NEXT
+          </Button>
+        ) : (
+          <Button
+            onClick={handlePostNow}
+            disabled={isSubmitting}
+            className="w-full h-12 text-base font-bold rounded-xl bg-primary hover:bg-primary/90"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                Posting...
+              </>
+            ) : (
+              'Post Now'
+            )}
+          </Button>
+        )}
+      </div>
+
+      {/* Payment Modal */}
       <PaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={handleCloseModal}
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
         onConfirmPayment={handleConfirmPayment}
-        isSubmitting={isPending}
-        submitError={submitError}
+        isSubmitting={isSubmitting}
         isVip={isVip}
       />
-    </>
+    </div>
   );
 }

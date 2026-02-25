@@ -1,301 +1,425 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useGetCallerUserProfile,
+  useGetMyListings,
   useSaveCallerUserProfile,
-  useGetListings,
-  useUpdateListing,
+  useDeactivateListing,
 } from '../hooks/useQueries';
-import ListingCard from '../components/ListingCard';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { User, Edit3, LogIn, Plus, PowerOff } from 'lucide-react';
+  ChevronRight,
+  Package,
+  Heart,
+  Settings,
+  HelpCircle,
+  Globe,
+  LogOut,
+  Edit,
+  CheckCircle,
+  Loader2,
+  Zap,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from '@tanstack/react-router';
-import { type Listing } from '../backend';
+import { Listing } from '../backend';
 
 export default function ProfilePage() {
-  const { identity, login, isLoggingIn } = useInternetIdentity();
-  const isAuthenticated = !!identity;
   const navigate = useNavigate();
+  const { identity, clear } = useInternetIdentity();
+  const queryClient = useQueryClient();
 
-  const { data: profile, isLoading: profileLoading } = useGetCallerUserProfile();
-  const { data: allListings = [], isLoading: listingsLoading } = useGetListings();
-  const { mutateAsync: saveProfile, isPending: savingProfile } = useSaveCallerUserProfile();
-  const { mutateAsync: updateListing, isPending: updatingListing } = useUpdateListing();
+  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
+  const { data: myListings = [], isLoading: listingsLoading } = useGetMyListings();
+  const saveProfile = useSaveCallerUserProfile();
+  const deactivateListing = useDeactivateListing();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editBio, setEditBio] = useState('');
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [myAdsOpen, setMyAdsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const [packagesOpen, setPackagesOpen] = useState(false);
 
-  const myPrincipal = identity?.getPrincipal().toString();
-  const myListings = allListings.filter(
-    (l) => l.owner.toString() === myPrincipal && l.isActive
-  );
+  const [displayName, setDisplayName] = useState('');
+  const [bio, setBio] = useState('');
 
-  const startEditing = () => {
-    setEditName(profile?.displayName ?? '');
-    setEditBio(profile?.bio ?? '');
-    setIsEditing(true);
+  const openEditProfile = () => {
+    setDisplayName(userProfile?.displayName || '');
+    setBio(userProfile?.bio || '');
+    setEditProfileOpen(true);
   };
 
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editName.trim()) return;
+  const handleSaveProfile = async () => {
+    if (!displayName.trim()) {
+      toast.error('Display name is required');
+      return;
+    }
     try {
-      await saveProfile({
-        displayName: editName.trim(),
-        bio: editBio.trim(),
+      await saveProfile.mutateAsync({
+        displayName: displayName.trim(),
+        bio: bio.trim(),
         contactInfo: null,
-        mobileNumber: null,
+        mobileNumber: userProfile?.mobileNumber ?? null,
       });
-      setIsEditing(false);
-      toast.success('Profile updated successfully!');
-    } catch {
-      toast.error('Failed to update profile. Please try again.');
+      toast.success('Profile updated!');
+      setEditProfileOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update profile');
     }
   };
 
-  const handleDeactivateListing = async (listing: Listing) => {
+  const handleLogout = async () => {
+    await clear();
+    queryClient.clear();
+    setSettingsOpen(false);
+    navigate({ to: '/' });
+  };
+
+  const handleDeactivate = async (listing: Listing) => {
     try {
-      await updateListing({
-        listingId: listing.id,
-        title: listing.title,
-        description: listing.description,
-        price: listing.price,
-        category: listing.category,
-        location: listing.location,
-        photoUrls: listing.photoUrls,
-        isActive: false,
-        isVip: listing.isVip,
-      });
-      toast.success('Listing deactivated.');
-    } catch {
-      toast.error('Failed to deactivate listing.');
+      await deactivateListing.mutateAsync(listing.id);
+      toast.success('Ad deactivated');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to deactivate');
     }
   };
 
-  // Suppress unused variable warning for navigate (kept for potential future use)
-  void navigate;
-
-  if (!isAuthenticated) {
+  if (!identity) {
     return (
-      <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center text-center">
-        <User className="w-16 h-16 text-muted-foreground/30 mb-4" />
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Sign in to view your profile
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          Log in to manage your profile and listings.
-        </p>
-        <Button onClick={login} disabled={isLoggingIn} className="gap-2">
-          {isLoggingIn ? (
-            <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-          ) : (
-            <LogIn className="w-4 h-4" />
-          )}
-          {isLoggingIn ? 'Logging in...' : 'Login'}
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-6 bg-white">
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
+          <Settings className="h-10 w-10 text-gray-400" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-800">Sign in to your account</h2>
+        <p className="text-gray-500 text-center">Login to manage your ads, profile, and more.</p>
+        <Button onClick={() => navigate({ to: '/signup' })} className="w-full max-w-xs rounded-xl">
+          Login / Sign Up
         </Button>
       </div>
     );
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="font-display text-3xl font-bold text-foreground mb-8">My Profile</h1>
+  const initials = userProfile?.displayName
+    ? userProfile.displayName.slice(0, 2).toUpperCase()
+    : identity.getPrincipal().toString().slice(0, 2).toUpperCase();
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Card */}
-        <div className="lg:col-span-1">
-          <div className="bg-card border border-border rounded-xl p-6">
-            {profileLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="w-20 h-20 rounded-full mx-auto" />
-                <Skeleton className="h-6 w-3/4 mx-auto" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ) : isEditing ? (
-              <form onSubmit={handleSaveProfile} className="space-y-4">
-                <h2 className="font-semibold text-foreground">Edit Profile</h2>
-                <div className="space-y-2">
-                  <Label htmlFor="editName">
-                    Display Name <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="editName"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="editBio">Bio</Label>
-                  <Textarea
-                    id="editBio"
-                    value={editBio}
-                    onChange={(e) => setEditBio(e.target.value)}
-                    rows={3}
-                    placeholder="Tell others about yourself..."
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit" size="sm" className="flex-1" disabled={savingProfile}>
-                    {savingProfile ? (
-                      <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                    ) : (
-                      'Save'
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(false)}
-                    disabled={savingProfile}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            ) : (
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl mx-auto mb-4">
-                  {profile?.displayName?.charAt(0)?.toUpperCase() ?? <User className="w-8 h-8" />}
-                </div>
-                <h2 className="font-display font-bold text-xl text-foreground">
-                  {profile?.displayName ?? 'Anonymous'}
-                </h2>
-                {profile?.bio && (
-                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
-                    {profile.bio}
-                  </p>
-                )}
-                {profile?.registrationTimestamp && (
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Member since{' '}
-                    {new Date(Number(profile.registrationTimestamp / BigInt(1_000_000))).toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </p>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 gap-2 w-full"
-                  onClick={startEditing}
-                >
-                  <Edit3 className="w-4 h-4" />
-                  Edit Profile
-                </Button>
+  const displayNameText = userProfile?.displayName || 'User';
+  const mobileText = userProfile?.mobileNumber ? `+91 ${userProfile.mobileNumber}` : 'No phone added';
+
+  const menuItems = [
+    {
+      icon: Package,
+      title: 'Buy Packages',
+      subtitle: 'Boost your ads with premium packages',
+      onClick: () => setPackagesOpen(true),
+      showChevron: true,
+    },
+    {
+      icon: Heart,
+      title: 'Wishlist',
+      subtitle: 'View your liked items here',
+      onClick: () => setWishlistOpen(true),
+      showChevron: true,
+    },
+    {
+      icon: Settings,
+      title: 'Settings',
+      subtitle: 'Privacy and logout',
+      onClick: () => setSettingsOpen(true),
+      showChevron: true,
+    },
+    {
+      icon: HelpCircle,
+      title: 'Help & Support',
+      subtitle: 'Get help and contact support',
+      onClick: () => navigate({ to: '/helpline' }),
+      showChevron: true,
+    },
+    {
+      icon: Globe,
+      title: 'Select Language',
+      subtitle: 'English',
+      onClick: () => setLanguageOpen(true),
+      showChevron: true,
+    },
+  ];
+
+  return (
+    <div className="bg-white min-h-screen">
+      {/* Profile Header */}
+      <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold shadow-md">
+              {initials}
+            </div>
+            <button
+              onClick={openEditProfile}
+              className="absolute -bottom-1 -right-1 bg-white border border-gray-200 rounded-full p-1 shadow-sm"
+            >
+              <Edit className="h-3 w-3 text-gray-600" />
+            </button>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-gray-900 truncate">{displayNameText}</h2>
+            <p className="text-sm text-gray-500">{mobileText}</p>
+            {userProfile?.mobileNumber && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span className="text-xs text-green-600 font-medium">Verified</span>
               </div>
             )}
           </div>
-
-          {/* Principal ID */}
-          <div className="bg-muted/50 border border-border rounded-xl p-4 mt-4">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Your Principal ID</p>
-            <p className="text-xs text-foreground font-mono break-all">
-              {myPrincipal}
-            </p>
-          </div>
+          <button
+            onClick={() => setMyAdsOpen(true)}
+            className="text-xs text-primary font-medium border border-primary rounded-xl px-3 py-1.5"
+          >
+            My Ads
+          </button>
         </div>
+      </div>
 
-        {/* My Listings */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl font-semibold text-foreground">
-              My Active Listings
-            </h2>
-            <Link to="/post-ad">
-              <Button size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
-                Post New Ad
-              </Button>
-            </Link>
-          </div>
-
-          {listingsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="rounded-xl overflow-hidden border border-border">
-                  <Skeleton className="aspect-[4/3] w-full" />
-                  <div className="p-4 space-y-2">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
+      {/* Menu Items */}
+      <div className="bg-white">
+        {menuItems.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <div key={item.title}>
+              <button
+                onClick={item.onClick}
+                className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                  <Icon className="h-5 w-5 text-primary" />
                 </div>
-              ))}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{item.subtitle}</p>
+                </div>
+                {item.showChevron && <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />}
+              </button>
+              {index < menuItems.length - 1 && <Separator />}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Version */}
+      <div className="px-4 py-4 border-t border-gray-100 bg-white">
+        <p className="text-xs text-gray-400 text-center">Animal Pashu Bazar — Version 54</p>
+      </div>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={editProfileOpen} onOpenChange={setEditProfileOpen}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="displayName">Display Name</Label>
+              <Input
+                id="displayName"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Your name"
+                className="mt-1 rounded-xl bg-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell buyers about yourself..."
+                rows={3}
+                className="mt-1 rounded-xl bg-white"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditProfileOpen(false)} className="rounded-xl">
+              Cancel
+            </Button>
+            <Button onClick={handleSaveProfile} disabled={saveProfile.isPending} className="rounded-xl">
+              {saveProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* My Ads Dialog */}
+      <Dialog open={myAdsOpen} onOpenChange={setMyAdsOpen}>
+        <DialogContent className="max-w-sm mx-auto max-h-[80vh] overflow-y-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>My Ads</DialogTitle>
+          </DialogHeader>
+          {listingsLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : myListings.length === 0 ? (
-            <div className="bg-card border border-border rounded-xl p-10 text-center">
-              <p className="text-muted-foreground mb-4">You have no active listings.</p>
-              <Link to="/post-ad">
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Post Your First Ad
-                </Button>
-              </Link>
+            <div className="text-center py-8 text-gray-500">
+              <p>No ads posted yet.</p>
+              <Button
+                className="mt-4 rounded-xl"
+                onClick={() => {
+                  setMyAdsOpen(false);
+                  navigate({ to: '/post-ad' });
+                }}
+              >
+                Post Your First Ad
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3">
               {myListings.map((listing) => (
-                <div key={listing.id.toString()} className="relative group">
-                  <ListingCard listing={listing} />
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          className="gap-1.5 shadow-xs text-xs h-8"
-                        >
-                          <PowerOff className="w-3 h-3" />
-                          Deactivate
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Deactivate Listing?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will hide "{listing.title}" from the marketplace. You can reactivate it later.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeactivateListing(listing)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            {updatingListing ? 'Deactivating...' : 'Deactivate'}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                <div key={String(listing.id)} className="border border-gray-200 rounded-xl p-3 bg-white">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-gray-900 truncate">{listing.title}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">₹{Number(listing.price).toLocaleString()}</p>
+                      <span
+                        className={`inline-block text-xs px-2 py-0.5 rounded-full mt-1 font-medium ${
+                          listing.status === 'approved'
+                            ? 'bg-green-100 text-green-700'
+                            : listing.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {String(listing.status).charAt(0).toUpperCase() + String(listing.status).slice(1)}
+                      </span>
+                    </div>
+                    {listing.isActive && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeactivate(listing)}
+                        disabled={deactivateListing.isPending}
+                        className="text-xs shrink-0 rounded-xl"
+                      >
+                        Deactivate
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-3">
+            <p className="text-sm text-gray-600">Manage your account settings and preferences.</p>
+            <Separator />
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 text-red-600 transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Language Dialog */}
+      <Dialog open={languageOpen} onOpenChange={setLanguageOpen}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>Select Language</DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <button className="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-200">
+              <span className="font-medium text-gray-900">English</span>
+              <CheckCircle className="h-5 w-5 text-primary" />
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Wishlist Dialog */}
+      <Dialog open={wishlistOpen} onOpenChange={setWishlistOpen}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>Wishlist</DialogTitle>
+          </DialogHeader>
+          <div className="py-6 text-center text-gray-500">
+            <Heart className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+            <p className="text-sm">Your wishlist is empty.</p>
+            <p className="text-xs text-gray-400 mt-1">Save ads you like to view them here.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Packages Dialog */}
+      <Dialog open={packagesOpen} onOpenChange={setPackagesOpen}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle>Buy Packages</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div className="border border-blue-200 rounded-xl p-4 bg-blue-50">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="font-bold text-gray-900">VIP Ad Boost</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Feature your ad at the top</p>
+                </div>
+                <span className="text-xl font-bold text-primary">₹99</span>
+              </div>
+              <Button
+                size="sm"
+                className="w-full rounded-xl"
+                onClick={() => {
+                  setPackagesOpen(false);
+                  navigate({ to: '/post-ad' });
+                }}
+              >
+                Post a VIP Ad
+              </Button>
+            </div>
+            <div className="border border-gray-200 rounded-xl p-4 bg-white">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="font-bold text-gray-900">Premium Pack</p>
+                  <p className="text-xs text-gray-500 mt-0.5">5 VIP ads + priority support</p>
+                </div>
+                <span className="text-xl font-bold text-gray-700">₹399</span>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full rounded-xl"
+                onClick={() => toast.info('Coming soon!')}
+              >
+                Coming Soon
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

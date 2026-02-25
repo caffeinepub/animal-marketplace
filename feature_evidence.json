@@ -2,29 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-frontend-src-pages-homepage-tsx-remove-the-invite-a-friend-and-help-grow-our-community-informational-banner-section-entirely-including-the-share-invite-button-and-its-container-the-rest-of-the-homepage-layout-sections-hero-featured-animals-listings-grid-filters-and-functionality-must-remain-structurally-unchanged",
-      "featureTitle": "In frontend/src/pages/HomePage.tsx, remove the 'Invite a friend and help grow our community!' informational banner section entirely (including the Share/Invite button and its container). The rest of the HomePage layout, sections (hero, Featured Animals, listings grid, filters), and functionality must remain structurally unchanged.",
-      "files": [
-        "frontend/src/pages/HomePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-158"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-frontend-src-components-bottomnav-tsx-replace-the-current-fifth-tab-account-with-a-share-tab-the-share-tab-must-display-an-appropriate-share-invite-icon-e-g-a-share-or-forward-arrow-icon-and-the-label-share-the-updated-bottom-navigation-bar-must-have-exactly-five-tabs-in-this-order-home-routes-to-chats-routes-to-messages-sell-routes-to-post-ad-styled-prominently-as-the-center-raised-button-my-ads-routes-to-dashboard-for-authenticated-users-and-share-triggers-the-web-share-api-or-clipboard-fallback-using-the-existing-usewebshare-hook-the-bottom-bar-must-retain-the-clean-white-background-and-professional-blue-active-state-indicator-styling",
-      "featureTitle": "In frontend/src/components/BottomNav.tsx, replace the current fifth tab ('Account') with a 'Share' tab. The Share tab must display an appropriate share/invite icon (e.g., a share or forward arrow icon) and the label 'Share'. The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised button), 'My Ads' (routes to '/dashboard' for authenticated users), and 'Share' (triggers the Web Share API or clipboard fallback using the existing useWebShare hook). The bottom bar must retain the clean white background and Professional Blue active-state indicator styling.",
+      "featureId": "feature-in-frontend-src-components-bottomnav-tsx-set-z-index-999-e-g-tailwind-class-z-999-on-the-bottom-navigation-bar-s-root-container-element-so-it-renders-above-all-other-page-content-overlays-and-background-elements",
+      "featureTitle": "In frontend/src/components/BottomNav.tsx, set z-index: 999 (e.g., Tailwind class z-[999]) on the bottom navigation bar's root container element so it renders above all other page content, overlays, and background elements.",
       "files": [
         "frontend/src/components/BottomNav.tsx"
       ],
@@ -36,16 +15,84 @@
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
         "qr-code@1.0.0",
-        "camera@1.0.0"
+        "camera@1.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-159"
+        "REQ-184"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-49-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-49",
-      "featureTitle": "Update the visible version label displayed in the app to 'Version 49'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 49'.",
+      "featureId": "feature-in-frontend-src-components-bottomnav-tsx-explicitly-set-pointer-events-auto-and-position-relative-or-ensure-no-override-on-each-of-the-five-tab-buttons-home-chats-sell-my-ads-and-account-so-that-all-tap-click-interactions-are-reliably-received-regardless-of-overlapping-layers",
+      "featureTitle": "In frontend/src/components/BottomNav.tsx, explicitly set pointer-events: auto and position: relative (or ensure no override) on each of the five tab buttons — Home, Chats, Sell, My Ads, and Account — so that all tap/click interactions are reliably received regardless of overlapping layers.",
+      "files": [
+        "frontend/src/components/BottomNav.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-185"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-frontend-src-components-bottomnav-tsx-apply-z-index-999-and-isolation-isolate-to-the-floating-circular-sell-button-specifically-ensuring-it-also-floats-above-all-other-elements-and-receives-pointer-events-correctly",
+      "featureTitle": "In frontend/src/components/BottomNav.tsx, apply z-index: 999 and isolation: isolate to the floating circular 'Sell' button specifically, ensuring it also floats above all other elements and receives pointer events correctly.",
+      "files": [
+        "frontend/src/components/BottomNav.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-186"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-frontend-src-components-layout-tsx-and-frontend-src-pages-homepage-tsx-audit-all-decorative-background-containers-including-any-hero-image-containers-header-background-layers-and-any-full-viewport-overlay-divs-apply-pointer-events-none-tailwind-pointer-events-none-to-every-purely-decorative-or-background-layer-element-so-they-cannot-intercept-clicks-intended-for-interactive-elements-beneath-or-above-them",
+      "featureTitle": "In frontend/src/components/Layout.tsx and frontend/src/pages/HomePage.tsx, audit all decorative background containers (including any hero image containers, header background layers, and any full-viewport overlay divs). Apply pointer-events: none (Tailwind: pointer-events-none) to every purely decorative or background-layer element so they cannot intercept clicks intended for interactive elements beneath or above them.",
+      "files": [
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-187"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-visible-version-label-displayed-in-the-app-to-version-55-find-the-version-string-wherever-it-appears-in-the-footer-header-or-any-other-visible-ui-element-within-layout-tsx-or-any-page-component-and-update-it-to-read-version-55",
+      "featureTitle": "Update the visible version label displayed in the app to 'Version 55'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 55'.",
       "files": [
         "frontend/src/components/Layout.tsx"
       ],
@@ -57,10 +104,11 @@
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
         "qr-code@1.0.0",
-        "camera@1.0.0"
+        "camera@1.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-160"
+        "REQ-190"
       ],
       "confidence": "high"
     }

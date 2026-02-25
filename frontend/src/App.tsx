@@ -1,155 +1,154 @@
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet, redirect } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import Layout from "./components/Layout";
-import HomePage from "./pages/HomePage";
-import ListingDetailPage from "./pages/ListingDetailPage";
-import PostAdPage from "./pages/PostAdPage";
-import MessagesPage from "./pages/MessagesPage";
-import ProfilePage from "./pages/ProfilePage";
-import HelplinePage from "./pages/HelplinePage";
-import TermsPage from "./pages/TermsPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
-import UserDashboardPage from "./pages/UserDashboardPage";
-import SignUpPage from "./pages/SignUpPage";
-import ManagementPage from "./pages/ManagementPage";
-import OwnerViewPage from "./pages/OwnerViewPage";
-import CattleTrackerPage from "./pages/CattleTrackerPage";
-import { useIsAdmin, useIsManagementUser, useIsOwnerUser, useIsCattleTrackerUser } from "./hooks/useQueries";
-import { useInternetIdentity } from "./hooks/useInternetIdentity";
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { useInternetIdentity } from './hooks/useInternetIdentity';
+import { useActor } from './hooks/useActor';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
+import ListingDetailPage from './pages/ListingDetailPage';
+import PostAdPage from './pages/PostAdPage';
+import ProfilePage from './pages/ProfilePage';
+import MessagesPage from './pages/MessagesPage';
+import SignUpPage from './pages/SignUpPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import UserDashboardPage from './pages/UserDashboardPage';
+import HelplinePage from './pages/HelplinePage';
+import TermsPage from './pages/TermsPage';
+import ManagementPage from './pages/ManagementPage';
+import OwnerViewPage from './pages/OwnerViewPage';
+import CattleTrackerPage from './pages/CattleTrackerPage';
 
-// Suppress unused import warning
-void redirect;
+// The specific admin principal allowed to access /tracker
+const CATTLE_TRACKER_PRINCIPAL = 'rhoqt-xhqg1-66ofc-khas4-fm4w6-73h56-vt55b-5bfnp-adgps-qxwoy-iqe';
 
-// Spinner component for loading states
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
-  );
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing } = useInternetIdentity();
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
+      </div>
+    );
+  }
+  if (!identity) {
+    window.location.href = '/signup';
+    return null;
+  }
+  return <>{children}</>;
 }
 
-// Admin route guard component
-function AdminRouteGuard() {
-  const { isAdmin, isLoading } = useIsAdmin();
-  const { identity } = useInternetIdentity();
-  const navigate = useNavigate();
+function AdminRouteGuard({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
 
-  const isAuthenticated = !!identity;
+  const { data: isAdmin, isLoading: adminLoading } = useQuery({
+    queryKey: ['isAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isAdmin();
+    },
+    enabled: !!actor && !actorFetching,
+    retry: false,
+  });
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated || !isAdmin) {
-        navigate({ to: "/" });
-      }
-    }
-  }, [isLoading, isAuthenticated, isAdmin, navigate]);
+  const isLoading = isInitializing || actorFetching || adminLoading;
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
+      </div>
+    );
   }
 
-  if (!isAuthenticated || !isAdmin) {
+  if (!identity) {
+    window.location.href = '/signup';
     return null;
   }
 
-  return <AdminDashboardPage />;
-}
-
-// Management route guard component
-function ManagementRouteGuard() {
-  const isManagementUser = useIsManagementUser();
-  const { identity, loginStatus } = useInternetIdentity();
-  const navigate = useNavigate();
-
-  const isAuthenticated = !!identity;
-  // Wait for both 'initializing' and 'logging-in' states to resolve
-  const isLoading = loginStatus === "initializing" || loginStatus === "logging-in";
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated || !isManagementUser) {
-        navigate({ to: "/" });
-      }
-    }
-  }, [isLoading, isAuthenticated, isManagementUser, navigate]);
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!isAuthenticated || !isManagementUser) {
+  if (!isAdmin) {
+    window.location.href = '/';
     return null;
   }
 
-  return <ManagementPage />;
+  return <>{children}</>;
 }
 
-// Owner View route guard component
-function OwnerViewRouteGuard() {
-  const isOwnerUser = useIsOwnerUser();
-  const { identity, loginStatus } = useInternetIdentity();
-  const navigate = useNavigate();
+function ManagementRouteGuard({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing, loginStatus } = useInternetIdentity();
+  const isLoadingAuth = isInitializing || loginStatus === 'logging-in';
 
-  const isAuthenticated = !!identity;
-  // Wait for both 'initializing' and 'logging-in' states to resolve
-  const isLoading = loginStatus === "initializing" || loginStatus === "logging-in";
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated || !isOwnerUser) {
-        navigate({ to: "/" });
-      }
-    }
-  }, [isLoading, isAuthenticated, isOwnerUser, navigate]);
-
-  if (isLoading) {
-    return <LoadingSpinner />;
+  if (isLoadingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
+      </div>
+    );
   }
 
-  if (!isAuthenticated || !isOwnerUser) {
+  if (!identity) {
+    window.location.href = '/signup';
     return null;
   }
 
-  return <OwnerViewPage />;
+  return <>{children}</>;
 }
 
-// Cattle Tracker route guard component
-function CattleTrackerRouteGuard() {
-  const isCattleTrackerUser = useIsCattleTrackerUser();
-  const { identity, loginStatus } = useInternetIdentity();
-  const navigate = useNavigate();
+function OwnerViewRouteGuard({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing, loginStatus } = useInternetIdentity();
+  const isLoadingAuth = isInitializing || loginStatus === 'logging-in';
 
-  const isAuthenticated = !!identity;
-  // CRITICAL: Must wait for BOTH 'initializing' AND 'logging-in' to resolve
-  // before making any access decision. 'initializing' is the initial state
-  // before the stored identity is loaded from local storage.
-  const isLoading = loginStatus === "initializing" || loginStatus === "logging-in";
-
-  useEffect(() => {
-    // Only redirect once auth state is fully resolved (not initializing or logging-in)
-    if (!isLoading) {
-      if (!isAuthenticated || !isCattleTrackerUser) {
-        navigate({ to: "/" });
-      }
-    }
-  }, [isLoading, isAuthenticated, isCattleTrackerUser, navigate]);
-
-  // Show spinner while auth state is loading — never redirect prematurely
-  if (isLoading) {
-    return <LoadingSpinner />;
+  if (isLoadingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
+      </div>
+    );
   }
 
-  // Auth resolved but access denied — return null (redirect triggered by useEffect)
-  if (!isAuthenticated || !isCattleTrackerUser) {
+  if (!identity) {
+    window.location.href = '/signup';
     return null;
   }
 
-  return <CattleTrackerPage />;
+  return <>{children}</>;
 }
 
-// Root route with layout
+function CattleTrackerRouteGuard({ children }: { children: React.ReactNode }) {
+  const { identity, isInitializing, loginStatus } = useInternetIdentity();
+
+  // Show spinner while auth state is still loading — prevents premature redirect
+  const isLoadingAuth = isInitializing || loginStatus === 'logging-in';
+
+  if (isLoadingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="animate-spin h-10 w-10 text-primary" />
+          <p className="text-sm text-gray-500 font-medium">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in at all
+  if (!identity) {
+    window.location.href = '/signup';
+    return null;
+  }
+
+  // Check principal directly from identity context — no async backend call needed
+  const callerPrincipal = identity.getPrincipal().toText();
+
+  // Allow the designated cattle tracker principal
+  if (callerPrincipal !== CATTLE_TRACKER_PRINCIPAL) {
+    window.location.href = '/';
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 const rootRoute = createRootRoute({
   component: () => (
     <Layout>
@@ -160,100 +159,113 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/",
+  path: '/',
   component: HomePage,
 });
 
 const listingDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/listing/$id",
+  path: '/listing/$id',
   component: ListingDetailPage,
 });
 
 const postAdRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/post-ad",
+  path: '/post-ad',
   component: PostAdPage,
-});
-
-const messagesRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/messages",
-  component: MessagesPage,
-});
-
-const messagesWithPrincipalRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/messages/$principal",
-  component: MessagesPage,
 });
 
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/profile",
+  path: '/profile',
   component: ProfilePage,
 });
 
-const signUpRoute = createRoute({
+const messagesRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/signup",
+  path: '/messages',
+  component: MessagesPage,
+});
+
+const signupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/signup',
   component: SignUpPage,
+});
+
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin',
+  component: () => (
+    <AdminRouteGuard>
+      <AdminDashboardPage />
+    </AdminRouteGuard>
+  ),
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/dashboard',
+  component: () => (
+    <AuthGuard>
+      <UserDashboardPage />
+    </AuthGuard>
+  ),
 });
 
 const helplineRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/helpline",
+  path: '/helpline',
   component: HelplinePage,
 });
 
 const termsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/terms",
+  path: '/terms',
   component: TermsPage,
-});
-
-const adminRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin",
-  component: AdminRouteGuard,
-});
-
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/dashboard",
-  component: UserDashboardPage,
 });
 
 const managementRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/management",
-  component: ManagementRouteGuard,
+  path: '/management',
+  component: () => (
+    <ManagementRouteGuard>
+      <ManagementPage />
+    </ManagementRouteGuard>
+  ),
 });
 
 const ownerViewRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/owner-view",
-  component: OwnerViewRouteGuard,
+  path: '/owner-view',
+  component: () => (
+    <OwnerViewRouteGuard>
+      <OwnerViewPage />
+    </OwnerViewRouteGuard>
+  ),
 });
 
 const cattleTrackerRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/tracker",
-  component: CattleTrackerRouteGuard,
+  path: '/tracker',
+  component: () => (
+    <CattleTrackerRouteGuard>
+      <CattleTrackerPage />
+    </CattleTrackerRouteGuard>
+  ),
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   listingDetailRoute,
   postAdRoute,
-  messagesRoute,
-  messagesWithPrincipalRoute,
   profileRoute,
-  signUpRoute,
-  helplineRoute,
-  termsRoute,
+  messagesRoute,
+  signupRoute,
   adminRoute,
   dashboardRoute,
+  helplineRoute,
+  termsRoute,
   managementRoute,
   ownerViewRoute,
   cattleTrackerRoute,
@@ -261,7 +273,7 @@ const routeTree = rootRoute.addChildren([
 
 const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }

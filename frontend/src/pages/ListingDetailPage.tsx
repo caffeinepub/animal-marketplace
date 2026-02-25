@@ -32,12 +32,11 @@ export default function ListingDetailPage() {
 
   const handleContactSeller = () => {
     if (!isAuthenticated) {
-      navigate({ to: '/messages' });
+      navigate({ to: '/signup' });
       return;
     }
-    if (ownerPrincipal) {
-      navigate({ to: '/messages/$principal', params: { principal: ownerPrincipal } });
-    }
+    // Navigate to messages page; the messages page handles principal-based routing
+    navigate({ to: '/messages' });
   };
 
   const formatTimestamp = (ts: bigint) => {

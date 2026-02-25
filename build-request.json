@@ -1,81 +1,142 @@
 {
   "kind": "build_request",
-  "title": "OLX-style home screen redesign: remove invite banner, replace Account tab with Share tab, update to Version 49",
+  "title": "Fix Bottom Nav Z-Index & Pointer Events (Version 55)",
   "projectName": "Animal Pashu Bazar",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-158",
-      "text": "In frontend/src/pages/HomePage.tsx, remove the 'Invite a friend and help grow our community!' informational banner section entirely (including the Share/Invite button and its container). The rest of the HomePage layout, sections (hero, Featured Animals, listings grid, filters), and functionality must remain structurally unchanged.",
+      "id": "REQ-184",
+      "text": "In frontend/src/components/BottomNav.tsx, set z-index: 999 (e.g., Tailwind class z-[999]) on the bottom navigation bar's root container element so it renders above all other page content, overlays, and background elements.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "Remove the large 'Invite a friend' share box from the middle of the screen."
+          "Set a high z-index: 999 for all buttons in the Bottom Navigation Bar and the 'Sell' button."
         ]
       },
       "acceptanceCriteria": [
-        "The 'Invite a friend and help grow our community!' banner is no longer rendered anywhere on the HomePage.",
-        "No share/invite button or banner container appears between the hero section and the Featured Animals section.",
-        "All other HomePage sections (hero, Featured Animals, listings grid, search/filter controls) remain intact and functional."
+        "The bottom navigation bar's root container has z-index 999 or higher.",
+        "The bar is visually rendered on top of all page content and background layers."
       ]
     },
     {
-      "id": "REQ-159",
-      "text": "In frontend/src/components/BottomNav.tsx, replace the current fifth tab ('Account') with a 'Share' tab. The Share tab must display an appropriate share/invite icon (e.g., a share or forward arrow icon) and the label 'Share'. The updated Bottom Navigation Bar must have exactly five tabs in this order: 'Home' (routes to '/'), 'Chats' (routes to '/messages'), 'Sell' (routes to '/post-ad', styled prominently as the center raised button), 'My Ads' (routes to '/dashboard' for authenticated users), and 'Share' (triggers the Web Share API or clipboard fallback using the existing useWebShare hook). The bottom bar must retain the clean white background and Professional Blue active-state indicator styling.",
+      "id": "REQ-185",
+      "text": "In frontend/src/components/BottomNav.tsx, explicitly set pointer-events: auto and position: relative (or ensure no override) on each of the five tab buttons — Home, Chats, Sell, My Ads, and Account — so that all tap/click interactions are reliably received regardless of overlapping layers.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "Add a small 'Share' or 'Invite' icon to the existing Bottom Navigation Bar.",
-          "Ensure the Bottom Bar now has: Home, Chats, Sell (+), My Ads, and Share."
+          "Ensure the 'Account', 'My Ads', and 'Chats' buttons have pointer-events: auto and are not covered by any other element."
         ]
       },
       "acceptanceCriteria": [
-        "The Bottom Navigation Bar contains exactly five tabs: Home, Chats, Sell, My Ads, and Share.",
-        "The 'Account' tab is no longer present in the Bottom Navigation Bar.",
-        "The 'Share' tab displays a recognizable share/invite icon and the label 'Share'.",
-        "Clicking the 'Share' tab invokes the Web Share API (navigator.share) with the app name, invite text, and the app's root URL; falls back to clipboard copy with a toast notification if navigator.share is unavailable.",
-        "The 'Sell' tab remains styled prominently (raised or highlighted center button) and routes to '/post-ad'.",
-        "The 'Home', 'Chats', and 'My Ads' tabs remain functional and route to their respective pages.",
-        "The active tab is highlighted with the Professional Blue active-state indicator.",
-        "The bottom bar retains the clean white background and is fixed to the bottom of the viewport on all pages."
+        "Clicking/tapping the Home, Chats, Sell, My Ads, and Account tabs all trigger their respective navigation actions.",
+        "No tab button is blocked by an overlapping element."
       ]
     },
     {
-      "id": "REQ-160",
-      "text": "Update the visible version label displayed in the app to 'Version 49'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 49'.",
+      "id": "REQ-186",
+      "text": "In frontend/src/components/BottomNav.tsx, apply z-index: 999 and isolation: isolate to the floating circular 'Sell' button specifically, ensuring it also floats above all other elements and receives pointer events correctly.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "Keep the theme clean white and update to Version 49."
+          "Set a high z-index: 999 for all buttons in the Bottom Navigation Bar and the 'Sell' button."
         ]
       },
       "acceptanceCriteria": [
-        "The version label reads 'Version 49' wherever it is displayed in the app UI.",
-        "No other visible version string remains showing a different version number."
+        "The Sell button has z-index 999 and is clickable.",
+        "The Sell button visually floats above the navigation bar without being obscured."
+      ]
+    },
+    {
+      "id": "REQ-187",
+      "text": "In frontend/src/components/Layout.tsx and frontend/src/pages/HomePage.tsx, audit all decorative background containers (including any hero image containers, header background layers, and any full-viewport overlay divs). Apply pointer-events: none (Tailwind: pointer-events-none) to every purely decorative or background-layer element so they cannot intercept clicks intended for interactive elements beneath or above them.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Ensure that the tiger background or any transparent containers are set to pointer-events: none so they don't block clicks."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Decorative background/overlay divs in Layout.tsx and HomePage.tsx have pointer-events: none.",
+        "No background layer intercepts clicks on the bottom navigation bar or other interactive elements."
+      ]
+    },
+    {
+      "id": "REQ-188",
+      "text": "Audit all page-level components (HomePage.tsx, PostAdPage.tsx, ListingDetailPage.tsx, MessagesPage.tsx, ProfilePage.tsx, UserDashboardPage.tsx, SignUpPage.tsx, and any other pages that render behind the bottom nav bar) for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events: none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Clear Overlays: Ensure that the tiger background or any transparent containers are set to pointer-events: none so they don't block clicks."
+        ]
+      },
+      "acceptanceCriteria": [
+        "On every page, all five bottom nav tabs are tappable without interference from page content layers.",
+        "No full-height page container has a z-index that competes with z-[999] on the bottom nav."
+      ]
+    },
+    {
+      "id": "REQ-189",
+      "text": "Verify that the 'Actor not available' comprehensive fix implemented in previous versions (polling for actor availability for up to 3 seconds, throwing 'Connection not ready. Please wait a moment and try again.' if unavailable, and the CattleTrackerRouteGuard reading the principal directly from identity?.getPrincipal().toText()) is still intact and active in frontend/src/hooks/useActor.ts, frontend/src/hooks/useQueries.ts, frontend/src/pages/SignUpPage.tsx, and frontend/src/App.tsx. If any regression is detected, re-apply the fix. No backend changes are required.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Backend Sync: Confirm the 'Actor not available' fix is active so buttons that trigger database actions (like login or post) work correctly."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The useSignUp mutation polls for actor availability and does not throw 'Actor not available' during normal operation.",
+        "The SignUpPage 'Create Account' button is disabled with 'Connecting...' label while the actor is initializing.",
+        "The CattleTrackerRouteGuard reads principal from the identity context directly, not from an async backend query.",
+        "The AdminRouteGuard shows a loading spinner while isAdmin is loading and only redirects when loading is complete."
+      ]
+    },
+    {
+      "id": "REQ-190",
+      "text": "Update the visible version label displayed in the app to 'Version 55'. Find the version string wherever it appears in the footer, header, or any other visible UI element within Layout.tsx or any page component and update it to read 'Version 55'.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Update Version: Push this fix as Version 55."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The version label reads 'Version 55' wherever it appears in the app UI.",
+        "No other version strings ('Version 54' or earlier) remain visible."
       ]
     }
   ],
   "constraints": [
     "Do not modify any files listed in frontend.immutablePaths.",
-    "The Web Share functionality in the Share tab must reuse the existing useWebShare hook logic.",
-    "The Bottom Navigation Bar must remain visible on all pages, fixed to the bottom of the viewport.",
-    "All other HomePage sections and functionality must remain unchanged after removing the invite banner.",
-    "The overall Professional Blue and white clean theme must remain unchanged."
+    "Do not change the backend schema or any Motoko files.",
+    "Do not alter the visual layout, tab order, or styling of the bottom navigation bar beyond the z-index and pointer-events fixes.",
+    "The five bottom nav tabs (Home, Chats, Sell, My Ads, Account) must remain in their current order and styling."
   ],
   "nonGoals": [
-    "No changes to the backend.",
-    "No changes to the 'Account' routing logic for other parts of the app beyond the BottomNav tab replacement.",
-    "No redesign of any page other than removing the invite banner from HomePage and updating BottomNav.",
-    "No changes to admin/owner-specific privileged navigation links in the header."
+    "Adding new navigation tabs or changing tab routes.",
+    "Redesigning any page layout beyond fixing pointer-events and z-index.",
+    "Any backend changes.",
+    "Changing the app branding, logo, or color scheme."
   ],
   "imageRequirements": {
     "required": [],

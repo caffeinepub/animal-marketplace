@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Copy, Check, QrCode, IndianRupee, Loader2, AlertCircle, Tag, CheckCircle2, Crown, Zap } from 'lucide-react';
+import { Copy, Check, IndianRupee, Loader2, AlertCircle, Tag, CheckCircle2, Crown } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -48,7 +48,6 @@ export default function PaymentModal({
 
   const basePrice = isVip ? VIP_PRICE : REGULAR_PRICE;
 
-  // Determine effective price
   let effectivePrice: number;
   if (adminFreeApplied) {
     effectivePrice = 0;
@@ -68,7 +67,6 @@ export default function PaymentModal({
       return;
     }
 
-    // Check for admin free code first (works for both VIP and regular)
     if (trimmed === ADMIN_FREE_CODE) {
       setAdminFreeApplied(true);
       setPromoApplied(false);
@@ -79,7 +77,6 @@ export default function PaymentModal({
       return;
     }
 
-    // Regular promo codes only apply to non-VIP ads
     if (isVip) {
       setPromoApplied(false);
       setAdminFreeApplied(false);
@@ -111,7 +108,7 @@ export default function PaymentModal({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback: select text
+      // fallback
     }
   };
 
@@ -137,7 +134,10 @@ export default function PaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
-      <DialogContent className="sm:max-w-md w-full" onInteractOutside={(e) => { if (isSubmitting) e.preventDefault(); }}>
+      <DialogContent
+        className="sm:max-w-md w-full rounded-2xl bg-white"
+        onInteractOutside={(e) => { if (isSubmitting) e.preventDefault(); }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground font-display text-xl">
             {isVip ? (
@@ -147,7 +147,7 @@ export default function PaymentModal({
             )}
             {isVip ? 'VIP Ad Posting Fee' : 'Posting Fee Required'}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogDescription className="text-gray-500">
             {isVip
               ? 'Your VIP ad will be featured at the top with a gold border and Verified badge.'
               : 'A one-time fee is required to publish your ad on Pashu Mandi.'}
@@ -160,10 +160,10 @@ export default function PaymentModal({
             <div className={`rounded-xl px-5 py-4 flex items-center justify-between ${
               isVip
                 ? 'bg-amber-50 border-2 border-amber-300'
-                : 'bg-primary/10 border border-primary/20'
+                : 'bg-blue-50 border border-blue-200'
             }`}>
               <div className="flex flex-col gap-0.5">
-                <span className="text-foreground font-semibold text-base">
+                <span className="text-gray-900 font-semibold text-base">
                   {isVip ? 'VIP Posting Fee' : 'Posting Fee'}
                 </span>
                 {isVip && (
@@ -175,7 +175,7 @@ export default function PaymentModal({
               </div>
               <div className="flex items-center gap-2">
                 {(promoApplied || adminFreeApplied) && (
-                  <span className="text-muted-foreground line-through text-base font-medium">₹{basePrice}</span>
+                  <span className="text-gray-400 line-through text-base font-medium">₹{basePrice}</span>
                 )}
                 <span className={`font-bold text-2xl font-display ${
                   adminFreeApplied ? 'text-green-600' : isVip ? 'text-amber-600' : 'text-primary'
@@ -185,9 +185,9 @@ export default function PaymentModal({
               </div>
             </div>
 
-            {/* Promo Code Section — available for all ads */}
+            {/* Promo Code Section */}
             <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-gray-800">
                 <Tag className="w-4 h-4 text-primary" />
                 Have a promo code?
               </label>
@@ -205,25 +205,24 @@ export default function PaymentModal({
                     }
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleApplyPromo(); }}
-                  className="flex-1 uppercase placeholder:normal-case"
+                  className="flex-1 uppercase placeholder:normal-case rounded-xl bg-white"
                   disabled={isCodeApplied}
                 />
                 <Button
                   type="button"
                   variant={isCodeApplied ? 'outline' : 'secondary'}
                   onClick={isCodeApplied ? handleRemovePromo : handleApplyPromo}
-                  className="shrink-0"
+                  className="shrink-0 rounded-xl"
                 >
                   {isCodeApplied ? 'Remove' : 'Apply'}
                 </Button>
               </div>
 
-              {/* Promo feedback message */}
               {promoMessage && (
-                <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                <div className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${
                   promoMessage.type === 'success'
                     ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-destructive/10 border border-destructive/20 text-destructive'
+                    : 'bg-red-50 border border-red-200 text-red-600'
                 }`}>
                   {promoMessage.type === 'success' ? (
                     <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -239,139 +238,77 @@ export default function PaymentModal({
             {adminFreeApplied ? (
               <>
                 <Separator />
-
-                {/* Free Ad Banner */}
                 <div className="flex flex-col items-center gap-3 py-2">
-                  <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 border-2 border-green-300">
-                    <Zap className="w-8 h-8 text-green-600" />
+                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8 text-green-600" />
                   </div>
-                  <div className="text-center space-y-1">
-                    <p className="font-semibold text-foreground text-base">Special code applied!</p>
-                    <p className="text-sm text-muted-foreground">
-                      Your ad is free. Click the button below to publish it instantly — no payment needed.
-                    </p>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-900">Free Ad Activated!</p>
+                    <p className="text-sm text-gray-500 mt-1">Your ad will be published for free.</p>
                   </div>
                 </div>
-
-                {/* Error Message */}
+                <Button
+                  onClick={handleConfirm}
+                  disabled={isSubmitting}
+                  className="w-full h-12 text-base font-semibold rounded-xl bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      Publishing...
+                    </>
+                  ) : (
+                    'Publish My Ad — Free'
+                  )}
+                </Button>
                 {submitError && (
-                  <div className="flex items-start gap-2 bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
-                    <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
-                    <p className="text-sm text-destructive">{submitError}</p>
+                  <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                    <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-700">{submitError}</p>
                   </div>
                 )}
-
-                {/* Publish button — skips payment entirely */}
-                <div className="flex flex-col gap-2 pt-1">
-                  <Button
-                    type="button"
-                    className="w-full bg-green-600 hover:bg-green-700 text-white"
-                    size="lg"
-                    onClick={handleConfirm}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Publishing your ad...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Zap className="w-4 h-4" />
-                        Publish My Ad — Free
-                      </span>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                    onClick={handleClose}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </Button>
-                </div>
               </>
             ) : (
               <>
                 <Separator />
 
-                {/* QR Code Section */}
+                {/* QR Code */}
                 <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                    <QrCode className="w-4 h-4 text-primary" />
-                    Scan to Pay via UPI
-                  </div>
-                  <div className={`rounded-xl p-3 bg-white shadow-sm ${isVip ? 'border-2 border-amber-300' : 'border-2 border-border'}`}>
+                  <p className="text-sm font-medium text-gray-700">Scan QR to Pay</p>
+                  <div className="rounded-2xl overflow-hidden border-2 border-gray-200 p-2 bg-white">
                     <img
                       src={qrCodeUrl}
-                      alt="UPI QR Code for payment"
-                      width={220}
-                      height={220}
-                      className="block"
+                      alt="UPI QR Code"
+                      className="w-[180px] h-[180px]"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Open any UPI app (GPay, PhonePe, Paytm) and scan this QR code
-                  </p>
                 </div>
 
-                <Separator />
-
-                {/* UPI ID Copy Section */}
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-foreground text-center">Or pay directly to UPI ID</p>
-                  <div className="flex items-center gap-2 bg-muted rounded-lg px-4 py-3 border border-border">
-                    <span className="flex-1 font-mono text-sm text-foreground select-all">{UPI_ID}</span>
-                    <button
-                      type="button"
-                      onClick={handleCopyUpiId}
-                      className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium transition-colors shrink-0"
-                      aria-label="Copy UPI ID"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          Copy
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Amount: <strong>₹{effectivePrice}</strong> · Note: Pashu Mandi Posting Fee
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 pt-1">
-                  <Button
-                    type="button"
-                    className={`w-full ${isVip ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-                    size="lg"
-                    onClick={handlePayNow}
+                {/* UPI ID */}
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
+                  <span className="flex-1 text-sm font-mono text-gray-800 truncate">{UPI_ID}</span>
+                  <button
+                    onClick={handleCopyUpiId}
+                    className="shrink-0 p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Copy UPI ID"
                   >
-                    Pay Now — ₹{effectivePrice}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                    onClick={handleClose}
-                  >
-                    Cancel
-                  </Button>
+                    {copied ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-gray-500" />
+                    )}
+                  </button>
                 </div>
+
+                <Button
+                  onClick={handlePayNow}
+                  className="w-full h-12 text-base font-semibold rounded-xl"
+                >
+                  I've Paid ₹{effectivePrice} — Continue
+                </Button>
               </>
             )}
           </div>
@@ -379,69 +316,43 @@ export default function PaymentModal({
 
         {step === 'confirm' && (
           <div className="space-y-5">
-            {/* Instructions */}
-            <div className={`rounded-xl p-4 space-y-2 ${isVip ? 'bg-amber-50 border border-amber-200' : 'bg-primary/5 border border-primary/20'}`}>
-              <p className="font-semibold text-foreground text-sm">Complete your payment</p>
-              <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                <li>Open your UPI app (GPay, PhonePe, Paytm, etc.)</li>
-                <li>Pay <strong className="text-foreground">₹{effectivePrice}</strong> to <span className="font-mono text-foreground">{UPI_ID}</span></li>
-                <li>Once payment is successful, click the button below</li>
-              </ol>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-amber-800 mb-1">⚠️ Confirm Payment</p>
+              <p className="text-xs text-amber-700">
+                Please confirm that you have completed the UPI payment of ₹{effectivePrice} to{' '}
+                <span className="font-mono font-semibold">{UPI_ID}</span>.
+              </p>
             </div>
 
-            <div className="bg-muted rounded-lg px-4 py-3 border border-border flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">UPI ID</span>
-              <span className="font-mono text-sm font-medium text-foreground">{UPI_ID}</span>
-            </div>
-
-            {isVip && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <Crown className="w-4 h-4 text-amber-500 shrink-0" />
-                <span className="text-sm text-amber-700 font-medium">VIP Ad — paying ₹{VIP_PRICE} for premium placement</span>
-              </div>
-            )}
-
-            {!isVip && promoApplied && (
-              <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
-                <span className="text-sm text-green-700 font-medium">Promo code applied — paying ₹{DISCOUNTED_PRICE} (was ₹{REGULAR_PRICE})</span>
-              </div>
-            )}
-
-            {/* Error Message */}
             {submitError && (
-              <div className="flex items-start gap-2 bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
-                <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
-                <p className="text-sm text-destructive">{submitError}</p>
+              <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-700">{submitError}</p>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2 pt-1">
+            <div className="flex gap-3">
               <Button
-                type="button"
-                className={`w-full ${isVip ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-                size="lg"
-                onClick={handleConfirm}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Publishing your ad...
-                  </span>
-                ) : (
-                  'I Have Paid – Publish My Ad'
-                )}
-              </Button>
-              <Button
-                type="button"
                 variant="outline"
-                className="w-full"
                 onClick={() => setStep('payment')}
                 disabled={isSubmitting}
+                className="flex-1 rounded-xl"
               >
                 Back
+              </Button>
+              <Button
+                onClick={handleConfirm}
+                disabled={isSubmitting}
+                className="flex-1 h-11 rounded-xl"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Publishing...
+                  </>
+                ) : (
+                  'Yes, Publish My Ad'
+                )}
               </Button>
             </div>
           </div>

@@ -1,57 +1,157 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "OLX-style home screen redesign: remove invite banner, replace Account tab with Share tab, update to Version 49",
+  "title": "Fix Bottom Nav Z-Index & Pointer Events (Version 55)",
   "requirements": [
     {
-      "id": "REQ-158",
-      "summary": "Remove the 'Invite a friend and help grow our community!' informational banner section entirely from HomePage, including the Share/Invite button and its container, while keeping all other sections intact",
+      "id": "REQ-184",
+      "summary": "Set z-index: 999 on the bottom navigation bar's root container so it renders above all other page content and overlays",
       "acceptanceCriteria": [
-        "The 'Invite a friend and help grow our community!' banner is no longer rendered anywhere on the HomePage.",
-        "No share/invite button or banner container appears between the hero section and the Featured Animals section.",
-        "All other HomePage sections (hero, Featured Animals, listings grid, search/filter controls) remain intact and functional."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Remove the invite/share banner section (the div containing 'Invite a friend and help grow our community!' text, Share/Invite button, and its container) from the HomePage component. Locate the banner between the hero section and Featured Animals section, and delete the entire banner container div including all its children. Ensure the remaining layout (hero section, Featured Animals section, search/filter controls, listings grid) remains structurally unchanged and properly spaced."
-        }
-      ]
-    },
-    {
-      "id": "REQ-159",
-      "summary": "Replace the 'Account' tab with a 'Share' tab in BottomNav, displaying a share icon and label, triggering the Web Share API or clipboard fallback using the existing useWebShare hook",
-      "acceptanceCriteria": [
-        "The Bottom Navigation Bar contains exactly five tabs: Home, Chats, Sell, My Ads, and Share.",
-        "The 'Account' tab is no longer present in the Bottom Navigation Bar.",
-        "The 'Share' tab displays a recognizable share/invite icon and the label 'Share'.",
-        "Clicking the 'Share' tab invokes the Web Share API (navigator.share) with the app name, invite text, and the app's root URL; falls back to clipboard copy with a toast notification if navigator.share is unavailable.",
-        "The 'Sell' tab remains styled prominently (raised or highlighted center button) and routes to '/post-ad'.",
-        "The 'Home', 'Chats', and 'My Ads' tabs remain functional and route to their respective pages.",
-        "The active tab is highlighted with the Professional Blue active-state indicator.",
-        "The bottom bar retains the clean white background and is fixed to the bottom of the viewport on all pages."
+        "The bottom navigation bar's root container has z-index 999 or higher.",
+        "The bar is visually rendered on top of all page content and background layers."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/BottomNav.tsx",
           "operation": "modify",
-          "description": "Replace the fifth tab (currently 'Account') with a 'Share' tab. Import the useWebShare hook from '../hooks/useWebShare'. Change the Account tab definition to use a share icon (e.g., Share2, ExternalLink, or Forward icon from lucide-react) and the label 'Share'. Replace the Account tab's onClick handler to call the share function from useWebShare with parameters: title 'Animal Pashu Bazar', text 'Join me on Animal Pashu Bazar - buy and sell animals easily!', and url as the app's root URL (window.location.origin). Remove the Account tab's routing logic (to '/profile' or '/signup'). Ensure the updated tab array maintains the exact order: Home (/), Chats (/messages), Sell (/post-ad), My Ads (/dashboard), Share (share action). Verify the share function is called correctly and the existing Web Share API / clipboard fallback logic from useWebShare is triggered. Retain all existing styling for the bottom bar (white background, Professional Blue active indicator, fixed positioning)."
+          "description": "Add z-[999] Tailwind class to the bottom navigation bar's root <nav> element to ensure it renders above all other page content, overlays, and background elements."
         }
       ]
     },
     {
-      "id": "REQ-160",
-      "summary": "Update the visible version label displayed in the app to 'Version 49'",
+      "id": "REQ-185",
+      "summary": "Set pointer-events: auto and position: relative on all five bottom nav tab buttons to ensure reliable tap/click interactions",
       "acceptanceCriteria": [
-        "The version label reads 'Version 49' wherever it is displayed in the app UI.",
-        "No other visible version string remains showing a different version number."
+        "Clicking/tapping the Home, Chats, Sell, My Ads, and Account tabs all trigger their respective navigation actions.",
+        "No tab button is blocked by an overlapping element."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BottomNav.tsx",
+          "operation": "modify",
+          "description": "Add pointer-events-auto and relative Tailwind classes to each of the five tab buttons (Home, Chats, Sell, My Ads, Account) so that all tap/click interactions are reliably received regardless of overlapping layers."
+        }
+      ]
+    },
+    {
+      "id": "REQ-186",
+      "summary": "Apply z-index: 999 and isolation: isolate to the floating circular 'Sell' button to ensure it floats above all elements and receives pointer events",
+      "acceptanceCriteria": [
+        "The Sell button has z-index 999 and is clickable.",
+        "The Sell button visually floats above the navigation bar without being obscured."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BottomNav.tsx",
+          "operation": "modify",
+          "description": "Add z-[999] and isolate Tailwind classes to the floating circular 'Sell' button specifically, ensuring it also floats above all other elements and receives pointer events correctly."
+        }
+      ]
+    },
+    {
+      "id": "REQ-187",
+      "summary": "Apply pointer-events: none to all decorative background containers in Layout.tsx and HomePage.tsx so they cannot intercept clicks",
+      "acceptanceCriteria": [
+        "Decorative background/overlay divs in Layout.tsx and HomePage.tsx have pointer-events: none.",
+        "No background layer intercepts clicks on the bottom navigation bar or other interactive elements."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Locate the version string currently displayed in the Layout component (likely in the footer, header, or a visible UI element). Update the version text to read 'Version 49'. Search for any hardcoded version strings (e.g., 'Version 48', 'v48', or similar patterns) and replace with 'Version 49'. Ensure the updated version label is visible in the rendered UI and no other version strings remain."
+          "description": "Audit all decorative background containers (including any hero image containers, header background layers, and any full-viewport overlay divs). Apply pointer-events-none Tailwind class to every purely decorative or background-layer element so they cannot intercept clicks intended for interactive elements."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Audit all decorative background containers (including the hero banner background, any overlay divs, and background image containers). Apply pointer-events-none Tailwind class to every purely decorative or background-layer element so they cannot intercept clicks intended for interactive elements beneath or above them."
+        }
+      ]
+    },
+    {
+      "id": "REQ-188",
+      "summary": "Audit all page-level components for full-width/full-height containers that may overlap the bottom nav and apply pointer-events: none to decorative containers",
+      "acceptanceCriteria": [
+        "On every page, all five bottom nav tabs are tappable without interference from page content layers.",
+        "No full-height page container has a z-index that competes with z-[999] on the bottom nav."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/PostAdPage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        },
+        {
+          "path": "frontend/src/pages/ListingDetailPage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        },
+        {
+          "path": "frontend/src/pages/MessagesPage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        },
+        {
+          "path": "frontend/src/pages/ProfilePage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        },
+        {
+          "path": "frontend/src/pages/UserDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        },
+        {
+          "path": "frontend/src/pages/SignUpPage.tsx",
+          "operation": "modify",
+          "description": "Audit for any full-width/full-height containers that may inadvertently have pointer-events enabled and are stacked at a z-index that overlaps the bottom nav bar. Add pointer-events-none to any such decorative containers and ensure the page content wrapper does not exceed the viewport in a way that causes z-index conflicts with the bottom nav."
+        }
+      ]
+    },
+    {
+      "id": "REQ-189",
+      "summary": "Verify that the 'Actor not available' comprehensive fix from previous versions is still intact and active, re-applying it if any regression is detected",
+      "acceptanceCriteria": [
+        "The useSignUp mutation polls for actor availability and does not throw 'Actor not available' during normal operation.",
+        "The SignUpPage 'Create Account' button is disabled with 'Connecting...' label while the actor is initializing.",
+        "The CattleTrackerRouteGuard reads principal from the identity context directly, not from an async backend query.",
+        "The AdminRouteGuard shows a loading spinner while isAdmin is loading and only redirects when loading is complete."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Verify that the actor initialization includes polling for actor availability for up to 3 seconds. If the actor is unavailable after polling, throw 'Connection not ready. Please wait a moment and try again.' If any regression is detected, re-apply the fix."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Verify that the useSignUp mutation (and any other mutations) poll for actor availability before executing, throwing 'Connection not ready. Please wait a moment and try again.' if unavailable. If any regression is detected, re-apply the fix."
+        },
+        {
+          "path": "frontend/src/pages/SignUpPage.tsx",
+          "operation": "modify",
+          "description": "Verify that the 'Create Account' button is disabled with 'Connecting...' label while the actor is initializing (using the isFetching state from useActor). If any regression is detected, re-apply the fix."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Verify that the CattleTrackerRouteGuard reads the principal directly from identity?.getPrincipal().toText() instead of an async backend query. Verify that the AdminRouteGuard shows a loading spinner while isAdmin is loading and only redirects when loading is complete. If any regression is detected, re-apply the fix."
+        }
+      ]
+    },
+    {
+      "id": "REQ-190",
+      "summary": "Update the visible version label displayed in the app to 'Version 55'",
+      "acceptanceCriteria": [
+        "The version label reads 'Version 55' wherever it appears in the app UI.",
+        "No other version strings ('Version 54' or earlier) remain visible."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Find the version string in the Layout component (likely in the header or footer) and update it to read 'Version 55'. Ensure no other version strings remain visible."
         }
       ]
     }
