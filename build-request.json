@@ -1,71 +1,39 @@
 {
   "kind": "build_request",
-  "title": "Add 'Sheep 🐑' to Category Dropdown in Post Ad and All Related Controls",
+  "title": "Add dark overlay to header background image for text legibility",
   "projectName": "Pashu Mandi",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-34",
-      "text": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep 🐑' as a selectable option in the category dropdown. The option value should be consistent with the existing category value format used for other categories (e.g., 'Sheep'). It must appear in the dropdown list alongside the existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
+      "id": "REQ-52",
+      "text": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-latest"
+          "msg-4"
         ],
         "quotes": [
-          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
+          "add a dark overlay to the header image so the text 'Pashu Mandi' is easily readable"
         ]
       },
       "acceptanceCriteria": [
-        "The category dropdown in PostAdPage includes a 'Sheep 🐑' option.",
-        "Selecting 'Sheep 🐑' sets the category field value to 'Sheep' (or the canonical string used for this category).",
-        "The option renders correctly in the dropdown alongside all other existing animal categories."
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "text": "In frontend/src/pages/HomePage.tsx, add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. The filter option value must match the value stored for Sheep listings.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-latest"
-        ],
-        "quotes": [
-          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The category filter dropdown on HomePage includes a 'Sheep 🐑' option.",
-        "Selecting 'Sheep 🐑' in the filter correctly filters the listings grid to show only Sheep listings."
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "text": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the category label map and assign it a distinct badge color consistent with the existing Professional Blue and white theme (e.g., a muted green or warm teal that does not clash with existing badge colors). The label displayed on the badge should be 'Sheep 🐑'.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-latest"
-        ],
-        "quotes": [
-          "Add 'Sheep 🐑' as a new option in the list along with Dogs, Cats, Birds, etc."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A listing with category 'Sheep' renders the badge label 'Sheep 🐑' on the ListingCard.",
-        "The badge has a distinct background color different from all other existing category badge colors.",
-        "The badge color is consistent with the app's Professional Blue and white theme."
+        "A dark semi-transparent overlay (e.g. bg-black/50 or darker) is applied over the header background image in Layout.tsx.",
+        "The 'Pashu Mandi' brand text is clearly legible (high contrast white text) against the overlaid header image.",
+        "All navigation links in the header remain clearly readable over the overlay.",
+        "The header layout, height, logo, navigation links, and all other structural elements are unchanged.",
+        "The overlay does not obscure interactive elements (links, buttons remain clickable)."
       ]
     }
   ],
   "constraints": [
-    "Do not change the backend API or data model — 'Sheep' as a category value is already supported by the backend's Text-based category field.",
-    "Do not modify any files listed under frontend.immutablePaths."
+    "Do not change the header background image asset (frontend/public/assets/generated/header-bg.dim_1200x300.png).",
+    "Do not alter the header layout, height, logo, or navigation link structure.",
+    "frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and frontend/src/components/ui are read-only and must not be modified."
   ],
   "nonGoals": [
-    "Adding any other new animal categories beyond Sheep.",
-    "Backend schema changes.",
-    "Changes to the payment flow, VIP logic, or any other unrelated feature."
+    "Replacing or regenerating the header background image.",
+    "Changing any other page styles or components outside of Layout.tsx.",
+    "Modifying backend logic."
   ],
   "imageRequirements": {
     "required": [],

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LogIn, ImagePlus, UserPlus, X, Camera, Crown } from 'lucide-react';
+import { LogIn, ImagePlus, UserPlus, X, Camera, Crown, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import PaymentModal from '../components/PaymentModal';
 
@@ -163,11 +163,14 @@ export default function PostAdPage() {
 
     setSubmitError(null);
     try {
-      const listingId = await createListing(pendingListingData);
+      await createListing(pendingListingData);
       setIsPaymentModalOpen(false);
       setPendingListingData(null);
-      toast.success('Your ad has been published!');
-      navigate({ to: '/listing/$id', params: { id: listingId.toString() } });
+      toast.success(
+        'Your ad has been submitted and is pending admin approval. It will appear publicly once approved.',
+        { duration: 6000 }
+      );
+      navigate({ to: '/' });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'Failed to post listing. Please try again.';
@@ -237,6 +240,17 @@ export default function PostAdPage() {
           <p className="text-muted-foreground mt-1">
             Fill in the details below to list your animal for sale.
           </p>
+        </div>
+
+        {/* Pending approval notice */}
+        <div className="mb-6 flex items-start gap-3 rounded-xl px-5 py-3 bg-blue-50 border border-blue-200">
+          <Clock className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">Admin Approval Required</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              All new ads are reviewed by our admin before going live. This usually takes a short time.
+            </p>
+          </div>
         </div>
 
         {/* Posting fee notice */}
@@ -464,29 +478,18 @@ export default function PostAdPage() {
               <div className="flex-1 min-w-0">
                 <label
                   htmlFor="isVip"
-                  className="flex items-center gap-2 font-semibold text-foreground cursor-pointer select-none"
+                  className="flex items-center gap-2 font-semibold text-foreground cursor-pointer mb-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Crown className="w-4 h-4 text-amber-500" />
                   Make this a VIP Ad
-                  <span className="text-amber-600 font-bold">(₹500)</span>
+                  <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                    ₹500
+                  </span>
                 </label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Your ad will appear in the <strong>Featured Animals</strong> section at the top of the homepage with a gold border and a <strong>Verified</strong> badge for maximum visibility.
+                <p className="text-sm text-muted-foreground">
+                  VIP ads appear at the top of the listings with a gold border, crown icon, and "Verified" badge — get more visibility and sell faster.
                 </p>
-                {isVip && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                      ⭐ Featured at top
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                      🏅 Gold border
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                      ✅ Verified badge
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -494,23 +497,22 @@ export default function PostAdPage() {
           {/* Submit */}
           <Button
             type="submit"
+            className="w-full"
             size="lg"
-            className={`w-full ${isVip ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-            disabled={isProcessingFiles}
+            disabled={isPending || isProcessingFiles}
           >
-            {isVip ? (
-              <span className="flex items-center gap-2">
-                <Crown className="w-4 h-4" />
-                Post VIP Ad — Pay ₹500
-              </span>
+            {isPending ? (
+              <>
+                <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                Submitting...
+              </>
             ) : (
-              'Post Ad — Pay ₹199'
+              `Continue to Payment — ₹${postingFee}`
             )}
           </Button>
         </form>
       </div>
 
-      {/* Payment Modal */}
       <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={handleCloseModal}

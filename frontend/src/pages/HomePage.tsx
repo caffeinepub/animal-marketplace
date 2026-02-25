@@ -197,7 +197,7 @@ export default function HomePage() {
           {/* Horizontally scrollable row on mobile, grid on larger screens */}
           <div className="flex gap-4 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-visible sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
             {featuredListings.map((listing) => (
-              <div key={listing.id.toString()} className="min-w-[260px] sm:min-w-0 flex-shrink-0 sm:flex-shrink">
+              <div key={listing.id.toString()} className="min-w-[260px] sm:min-w-0 shrink-0 sm:shrink">
                 <ListingCard listing={listing} className="h-full" />
               </div>
             ))}

@@ -87,7 +87,7 @@ export default function PhotoGallery({ photos, title }: PhotoGalleryProps) {
               key={index}
               onClick={() => goTo(index)}
               className={cn(
-                'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
+                'shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
                 index === currentIndex
                   ? 'border-primary shadow-xs'
                   : 'border-transparent opacity-60 hover:opacity-100'

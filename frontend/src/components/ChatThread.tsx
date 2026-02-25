@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Send, MessageCircle } from 'lucide-react';
+import { Send, MessageCircle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -13,6 +13,12 @@ interface ChatThreadProps {
   recipientPrincipal: string;
   listingId?: bigint;
 }
+
+const QUICK_REPLIES = [
+  'Is this animal still available?',
+  'What is your final price?',
+  'Can I visit to see the animal?',
+];
 
 function formatTime(timestamp: bigint): string {
   const ms = Number(timestamp / BigInt(1_000_000));
@@ -56,6 +62,19 @@ export default function ChatThread({ recipientPrincipal, listingId }: ChatThread
         text: messageText.trim(),
       });
       setMessageText('');
+    } catch {
+      toast.error('Failed to send message. Please try again.');
+    }
+  };
+
+  const handleQuickReply = async (text: string) => {
+    if (isSending) return;
+    try {
+      await sendMessage({
+        recipient: recipientPrincipal,
+        listingId,
+        text,
+      });
     } catch {
       toast.error('Failed to send message. Please try again.');
     }
@@ -136,8 +155,34 @@ export default function ChatThread({ recipientPrincipal, listingId }: ChatThread
         )}
       </div>
 
+      {/* Quick Reply Buttons */}
+      <div className="px-4 pt-3 pb-1 border-t border-border bg-card">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Zap className="w-3.5 h-3.5 text-primary" />
+          <span className="text-xs font-medium text-muted-foreground">Quick Reply</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {QUICK_REPLIES.map((reply) => (
+            <button
+              key={reply}
+              type="button"
+              onClick={() => handleQuickReply(reply)}
+              disabled={isSending}
+              className={cn(
+                'text-xs px-3 py-1.5 rounded-full border border-primary/40 text-primary bg-primary/5',
+                'hover:bg-primary hover:text-primary-foreground hover:border-primary',
+                'transition-colors duration-150 font-medium',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              {reply}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Input */}
-      <form onSubmit={handleSend} className="p-4 border-t border-border bg-card flex gap-2">
+      <form onSubmit={handleSend} className="p-4 pt-2 border-border bg-card flex gap-2">
         <Input
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}

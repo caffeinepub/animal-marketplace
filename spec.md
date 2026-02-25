@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add "Sheep 🐑" as a new category option across all relevant frontend controls in the Pashu Mandi app.
+**Goal:** Add a dark semi-transparent overlay to the header background image in Layout.tsx so that the "Pashu Mandi" brand text and navigation links are clearly readable.
 
 **Planned changes:**
-- Add "Sheep 🐑" option to the category dropdown in `PostAdPage.tsx` with value `'Sheep'`
-- Add "Sheep 🐑" option to the category filter dropdown in `HomePage.tsx` so users can filter listings by Sheep
-- Add `'Sheep'` to the category label map in `ListingCard.tsx` with a distinct badge color consistent with the app's Professional Blue and white theme, displaying the label "Sheep 🐑"
+- Apply a dark semi-transparent overlay (e.g. `bg-black/50` or `bg-black/60`) over the header background image in `frontend/src/components/Layout.tsx`
+- Ensure the overlay does not block interactive elements (links and buttons remain clickable)
+- Keep all header structure, layout, height, logo, and navigation links unchanged
 
-**User-visible outcome:** Users can post ads under the "Sheep 🐑" category, filter listings by Sheep on the home page, and see a correctly labeled and colored badge on Sheep listing cards.
+**User-visible outcome:** The header text "Pashu Mandi" and all navigation links are clearly legible with high contrast against the header background image.

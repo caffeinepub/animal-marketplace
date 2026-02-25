@@ -10,6 +10,8 @@ import MessagesPage from './pages/MessagesPage';
 import ProfilePage from './pages/ProfilePage';
 import SignUpPage from './pages/SignUpPage';
 import HelplinePage from './pages/HelplinePage';
+import TermsPage from './pages/TermsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
@@ -81,6 +83,18 @@ const helplineRoute = createRoute({
   component: HelplinePage,
 });
 
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/terms',
+  component: TermsPage,
+});
+
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin',
+  component: AdminDashboardPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   postAdRoute,
@@ -90,6 +104,8 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   signUpRoute,
   helplineRoute,
+  termsRoute,
+  adminRoute,
 ]);
 
 const router = createRouter({ routeTree });

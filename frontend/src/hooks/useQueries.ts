@@ -124,7 +124,8 @@ export function useGetListing(id: string | undefined) {
     queryKey: ['listing', id],
     queryFn: async () => {
       if (!actor || id === undefined) return null;
-      return actor.getListing(BigInt(id));
+      const listings = await actor.getListings();
+      return listings.find((l) => l.id.toString() === id) ?? null;
     },
     enabled: !!actor && !actorFetching && id !== undefined,
   });
@@ -207,6 +208,69 @@ export function useDeleteListing() {
       return actor.deleteListing(listingId);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+    },
+  });
+}
+
+// ─── Admin ───────────────────────────────────────────────────────────────────
+
+export function useIsCallerAdmin() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<boolean>({
+    queryKey: ['isCallerAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isCallerAdmin();
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+    retry: false,
+  });
+}
+
+export function useGetPendingListings() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<Listing[]>({
+    queryKey: ['pendingListings'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getPendingListings();
+    },
+    enabled: !!actor && !actorFetching && !!identity,
+  });
+}
+
+export function useApproveListing() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (listingId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.approveListing(listingId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pendingListings'] });
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+    },
+  });
+}
+
+export function useRejectListing() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (listingId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.rejectListing(listingId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pendingListings'] });
       queryClient.invalidateQueries({ queryKey: ['listings'] });
     },
   });

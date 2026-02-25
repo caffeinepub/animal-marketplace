@@ -1,48 +1,39 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T13:49:52.917Z",
+  "generatedAt": "2026-02-25T14:42:29.682Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 0,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-34",
-        "summary": "In frontend/src/pages/PostAdPage.tsx, add 'Sheep 🐑' as a selectable option in the category dropdown. The option value should be consistent with the existing category value format used for other categories (e.g., 'Sheep'). It must appear in the dropdown list alongside the existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.).",
-        "status": "missing",
+        "id": "REQ-52",
+        "summary": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
+        "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/PostAdPage.tsx"
+          "frontend/src/components/Layout.tsx"
         ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-35",
-        "summary": "In frontend/src/pages/HomePage.tsx, add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. The filter option value must match the value stored for Sheep listings.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/HomePage.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-36",
-        "summary": "In frontend/src/components/ListingCard.tsx, add 'Sheep' to the category label map and assign it a distinct badge color consistent with the existing Professional Blue and white theme (e.g., a muted green or warm teal that does not clash with existing badge colors). The label displayed on the badge should be 'Sheep 🐑'.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/components/ListingCard.tsx"
-        ],
-        "matchedFiles": []
+        "matchedFiles": [
+          "frontend/src/components/Layout.tsx"
+        ]
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
     "feature_evidence.json",
+    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/PhotoGallery.tsx",
+    "frontend/src/pages/AdminDashboardPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/PostAdPage.tsx",
+    "frontend/src/pages/TermsPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

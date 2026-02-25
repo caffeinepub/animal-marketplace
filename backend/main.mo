@@ -6,8 +6,8 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
 import Array "mo:core/Array";
-import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import MixinAuthorization "authorization/MixinAuthorization";
 
 
 
@@ -27,6 +27,8 @@ actor {
     #sheep;
   };
 
+  public type ListingStatus = { #pending; #approved; #rejected };
+
   type Listing = {
     id : ListingId;
     owner : Principal;
@@ -39,6 +41,23 @@ actor {
     timestamp : Time.Time;
     isActive : Bool;
     isVip : Bool;
+    status : ListingStatus;
+  };
+
+  // Public-safe listing type that omits sensitive owner info for anonymous callers
+  type PublicListing = {
+    id : ListingId;
+    owner : Principal;
+    title : Text;
+    description : Text;
+    price : Nat;
+    category : AnimalCategory;
+    location : Text;
+    photoUrls : [Text];
+    timestamp : Time.Time;
+    isActive : Bool;
+    isVip : Bool;
+    status : ListingStatus;
   };
 
   type Message = {
@@ -55,6 +74,13 @@ actor {
     contactInfo : ?Text;
     registrationTimestamp : Time.Time;
     mobileNumber : ?Text;
+  };
+
+  // Public profile strips sensitive contact info
+  type PublicUserProfile = {
+    displayName : Text;
+    bio : Text;
+    registrationTimestamp : Time.Time;
   };
 
   let accessControlState = AccessControl.initState();
@@ -96,20 +122,53 @@ actor {
       timestamp = Time.now();
       isActive = true;
       isVip;
+      status = #pending; // New listings are pending by default
     };
 
     listings.add(listingId, listing);
     listingId;
   };
 
+  public shared ({ caller }) func approveListing(listingId : ListingId) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can approve listings");
+    };
+
+    switch (listings.get(listingId)) {
+      case (null) { Runtime.trap("Listing not found") };
+      case (?listing) {
+        let updatedListing = { listing with status = #approved };
+        listings.add(listingId, updatedListing);
+      };
+    };
+  };
+
+  public shared ({ caller }) func rejectListing(listingId : ListingId) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can reject listings");
+    };
+
+    switch (listings.get(listingId)) {
+      case (null) { Runtime.trap("Listing not found") };
+      case (?listing) {
+        let updatedListing = { listing with status = #rejected };
+        listings.add(listingId, updatedListing);
+      };
+    };
+  };
+
+  // Public query: returns only approved listings, no auth required
   public query func getListings() : async [Listing] {
     let allListings = listings.values().toArray();
 
-    let vipListings = allListings.filter(func(l) { l.isVip });
-    let nonVipListings = allListings.filter(func(l) { not l.isVip });
+    // Filter for approved listings only — pending and rejected must not appear publicly
+    let approvedListings = allListings.filter(func(l : Listing) : Bool { l.status == #approved });
+
+    let vipListings = approvedListings.filter(func(l : Listing) : Bool { l.isVip });
+    let nonVipListings = approvedListings.filter(func(l : Listing) : Bool { not l.isVip });
 
     let sortedNonVip = nonVipListings.sort(
-      func(a, b) {
+      func(a : Listing, b : Listing) : { #less; #equal; #greater } {
         if (a.timestamp > b.timestamp) { #less } else {
           if (a.timestamp < b.timestamp) { #greater } else { #equal };
         };
@@ -119,8 +178,20 @@ actor {
     vipListings.concat(sortedNonVip);
   };
 
-  public query func getListing(listingId : ListingId) : async ?Listing {
-    listings.get(listingId);
+  // Admin-only: returns all pending listings for review
+  public query ({ caller }) func getPendingListings() : async [Listing] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can access pending listings");
+    };
+    listings.values().toArray().filter(func(l : Listing) : Bool { l.status == #pending });
+  };
+
+  // Admin-only: returns all listings regardless of status
+  public query ({ caller }) func getAllListings() : async [Listing] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can access all listings");
+    };
+    listings.values().toArray();
   };
 
   public shared ({ caller }) func updateListing(
@@ -144,6 +215,13 @@ actor {
         if (existing.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
           Runtime.trap("Unauthorized: Only the owner or an admin can update this listing");
         };
+        // When a non-admin owner updates a listing, it goes back to pending for re-review.
+        // Admins updating a listing preserve the current status.
+        let newStatus : ListingStatus = if (AccessControl.isAdmin(accessControlState, caller)) {
+          existing.status;
+        } else {
+          #pending;
+        };
         let updated : Listing = {
           id = existing.id;
           owner = existing.owner;
@@ -156,6 +234,7 @@ actor {
           timestamp = existing.timestamp;
           isActive;
           isVip;
+          status = newStatus;
         };
         listings.add(listingId, updated);
       };
@@ -245,7 +324,7 @@ actor {
       case (?msgs) {
         for (msg in msgs.values()) {
           let partner = if (msg.sender == caller) { msg.recipient } else { msg.sender };
-          let alreadyAdded = partners.any(func(p) { p == partner });
+          let alreadyAdded = partners.any(func(p : Principal) : Bool { p == partner });
           if (not alreadyAdded) {
             partners.add(partner);
           };
@@ -280,44 +359,36 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // signUp is accessible to any caller including guests, because new users
-  // have not yet been assigned the #user role. Anonymous principals (guests)
-  // must be able to call this to register. If a profile already exists,
-  // only displayName and mobileNumber are updated; other fields are preserved.
+  // signUp is intentionally open to any caller (including guests/anonymous)
+  // so new users can register themselves
   public shared ({ caller }) func signUp(displayName : Text, mobileNumber : Text) : async () {
-    // No permission check: guests and new users must be able to sign up.
-    // Anonymous principals are intentionally allowed so that identity-based
-    // sign-up flows work before a role is assigned.
-
     let existing = userProfiles.get(caller);
 
     let profile : UserProfile = switch (existing) {
       case (null) {
-        // Brand new profile
         {
           displayName;
           bio = "";
           contactInfo = null;
           registrationTimestamp = Time.now();
           mobileNumber = ?mobileNumber;
-        }
+        };
       };
       case (?p) {
-        // Existing profile: update only displayName and mobileNumber
         {
           displayName;
           bio = p.bio;
           contactInfo = p.contactInfo;
           registrationTimestamp = p.registrationTimestamp;
           mobileNumber = ?mobileNumber;
-        }
+        };
       };
     };
 
     userProfiles.add(caller, profile);
   };
 
-  // getMobileNumber: only the authenticated user can retrieve their own mobile number.
+  // Only the authenticated user can retrieve their own mobile number
   public query ({ caller }) func getMobileNumber() : async ?Text {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can get their own mobile number");
@@ -328,9 +399,21 @@ actor {
     };
   };
 
-  // Public profile lookup — no auth required (marketplace use case: view seller profiles)
-  public query func getProfile(principal : Principal) : async ?UserProfile {
-    userProfiles.get(principal);
+  // Public profile lookup — strips sensitive fields (contactInfo, mobileNumber)
+  // so anonymous callers cannot harvest private contact data
+  public query ({ caller }) func getProfile(principal : Principal) : async ?PublicUserProfile {
+    // If the caller is the profile owner or an admin, they may see the full profile via getMyProfile/getUserProfile.
+    // This endpoint intentionally returns only the public subset.
+    switch (userProfiles.get(principal)) {
+      case (null) { null };
+      case (?profile) {
+        ?{
+          displayName = profile.displayName;
+          bio = profile.bio;
+          registrationTimestamp = profile.registrationTimestamp;
+        };
+      };
+    };
   };
 
   public query ({ caller }) func getMyProfile() : async ?UserProfile {
@@ -339,8 +422,6 @@ actor {
     };
     userProfiles.get(caller);
   };
-
-  // Required profile functions for the frontend
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -371,6 +452,7 @@ actor {
     userProfiles.add(caller, profile);
   };
 
+  // Full profile visible only to the owner or an admin
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 27,
+  "projectStateVersion": 41,
   "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
   "architectural_notes": [
     "Marketplace model: users can post, browse, and respond to animal sale listings",
@@ -10,7 +10,8 @@
     "App name is 'Pashu Mandi'; theme uses white background with Professional Blue primary color; currency is ₹ (Rupee)",
     "Posting an ad requires a ₹199 fee paid via UPI (ID: 8431207976king@ybl); listing is only published after payment confirmation",
     "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section",
-    "Admin promo code 'FREEADMIN' bypasses payment entirely and sets fee to ₹0; admin secret identifier is 'IrfanKhanDj'"
+    "Admin promo code 'FREEADMIN' bypasses payment entirely and sets fee to ₹0; admin secret identifier is 'IrfanKhanDj'",
+    "Admin approval workflow: new listings start in 'pending' state and are only publicly visible after admin approval from the admin dashboard"
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -230,6 +231,94 @@
         "REQ-33"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-replace-the-current-paw-print-logo-image-icon-in-the-header-with-the-new-round-goat-logo-image-use-the-generated-asset-at-frontend-public-assets-generated-goat-logo-dim-64x64-png-as-the-logo-src-render-it-as-a-round-image-rounded-full-matching-the-header-height-replacing-any-existing-logo-icon-or-emoji",
+      "title": "In frontend/src/components/Layout.tsx, replace the current paw print logo image/icon in the header with the new round goat logo image. Use the generated asset at 'frontend/public/assets/generated/goat-logo.dim_64x64.png' as the logo src. Render it as a round image (rounded-full) matching the header height, replacing any existing logo icon or emoji.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-index-html-replace-the-current-favicon-app-icon-link-with-a-reference-to-the-new-goat-logo-image-at-assets-generated-goat-logo-dim-64x64-png-update-the-link-rel-icon-tag-so-the-browser-tab-and-app-icon-display-the-new-round-goat-logo",
+      "title": "In frontend/index.html, replace the current favicon/app icon link with a reference to the new goat logo image at '/assets/generated/goat-logo.dim_64x64.png'. Update the <link rel='icon'> tag so the browser tab and app icon display the new round goat logo.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-at-route-terms-named-terms-conditions-the-page-must-match-the-existing-professional-blue-and-white-theme-used-throughout-the-app-it-must-display-the-following-four-terms-clearly-each-as-a-numbered-or-bulleted-item-1-users-must-provide-honest-information-about-animals-2-illegal-trading-of-wild-animals-is-strictly-prohibited-3-pashu-mandi-is-only-a-platform-we-are-not-responsible-for-any-fraud-between-buyer-and-seller-4-admin-has-the-right-to-remove-any-post-if-found-suspicious-style-the-page-with-a-prominent-heading-terms-conditions-a-clean-card-or-content-block-layout-and-readable-body-text-consistent-with-the-app-s-typography",
+      "title": "Create a new frontend page at route '/terms' named 'Terms & Conditions'. The page must match the existing Professional Blue and white theme used throughout the app. It must display the following four terms clearly, each as a numbered or bulleted item: (1) 'Users must provide honest information about animals.' (2) 'Illegal trading of wild animals is strictly prohibited.' (3) 'Pashu Mandi is only a platform; we are not responsible for any fraud between buyer and seller.' (4) 'Admin has the right to remove any post if found suspicious.' Style the page with a prominent heading 'Terms & Conditions', a clean card or content block layout, and readable body text consistent with the app's typography.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-navigation-link-labelled-terms-in-the-app-s-layout-footer-layout-tsx-that-routes-to-terms-styled-consistently-with-other-footer-links-in-the-professional-blue-and-white-theme",
+      "title": "Add a navigation link labelled 'Terms' in the app's Layout footer (Layout.tsx) that routes to '/terms', styled consistently with other footer links in the Professional Blue and white theme.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-frontend-page-at-route-admin-named-admin-dashboard-the-page-must-be-styled-consistently-with-the-existing-professional-blue-and-white-theme-it-must-fetch-pending-listings-using-the-getpendinglistings-backend-query-and-display-them-in-a-list-or-card-grid-each-pending-listing-must-show-title-category-location-price-seller-principal-and-the-first-photo-thumbnail-each-card-must-have-an-approve-button-professional-blue-and-a-reject-button-red-destructive-style-that-call-the-respective-backend-functions-and-refresh-the-list-on-success",
+      "title": "Create a new frontend page at route `/admin` named 'Admin Dashboard'. The page must be styled consistently with the existing Professional Blue and white theme. It must fetch pending listings using the `getPendingListings` backend query and display them in a list or card grid. Each pending listing must show: title, category, location, price, seller principal, and the first photo thumbnail. Each card must have an 'Approve' button (Professional Blue) and a 'Reject' button (red/destructive style) that call the respective backend functions and refresh the list on success.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-navigation-link-labelled-admin-in-the-app-s-layout-header-layout-tsx-that-routes-to-admin-visible-only-when-the-authenticated-user-is-the-admin-principal-style-it-consistently-with-existing-nav-links-in-the-professional-blue-theme",
+      "title": "Add a navigation link labelled 'Admin' in the app's Layout header (Layout.tsx) that routes to `/admin`, visible only when the authenticated user is the admin principal. Style it consistently with existing nav links in the Professional Blue theme.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-after-a-user-successfully-submits-a-listing-via-postadpage-after-the-payment-freeadmin-flow-display-an-inline-success-message-or-toast-that-says-your-ad-has-been-submitted-and-is-pending-admin-approval-it-will-appear-publicly-once-approved-instead-of-or-in-addition-to-the-current-generic-success-toast",
+      "title": "After a user successfully submits a listing via PostAdPage (after the payment/FREEADMIN flow), display an inline success message or toast that says 'Your ad has been submitted and is pending admin approval. It will appear publicly once approved.' instead of or in addition to the current generic success toast.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-chatthread-tsx-add-three-quick-reply-buttons-above-the-chat-input-field-with-the-pre-filled-messages-is-this-animal-still-available-what-is-your-final-price-and-can-i-visit-to-see-the-animal-clicking-any-button-must-instantly-send-that-message-as-if-the-user-typed-and-submitted-it-i-e-call-the-same-sendmessage-mutation-used-by-the-text-input-form-the-buttons-must-be-styled-consistently-with-the-professional-blue-theme-e-g-outlined-or-filled-blue-buttons-and-must-only-be-visible-to-the-buyer-side-of-the-conversation-i-e-the-current-user-who-is-not-the-listing-owner-seller",
+      "title": "In frontend/src/components/ChatThread.tsx, add three Quick Reply buttons above the chat input field with the pre-filled messages: 'Is this animal still available?', 'What is your final price?', and 'Can I visit to see the animal?'. Clicking any button must instantly send that message as if the user typed and submitted it (i.e., call the same sendMessage mutation used by the text input form). The buttons must be styled consistently with the Professional Blue theme (e.g., outlined or filled blue buttons) and must only be visible to the buyer side of the conversation (i.e., the current user who is not the listing owner/seller).",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-replace-the-current-animal-background-image-used-in-the-app-header-with-the-newly-uploaded-image-asset-saved-as-frontend-public-assets-generated-header-bg-dim-1200x300-png-set-it-as-the-header-s-background-image-ensure-the-pashu-mandi-brand-text-and-all-navigation-links-remain-clearly-legible-over-the-new-image-by-applying-a-sufficient-dark-or-semi-transparent-overlay-e-g-bg-black-40-or-equivalent-and-keeping-the-text-color-white-or-high-contrast-the-header-layout-height-navigation-links-logo-and-all-other-header-elements-must-remain-structurally-unchanged",
+      "title": "In frontend/src/components/Layout.tsx, replace the current animal background image used in the app header with the newly uploaded image asset (saved as 'frontend/public/assets/generated/header-bg.dim_1200x300.png'). Set it as the header's background image. Ensure the 'Pashu Mandi' brand text and all navigation links remain clearly legible over the new image by applying a sufficient dark or semi-transparent overlay (e.g. bg-black/40 or equivalent) and keeping the text color white or high-contrast. The header layout, height, navigation links, logo, and all other header elements must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-replace-the-current-header-background-image-with-the-newly-uploaded-image-asset-saved-as-frontend-public-assets-generated-header-bg-dim-1200x300-png-set-it-as-the-header-s-background-image-ensure-the-pashu-mandi-brand-text-and-all-navigation-links-remain-clearly-legible-over-the-new-image-by-applying-a-sufficient-dark-or-semi-transparent-overlay-e-g-bg-black-40-or-equivalent-and-keeping-the-text-color-white-or-high-contrast-the-header-layout-height-navigation-links-logo-and-all-other-header-elements-must-remain-structurally-unchanged",
+      "title": "In frontend/src/components/Layout.tsx, replace the current header background image with the newly uploaded image asset (saved as 'frontend/public/assets/generated/header-bg.dim_1200x300.png'). Set it as the header's background image. Ensure the 'Pashu Mandi' brand text and all navigation links remain clearly legible over the new image by applying a sufficient dark or semi-transparent overlay (e.g. bg-black/40 or equivalent) and keeping the text color white or high-contrast. The header layout, height, navigation links, logo, and all other header elements must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-components-layout-tsx-ensure-the-header-has-a-sufficiently-dark-semi-transparent-overlay-applied-over-the-background-image-e-g-bg-black-50-or-bg-black-60-so-that-the-pashu-mandi-brand-text-and-all-navigation-links-are-clearly-and-easily-readable-the-overlay-must-be-dark-enough-to-provide-strong-contrast-against-white-light-text-the-header-layout-height-logo-navigation-links-and-all-other-header-elements-must-remain-structurally-unchanged",
+      "title": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -399,6 +488,82 @@
       "reqIds": [
         "REQ-36"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Replace the current paw print logo in the header and as the app icon with a new round goat logo uploaded by the user.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Create a Terms & Conditions page (or section) with the following terms: (1) Users must provide honest information about animals. (2) Illegal trading of wild animals is strictly prohibited. (3) Pashu Mandi is only a platform; we are not responsible for any fraud between buyer and seller. (4) Admin has the right to remove any post if found suspicious.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Add an Admin Approval workflow: new listings should default to a 'pending approval' state and not be visible to the public until an admin manually approves them from the admin dashboard.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Add a `status` field to the Listing data type in the backend with three possible values: `#pending`, `#approved`, and `#rejected`. When `createListing` is called, new listings must be created with status `#pending` by default, regardless of whether they are VIP or regular ads.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Update the backend `getAllListings` / `getListings` query function to return only listings with status `#approved` to public (unauthenticated or non-admin) callers. Pending and rejected listings must not appear in public listing results.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Add a backend `approveListing(id: Nat) : async Result` function and a `rejectListing(id: Nat) : async Result` function restricted to a hardcoded admin principal. These functions update the listing's status to `#approved` or `#rejected` respectively.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Add a backend `getPendingListings() : async [Listing]` function restricted to admin callers that returns all listings with status `#pending`, so the admin dashboard can display them for review.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "Add a backend migration in `backend/migration.mo` (or inline in `main.mo` upgrade hook) that sets the `status` field of all pre-existing listings (created before this upgrade) to `#approved`, so existing live listings remain publicly visible after the upgrade.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "Add Quick Reply buttons in the chat/messages view: three pre-filled message buttons ('Is this animal still available?', 'What is your final price?', 'Can I visit to see the animal?') appear above the chat input. Clicking any button instantly sends that message to the seller. Styled in Professional Blue theme.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-43",
+      "summary": "Replace the current animal background image in the app header with a new user-uploaded image, ensuring the 'Pashu Mandi' text remains clearly visible over it.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Add a dark semi-transparent overlay on the header background image so the 'Pashu Mandi' brand text and navigation links remain clearly readable.",
+      "reqIds": [],
       "status": "pending"
     }
   ],

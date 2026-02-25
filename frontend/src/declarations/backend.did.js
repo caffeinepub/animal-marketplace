@@ -8,6 +8,7 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const ListingId = IDL.Nat;
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -26,8 +27,26 @@ export const AnimalCategory = IDL.Variant({
   'buffalo' : IDL.Null,
   'smallAnimal' : IDL.Null,
 });
-export const ListingId = IDL.Nat;
+export const ListingStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
 export const Time = IDL.Int;
+export const Listing = IDL.Record({
+  'id' : ListingId,
+  'status' : ListingStatus,
+  'title' : IDL.Text,
+  'photoUrls' : IDL.Vec(IDL.Text),
+  'owner' : IDL.Principal,
+  'description' : IDL.Text,
+  'isActive' : IDL.Bool,
+  'timestamp' : Time,
+  'category' : AnimalCategory,
+  'isVip' : IDL.Bool,
+  'price' : IDL.Nat,
+  'location' : IDL.Text,
+});
 export const UserProfile = IDL.Record({
   'bio' : IDL.Text,
   'contactInfo' : IDL.Opt(IDL.Text),
@@ -42,22 +61,15 @@ export const Message = IDL.Record({
   'sender' : IDL.Principal,
   'timestamp' : Time,
 });
-export const Listing = IDL.Record({
-  'id' : ListingId,
-  'title' : IDL.Text,
-  'photoUrls' : IDL.Vec(IDL.Text),
-  'owner' : IDL.Principal,
-  'description' : IDL.Text,
-  'isActive' : IDL.Bool,
-  'timestamp' : Time,
-  'category' : AnimalCategory,
-  'isVip' : IDL.Bool,
-  'price' : IDL.Nat,
-  'location' : IDL.Text,
+export const PublicUserProfile = IDL.Record({
+  'bio' : IDL.Text,
+  'displayName' : IDL.Text,
+  'registrationTimestamp' : Time,
 });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'approveListing' : IDL.Func([ListingId], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createListing' : IDL.Func(
       [
@@ -73,14 +85,19 @@ export const idlService = IDL.Service({
       [],
     ),
   'deleteListing' : IDL.Func([ListingId], [], []),
+  'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getConversation' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], ['query']),
-  'getListing' : IDL.Func([ListingId], [IDL.Opt(Listing)], ['query']),
   'getListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
   'getMobileNumber' : IDL.Func([], [IDL.Opt(IDL.Text)], ['query']),
   'getMyProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
-  'getProfile' : IDL.Func([IDL.Principal], [IDL.Opt(UserProfile)], ['query']),
+  'getPendingListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+  'getProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(PublicUserProfile)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -88,6 +105,7 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'listConversations' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+  'rejectListing' : IDL.Func([ListingId], [], []),
   'saveCallerUserProfile' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
       [],
@@ -120,6 +138,7 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const ListingId = IDL.Nat;
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -138,8 +157,26 @@ export const idlFactory = ({ IDL }) => {
     'buffalo' : IDL.Null,
     'smallAnimal' : IDL.Null,
   });
-  const ListingId = IDL.Nat;
+  const ListingStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
   const Time = IDL.Int;
+  const Listing = IDL.Record({
+    'id' : ListingId,
+    'status' : ListingStatus,
+    'title' : IDL.Text,
+    'photoUrls' : IDL.Vec(IDL.Text),
+    'owner' : IDL.Principal,
+    'description' : IDL.Text,
+    'isActive' : IDL.Bool,
+    'timestamp' : Time,
+    'category' : AnimalCategory,
+    'isVip' : IDL.Bool,
+    'price' : IDL.Nat,
+    'location' : IDL.Text,
+  });
   const UserProfile = IDL.Record({
     'bio' : IDL.Text,
     'contactInfo' : IDL.Opt(IDL.Text),
@@ -154,22 +191,15 @@ export const idlFactory = ({ IDL }) => {
     'sender' : IDL.Principal,
     'timestamp' : Time,
   });
-  const Listing = IDL.Record({
-    'id' : ListingId,
-    'title' : IDL.Text,
-    'photoUrls' : IDL.Vec(IDL.Text),
-    'owner' : IDL.Principal,
-    'description' : IDL.Text,
-    'isActive' : IDL.Bool,
-    'timestamp' : Time,
-    'category' : AnimalCategory,
-    'isVip' : IDL.Bool,
-    'price' : IDL.Nat,
-    'location' : IDL.Text,
+  const PublicUserProfile = IDL.Record({
+    'bio' : IDL.Text,
+    'displayName' : IDL.Text,
+    'registrationTimestamp' : Time,
   });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'approveListing' : IDL.Func([ListingId], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createListing' : IDL.Func(
         [
@@ -185,6 +215,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'deleteListing' : IDL.Func([ListingId], [], []),
+    'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getConversation' : IDL.Func(
@@ -192,11 +223,15 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Message)],
         ['query'],
       ),
-    'getListing' : IDL.Func([ListingId], [IDL.Opt(Listing)], ['query']),
     'getListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
     'getMobileNumber' : IDL.Func([], [IDL.Opt(IDL.Text)], ['query']),
     'getMyProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
-    'getProfile' : IDL.Func([IDL.Principal], [IDL.Opt(UserProfile)], ['query']),
+    'getPendingListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+    'getProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(PublicUserProfile)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -204,6 +239,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'listConversations' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+    'rejectListing' : IDL.Func([ListingId], [], []),
     'saveCallerUserProfile' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
         [],

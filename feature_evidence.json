@@ -1,4 +1,26 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-in-frontend-src-components-layout-tsx-ensure-the-header-has-a-sufficiently-dark-semi-transparent-overlay-applied-over-the-background-image-e-g-bg-black-50-or-bg-black-60-so-that-the-pashu-mandi-brand-text-and-all-navigation-links-are-clearly-and-easily-readable-the-overlay-must-be-dark-enough-to-provide-strong-contrast-against-white-light-text-the-header-layout-height-logo-navigation-links-and-all-other-header-elements-must-remain-structurally-unchanged",
+      "featureTitle": "In frontend/src/components/Layout.tsx, ensure the header has a sufficiently dark semi-transparent overlay applied over the background image (e.g. bg-black/50 or bg-black/60) so that the 'Pashu Mandi' brand text and all navigation links are clearly and easily readable. The overlay must be dark enough to provide strong contrast against white/light text. The header layout, height, logo, navigation links, and all other header elements must remain structurally unchanged.",
+      "files": [
+        "frontend/src/components/Layout.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-52"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

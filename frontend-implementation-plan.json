@@ -1,52 +1,23 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add 'Sheep 🐑' to Category Dropdown in Post Ad and All Related Controls",
+  "title": "Add dark overlay to header background image for text legibility",
   "requirements": [
     {
-      "id": "REQ-34",
-      "summary": "Add 'Sheep 🐑' option to category dropdown in PostAdPage",
+      "id": "REQ-52",
+      "summary": "Apply a dark semi-transparent overlay (bg-black/50 or darker) over the header background image in Layout.tsx to ensure the 'Pashu Mandi' brand text and all navigation links are clearly readable with high contrast, while preserving all existing header layout, structure, and interactive elements",
       "acceptanceCriteria": [
-        "The category dropdown in PostAdPage includes a 'Sheep 🐑' option.",
-        "Selecting 'Sheep 🐑' sets the category field value to 'Sheep' (or the canonical string used for this category).",
-        "The option renders correctly in the dropdown alongside all other existing animal categories."
+        "A dark semi-transparent overlay (e.g. bg-black/50 or darker) is applied over the header background image in Layout.tsx.",
+        "The 'Pashu Mandi' brand text is clearly legible (high contrast white text) against the overlaid header image.",
+        "All navigation links in the header remain clearly readable over the overlay.",
+        "The header layout, height, logo, navigation links, and all other structural elements are unchanged.",
+        "The overlay does not obscure interactive elements (links, buttons remain clickable)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/PostAdPage.tsx",
+          "path": "frontend/src/components/Layout.tsx",
           "operation": "modify",
-          "description": "Add 'Sheep 🐑' as a selectable option in the category dropdown. Locate the existing category select element and add a new option with value 'sheep' (matching the AnimalCategory enum from backend.d.ts) and display text 'Sheep 🐑'. Ensure it appears in the dropdown list alongside existing categories (Dogs, Cats, Birds, Cow, Buffalo, Goat, etc.) in a logical order."
-        }
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "summary": "Add 'Sheep 🐑' to category filter dropdown on HomePage",
-      "acceptanceCriteria": [
-        "The category filter dropdown on HomePage includes a 'Sheep 🐑' option.",
-        "Selecting 'Sheep 🐑' in the filter correctly filters the listings grid to show only Sheep listings."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Add 'Sheep 🐑' to the category filter dropdown so users can filter listings by Sheep. Locate the category filter select element in the search/filter controls and add a new option with value 'sheep' (matching the AnimalCategory enum) and display text 'Sheep 🐑'. Ensure the filter logic correctly filters the listings when 'sheep' is selected."
-        }
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "summary": "Add 'Sheep' category badge styling to ListingCard",
-      "acceptanceCriteria": [
-        "A listing with category 'Sheep' renders the badge label 'Sheep 🐑' on the ListingCard.",
-        "The badge has a distinct background color different from all other existing category badge colors.",
-        "The badge color is consistent with the app's Professional Blue and white theme."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ListingCard.tsx",
-          "operation": "modify",
-          "description": "Add 'Sheep' to the category label map with display text 'Sheep 🐑' and assign it a distinct badge color consistent with the existing Professional Blue and white theme. Choose a muted green or warm teal background color (e.g., bg-teal-100 with text-teal-800 for light mode) that does not clash with existing badge colors. Ensure the badge renders correctly when a listing has category 'sheep'."
+          "description": "Add or strengthen the dark semi-transparent overlay on the header background image. Locate the header element that uses the background image at frontend/public/assets/generated/header-bg.dim_1200x300.png and ensure it has a child element (typically a div) with a dark overlay class such as 'bg-black/50' or 'bg-black/60' applied. The overlay must be positioned to cover the background image without interfering with the z-index stacking of text and navigation elements. Verify that the 'Pashu Mandi' logo/text and all navigation links remain fully interactive and clearly visible with high contrast against the darkened background. Do not alter the header's layout, dimensions, logo, navigation structure, or any other elements beyond the overlay styling."
         }
       ]
     }

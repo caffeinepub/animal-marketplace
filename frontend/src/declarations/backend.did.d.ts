@@ -23,6 +23,7 @@ export type AnimalCategory = { 'cat' : null } |
   { 'smallAnimal' : null };
 export interface Listing {
   'id' : ListingId,
+  'status' : ListingStatus,
   'title' : string,
   'photoUrls' : Array<string>,
   'owner' : Principal,
@@ -35,12 +36,20 @@ export interface Listing {
   'location' : string,
 }
 export type ListingId = bigint;
+export type ListingStatus = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
 export interface Message {
   'listingId' : [] | [ListingId],
   'text' : string,
   'recipient' : Principal,
   'sender' : Principal,
   'timestamp' : Time,
+}
+export interface PublicUserProfile {
+  'bio' : string,
+  'displayName' : string,
+  'registrationTimestamp' : Time,
 }
 export type Time = bigint;
 export interface UserProfile {
@@ -55,23 +64,26 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'approveListing' : ActorMethod<[ListingId], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createListing' : ActorMethod<
     [string, string, bigint, AnimalCategory, string, Array<string>, boolean],
     ListingId
   >,
   'deleteListing' : ActorMethod<[ListingId], undefined>,
+  'getAllListings' : ActorMethod<[], Array<Listing>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getConversation' : ActorMethod<[Principal], Array<Message>>,
-  'getListing' : ActorMethod<[ListingId], [] | [Listing]>,
   'getListings' : ActorMethod<[], Array<Listing>>,
   'getMobileNumber' : ActorMethod<[], [] | [string]>,
   'getMyProfile' : ActorMethod<[], [] | [UserProfile]>,
-  'getProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getPendingListings' : ActorMethod<[], Array<Listing>>,
+  'getProfile' : ActorMethod<[Principal], [] | [PublicUserProfile]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'listConversations' : ActorMethod<[], Array<Principal>>,
+  'rejectListing' : ActorMethod<[ListingId], undefined>,
   'saveCallerUserProfile' : ActorMethod<
     [string, string, [] | [string], [] | [string]],
     undefined
