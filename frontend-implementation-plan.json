@@ -1,0 +1,79 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "VIP Ads with Featured Animals Section",
+  "requirements": [
+    {
+      "id": "REQ-23",
+      "summary": "Add VIP Ad option to Post Ad form with ₹500 pricing",
+      "acceptanceCriteria": [
+        "A 'Make this a VIP Ad (₹500)' checkbox/toggle is visible in the Post Ad form.",
+        "Selecting it updates the form's isVip state to true.",
+        "The PaymentModal receives the isVip flag and displays ₹500 as the posting fee when isVip is true.",
+        "When isVip is false, the modal continues to show ₹199 as before.",
+        "The isVip value is passed to the createListing backend call on payment confirmation."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/PostAdPage.tsx",
+          "operation": "modify",
+          "description": "Add a checkbox/toggle control labelled 'Make this a VIP Ad (₹500)' below the existing form fields. Introduce an `isVip` boolean state field (defaulting to false). Style the control consistently with the Professional Blue theme. Pass the `isVip` state to PaymentModal when opening it. On payment confirmation, include the `isVip` value in the createListing backend call alongside existing parameters."
+        }
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "summary": "Update PaymentModal to handle VIP and regular ad fees with conditional promo code support",
+      "acceptanceCriteria": [
+        "PaymentModal shows 'Posting Fee: ₹500' when isVip is true.",
+        "PaymentModal shows 'Posting Fee: ₹199' when isVip is false.",
+        "UPI QR code encodes ₹500 for VIP ads and ₹199 for regular ads.",
+        "Promo code input is hidden or disabled for VIP ads with an appropriate note.",
+        "Existing promo code flow is unchanged for non-VIP ads."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/PaymentModal.tsx",
+          "operation": "modify",
+          "description": "Accept an `isVip` boolean prop. When isVip is true, display 'Posting Fee: ₹500' and generate a UPI QR code for ₹500. When isVip is false, retain the existing ₹199 logic. Disable or hide the promo code input field when isVip is true, showing a note like 'Promo codes are not applicable for VIP Ads'. Ensure the promo code discount logic only applies to non-VIP ads."
+        }
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "summary": "Add gold border and Verified badge to VIP listing cards",
+      "acceptanceCriteria": [
+        "VIP listing cards have a visible gold/amber border distinguishing them from regular cards.",
+        "A 'Verified' badge with gold styling is shown on VIP listing cards.",
+        "Non-VIP listing cards are visually unchanged.",
+        "The badge is clearly legible and does not obscure the listing photo or title."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ListingCard.tsx",
+          "operation": "modify",
+          "description": "Check the listing's `isVip` boolean field. When isVip is true, apply a gold/amber border (e.g., border-yellow-400 or border-amber-400 with border-2 or border-3) to the card container. Render a 'Verified' badge with gold background and contrasting text (e.g., bg-yellow-400 or bg-amber-400 with text-white or text-gray-900) positioned at the top-left or top-right corner of the card without obscuring the photo or title. Ensure non-VIP cards retain their existing styling."
+        }
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "summary": "Add Featured Animals section on HomePage displaying VIP listings",
+      "acceptanceCriteria": [
+        "A 'Featured Animals' section heading is visible at the top of the home page when VIP listings exist.",
+        "Only VIP listings appear in the Featured Animals section.",
+        "The section is hidden when there are no VIP listings.",
+        "The Featured Animals section uses a gold accent on the heading (icon or decorative element).",
+        "The main listings grid below still shows all listings with VIP ones sorted to the top.",
+        "Featured Animals cards display the gold border and 'Verified' badge from REQ-25."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Filter the fetched listings array to separate VIP listings (isVip === true) from all listings. Add a 'Featured Animals' section above the main listings grid. Display the section only when VIP listings exist. Use a prominent heading 'Featured Animals' with a gold accent (e.g., a gold star icon or gold underline using border-b-4 border-yellow-400). Render VIP listings in a horizontally scrollable row or a small dedicated grid using ListingCard components (which will automatically show the gold border and Verified badge). The main listings grid below continues to show all active listings (backend returns them VIP-first), maintaining the existing filterable grid layout."
+        }
+      ]
+    }
+  ]
+}

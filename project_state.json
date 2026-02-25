@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 17,
+  "summary": "A marketplace app for buying and selling animals, similar to OLX, rebranded as 'Pashu Mandi'. Users can post ads with photos, prices (in ₹ Rupee), and descriptions. The app includes search filters by location and category, a chat system between buyers and sellers, and user profile management. The visual theme uses a clean white background with Professional Blue as the primary color for buttons and headers.",
+  "architectural_notes": [
+    "Marketplace model: users can post, browse, and respond to animal sale listings",
+    "Media uploads required for ad photos",
+    "Real-time or async chat between buyer and seller per listing",
+    "Category list includes both pets and farm animals: Dogs, Cats, Birds, Fish, Reptiles, Small Animals, Cow, Buffalo, Goat, Sheep, Other",
+    "App name is 'Pashu Mandi'; theme uses white background with Professional Blue primary color; currency is ₹ (Rupee)",
+    "Posting an ad requires a ₹199 fee paid via UPI (ID: 8431207976king@ybl); listing is only published after payment confirmation",
+    "VIP/premium listings cost ₹500 extra, are marked with a 'Verified' badge and gold border, and are pinned to the top of the listings feed in a 'Featured Animals' section"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-design-and-apply-a-warm-nature-inspired-visual-theme-across-the-entire-app-earthy-tones-greens-ambers-warm-neutrals-friendly-typography-card-based-layouts-for-listings-and-a-consistent-header-navigation-bar-the-style-should-feel-trustworthy-and-approachable-for-an-animal-marketplace",
+      "title": "Design and apply a warm, nature-inspired visual theme across the entire app — earthy tones (greens, ambers, warm neutrals), friendly typography, card-based layouts for listings, and a consistent header/navigation bar. The style should feel trustworthy and approachable for an animal marketplace.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-post-ad-page-where-authenticated-users-can-create-a-new-animal-listing-by-filling-in-title-description-price-category-dropdown-from-predefined-animal-categories-location-text-input-and-up-to-5-photo-urls-the-form-must-validate-required-fields-and-submit-to-the-backend-createlisting-function",
+      "title": "Build a 'Post Ad' page where authenticated users can create a new animal listing by filling in: title, description, price, category (dropdown from predefined animal categories), location (text input), and up to 5 photo URLs. The form must validate required fields and submit to the backend createListing function.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-home-browse-page-that-displays-all-active-animal-listings-as-a-grid-of-cards-each-card-shows-the-listing-s-primary-photo-title-price-category-and-location-implement-client-side-search-and-filter-controls-to-filter-listings-by-location-text-match-and-category-dropdown-include-a-text-search-bar-that-filters-by-title-or-description-keywords",
+      "title": "Build a Home/Browse page that displays all active animal listings as a grid of cards. Each card shows the listing's primary photo, title, price, category, and location. Implement client-side search and filter controls to filter listings by location (text match) and category (dropdown). Include a text search bar that filters by title or description keywords.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-listing-detail-page-that-shows-all-listing-information-all-photos-gallery-carousel-title-description-price-category-location-seller-display-name-and-a-contact-seller-button-the-page-must-be-accessible-via-a-route-like-listing-id",
+      "title": "Build a Listing Detail page that shows all listing information: all photos (gallery/carousel), title, description, price, category, location, seller display name, and a 'Contact Seller' button. The page must be accessible via a route like /listing/:id.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-messages-page-that-lists-all-of-the-authenticated-user-s-conversations-showing-the-other-participant-s-name-principal-and-the-last-message-preview-clicking-a-conversation-opens-a-chat-thread-view-showing-the-full-message-history-and-an-input-field-to-send-a-new-message",
+      "title": "Build a Messages page that lists all of the authenticated user's conversations (showing the other participant's name/principal and the last message preview). Clicking a conversation opens a chat thread view showing the full message history and an input field to send a new message.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-user-profile-page-for-authenticated-users-showing-their-display-name-bio-and-all-their-active-listings-include-an-edit-profile-form-to-update-display-name-and-bio-also-allow-the-user-to-deactivate-delete-their-own-listings-from-this-page",
+      "title": "Build a User Profile page for authenticated users showing their display name, bio, and all their active listings. Include an 'Edit Profile' form to update display name and bio. Also allow the user to deactivate (delete) their own listings from this page.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-signup-frontend-page-with-a-simple-form-containing-two-fields-full-name-text-input-required-and-mobile-number-text-input-required-validated-for-numeric-format-on-successful-submission-the-form-calls-the-backend-signup-function-and-redirects-the-user-to-the-home-page-the-page-must-match-the-existing-warm-nature-inspired-visual-theme-earthy-tones-card-based-layout-consistent-header-show-inline-validation-errors-for-empty-or-invalid-fields-add-a-navigation-link-or-button-to-this-page-from-the-app-header-and-from-the-post-ad-page-for-unauthenticated-unregistered-users",
+      "title": "Create a '/signup' frontend page with a simple form containing two fields: 'Full Name' (text input, required) and 'Mobile Number' (text input, required, validated for numeric format). On successful submission the form calls the backend `signUp` function and redirects the user to the Home page. The page must match the existing warm, nature-inspired visual theme (earthy tones, card-based layout, consistent header). Show inline validation errors for empty or invalid fields. Add a navigation link or button to this page from the app header and from the Post Ad page for unauthenticated/unregistered users.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-all-frontend-category-dropdowns-filter-controls-and-category-label-color-maps-e-g-in-postadpage-homepage-and-listingcard-to-include-the-four-new-farm-animal-categories-cow-buffalo-goat-and-sheep-each-new-category-should-have-a-distinct-label-and-badge-color-consistent-with-the-existing-warm-nature-inspired-theme",
+      "title": "Update all frontend category dropdowns, filter controls, and category label/color maps (e.g., in PostAdPage, HomePage, and ListingCard) to include the four new farm animal categories: 'Cow', 'Buffalo', 'Goat', and 'Sheep'. Each new category should have a distinct label and badge color consistent with the existing warm, nature-inspired theme.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-postadpage-replace-the-up-to-5-photo-url-text-inputs-with-a-file-upload-control-the-control-must-render-a-clearly-labelled-upload-photos-button-that-opens-the-device-s-native-file-picker-accepting-common-image-formats-jpeg-png-webp-and-allows-selecting-up-to-5-images-at-once-or-sequentially-selected-images-must-be-read-as-base64-data-urls-on-the-client-side-and-displayed-as-thumbnail-previews-beneath-the-upload-button-each-with-an-x-remove-button-the-existing-validation-at-least-one-photo-required-must-remain-on-form-submission-the-base64-data-urls-are-passed-to-the-backend-createlisting-function-in-the-same-photourls-field-that-previously-held-url-strings-so-no-backend-api-signature-change-is-needed",
+      "title": "In PostAdPage, replace the up-to-5 photo URL text inputs with a file upload control. The control must render a clearly labelled 'Upload Photos' button that opens the device's native file picker (accepting common image formats: JPEG, PNG, WebP) and allows selecting up to 5 images at once or sequentially. Selected images must be read as Base64 data URLs on the client side and displayed as thumbnail previews beneath the upload button, each with an 'X' remove button. The existing validation (at least one photo required) must remain. On form submission the Base64 data URLs are passed to the backend createListing function in the same photoUrls field that previously held URL strings, so no backend API signature change is needed.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rename-the-app-to-pashu-mandi-everywhere-it-appears-update-the-html-page-title-in-frontend-index-html-the-app-name-displayed-in-the-header-navigation-bar-in-layout-tsx-any-logo-text-and-any-other-visible-branding-strings-across-all-pages",
+      "title": "Rename the app to 'Pashu Mandi' everywhere it appears: update the HTML page title in frontend/index.html, the app name displayed in the header/navigation bar in Layout.tsx, any logo text, and any other visible branding strings across all pages.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-retheme-the-entire-frontend-to-use-a-clean-white-background-with-professional-blue-e-g-1d4ed8-or-similar-as-the-primary-color-for-buttons-headers-nav-bar-links-badges-and-interactive-accents-replace-the-existing-warm-earthy-amber-green-color-tokens-in-frontend-src-index-css-and-frontend-tailwind-config-js-with-the-new-white-and-blue-palette-ensure-all-body-and-card-backgrounds-are-white-or-very-light-neutral-and-all-primary-action-elements-buttons-active-nav-links-category-badges-where-appropriate-use-the-professional-blue-remove-or-neutralize-the-warm-brown-amber-green-tones-from-the-theme",
+      "title": "Retheme the entire frontend to use a clean white background with Professional Blue (e.g. #1D4ED8 or similar) as the primary color for buttons, headers, nav bar, links, badges, and interactive accents. Replace the existing warm earthy/amber/green color tokens in frontend/src/index.css and frontend/tailwind.config.js with the new white-and-blue palette. Ensure all body and card backgrounds are white or very light neutral, and all primary action elements (buttons, active nav links, category badges where appropriate) use the Professional Blue. Remove or neutralize the warm brown/amber/green tones from the theme.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-text-across-the-app-is-clearly-legible-against-the-new-white-light-background-update-any-text-color-tokens-that-relied-on-the-old-warm-toned-backgrounds-ensure-body-text-is-dark-e-g-near-black-or-dark-gray-headings-are-high-contrast-and-text-on-blue-elements-buttons-headers-is-white-check-listingcard-homepage-listingdetailpage-postadpage-messagespage-profilepage-signuppage-and-layout-for-any-low-contrast-text-and-correct-it",
+      "title": "Ensure all text across the app is clearly legible against the new white/light background. Update any text color tokens that relied on the old warm-toned backgrounds — ensure body text is dark (e.g. near-black or dark gray), headings are high contrast, and text on blue elements (buttons, headers) is white. Check ListingCard, HomePage, ListingDetailPage, PostAdPage, MessagesPage, ProfilePage, SignUpPage, and Layout for any low-contrast text and correct it.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-set-the-currency-symbol-to-indian-rupee-throughout-the-frontend-update-the-price-formatting-utility-in-listingcard-and-any-other-location-that-displays-or-formats-prices-e-g-listingdetailpage-homepage-to-prefix-prices-with-instead-of-any-other-currency-symbol-or-none",
+      "title": "Set the currency symbol to ₹ (Indian Rupee) throughout the frontend. Update the price formatting utility in ListingCard and any other location that displays or formats prices (e.g. ListingDetailPage, HomePage) to prefix prices with ₹ instead of any other currency symbol or none.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-postadpage-intercept-the-form-submission-flow-so-that-when-the-user-clicks-the-post-ad-submit-button-instead-of-immediately-calling-createlisting-display-a-payment-required-modal-overlay-the-modal-must-show-1-the-message-posting-fee-199-2-a-upi-qr-code-image-generated-from-the-upi-id-8431207976king-ybl-for-199-3-the-raw-upi-id-8431207976king-ybl-as-copyable-text-for-manual-payment-4-a-pay-now-button-styled-in-the-app-s-professional-blue-theme-and-5-a-cancel-button-to-dismiss-the-modal-and-return-to-the-form-without-submitting-the-actual-createlisting-backend-call-must-not-be-made-until-the-user-confirms-payment",
+      "title": "In PostAdPage, intercept the form submission flow so that when the user clicks the 'Post Ad' submit button, instead of immediately calling createListing, display a Payment Required modal/overlay. The modal must show: (1) the message 'Posting Fee: ₹199', (2) a UPI QR code image generated from the UPI ID '8431207976king@ybl' for ₹199, (3) the raw UPI ID '8431207976king@ybl' as copyable text for manual payment, (4) a 'Pay Now' button styled in the app's Professional Blue theme, and (5) a 'Cancel' button to dismiss the modal and return to the form without submitting. The actual createListing backend call must NOT be made until the user confirms payment.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-after-the-user-clicks-pay-now-in-the-payment-modal-show-a-confirm-payment-step-inside-the-modal-that-instructs-the-user-to-complete-the-upi-payment-and-then-click-a-i-have-paid-publish-my-ad-button-clicking-this-confirmation-button-proceeds-to-call-the-createlisting-backend-function-and-on-success-navigates-to-the-home-page-and-shows-a-success-toast-if-the-backend-call-fails-show-an-inline-error-message-inside-the-modal-without-closing-it",
+      "title": "After the user clicks 'Pay Now' in the payment modal, show a 'Confirm Payment' step inside the modal that instructs the user to complete the UPI payment and then click a 'I Have Paid – Publish My Ad' button. Clicking this confirmation button proceeds to call the createListing backend function and, on success, navigates to the home page and shows a success toast. If the backend call fails, show an inline error message inside the modal without closing it.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-paymentmodal-component-add-a-promo-code-input-field-with-an-apply-button-on-the-initial-payment-step-where-the-199-fee-and-upi-qr-code-are-shown-when-the-user-enters-a-valid-promo-code-and-clicks-apply-display-the-inline-success-message-promo-code-applied-new-price-99-beneath-the-input-update-the-displayed-posting-fee-from-199-to-99-and-change-the-pay-now-button-label-amount-to-reflect-99-if-an-invalid-code-is-entered-show-an-inline-error-such-as-invalid-promo-code-the-promo-code-field-and-apply-button-must-be-styled-consistently-with-the-app-s-professional-blue-theme",
+      "title": "In the PaymentModal component, add a promo code input field with an 'Apply' button on the initial payment step (where the ₹199 fee and UPI QR code are shown). When the user enters a valid promo code and clicks 'Apply', display the inline success message 'Promo code applied! New price: ₹99' beneath the input, update the displayed posting fee from ₹199 to ₹99, and change the 'Pay Now' button label/amount to reflect ₹99. If an invalid code is entered, show an inline error such as 'Invalid promo code'. The promo code field and Apply button must be styled consistently with the app's Professional Blue theme.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-postadpage-add-a-clearly-labelled-checkbox-or-toggle-option-reading-make-this-a-vip-ad-500-below-the-existing-form-fields-when-this-option-is-selected-set-a-isvip-flag-in-the-form-state-pass-this-flag-through-to-the-paymentmodal-so-the-payment-modal-can-display-the-correct-fee-500-for-vip-ads-199-for-regular-ads-the-vip-option-must-be-styled-consistently-with-the-professional-blue-theme",
+      "title": "In PostAdPage, add a clearly labelled checkbox or toggle option reading 'Make this a VIP Ad (₹500)' below the existing form fields. When this option is selected, set a `isVip` flag in the form state. Pass this flag through to the PaymentModal so the payment modal can display the correct fee (₹500 for VIP ads, ₹199 for regular ads). The VIP option must be styled consistently with the Professional Blue theme.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-paymentmodal-to-accept-and-display-the-correct-posting-fee-based-on-whether-the-listing-is-a-vip-ad-when-isvip-is-true-display-posting-fee-500-and-update-the-upi-qr-code-amount-to-500-when-isvip-is-false-retain-the-existing-199-flow-the-promo-code-discount-feature-should-only-apply-to-non-vip-ads-disable-promo-code-input-when-isvip-is-true-or-show-a-note-that-promo-codes-are-not-applicable-for-vip-ads",
+      "title": "Update PaymentModal to accept and display the correct posting fee based on whether the listing is a VIP Ad. When isVip is true, display 'Posting Fee: ₹500' and update the UPI QR code amount to ₹500. When isVip is false, retain the existing ₹199 flow. The promo code discount feature should only apply to non-VIP ads (disable promo code input when isVip is true, or show a note that promo codes are not applicable for VIP Ads).",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-listingcard-to-visually-distinguish-vip-listings-render-a-gold-border-e-g-border-yellow-400-or-equivalent-around-the-card-and-display-a-verified-badge-gold-background-white-or-dark-text-prominently-on-the-card-e-g-top-left-or-top-right-corner-overlay-when-the-listing-s-isvip-field-is-true-non-vip-cards-must-remain-visually-unchanged",
+      "title": "Update ListingCard to visually distinguish VIP listings: render a gold border (e.g. border-yellow-400 or equivalent) around the card and display a 'Verified' badge (gold background, white or dark text) prominently on the card (e.g. top-left or top-right corner overlay) when the listing's `isVip` field is true. Non-VIP cards must remain visually unchanged.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-homepage-add-a-featured-animals-section-above-the-main-listings-grid-this-section-displays-only-vip-listings-isvip-true-as-a-horizontally-scrollable-row-or-a-small-dedicated-grid-the-section-must-have-a-prominent-heading-featured-animals-styled-with-a-gold-accent-e-g-a-gold-star-icon-or-gold-underline-if-there-are-no-vip-listings-this-section-should-be-hidden-entirely-the-main-listings-grid-below-continues-to-show-all-active-listings-vip-first-then-regular-unchanged-in-layout",
+      "title": "On the HomePage, add a 'Featured Animals' section above the main listings grid. This section displays only VIP listings (isVip === true) as a horizontally scrollable row or a small dedicated grid. The section must have a prominent heading 'Featured Animals' styled with a gold accent (e.g. a gold star icon or gold underline). If there are no VIP listings, this section should be hidden entirely. The main listings grid below continues to show all active listings (VIP first, then regular), unchanged in layout.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Post ads with photos, prices, and descriptions of animals",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Search and filter listings by location and category",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "In-app chat system between buyers and sellers",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "User profile section for managing account and listings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implement a backend data model and API for animal listings. Each listing must store: owner principal, title, description, price (as Nat), animal category (e.g., Dogs, Cats, Birds, Fish, Reptiles, Small Animals, Other), location (text), photo URLs (array of text), creation timestamp, and active/inactive status.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Implement a backend chat/messaging system. Each conversation is between two principals and optionally linked to a listing. Store messages with: sender principal, recipient principal, listing ID (optional), message text, and timestamp. Expose functions: sendMessage, getConversation (messages between two principals), and listConversations (all conversations for the caller).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Implement a backend user profile system. Each profile stores: principal, display name, bio, contact info (optional), and registration timestamp. Expose functions: upsertProfile (create or update), getProfile (by principal), and getMyProfile.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add a simple User Sign-up page where people can create an account using their name and mobile number before posting an ad.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add a backend function `signUp` that accepts a display name (Text) and mobile number (Text) and stores them as part of the user's profile. The mobile number should be stored alongside the existing profile fields (principal, display name, bio, contact info, registration timestamp). If a profile already exists for the caller, update only the display name and mobile number fields. Expose a `getMobileNumber` function so authenticated users can retrieve their own stored mobile number.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Replace photo URL input on the ad posting page with a file upload button so users can directly select and upload animal photos from their device gallery.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Update the animal category list to include farm animals: Cow, Buffalo, Goat, and Sheep, in addition to existing categories.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Update the animal category list in the backend to add four new farm animal categories: 'Cow', 'Buffalo', 'Goat', and 'Sheep', alongside the existing pet categories.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Rename the app to 'Pashu Mandi', update the theme to a clean white background with Professional Blue as the primary color for buttons and headers, set the currency symbol to ₹ (Rupee), and ensure all text is clearly visible against the new background.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "When a user clicks 'Post Ad', show a posting fee message of ₹199. The ad should only be published after payment. Add a 'Pay Now' button that shows a UPI payment prompt with QR code or UPI ID '8431207976king@ybl'. Only publish the listing after the user confirms payment.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Add a promo code field in the payment modal. When a valid promo code is applied, show 'Promo code applied! New price: ₹99' and update the Pay Now button to charge ₹99 instead of ₹199. The discount brings the price to ₹99 (not zero).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Set the promo code to 'PASHU50' (replacing any previous code). When entered, price changes to ₹99. The code is limited to 50 successful uses; after 50 uses show 'This offer has expired'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add a 'Featured Animals' section on the Home Screen showing premium/VIP listings at the top. In Post Ad form, add a 'Make this a VIP Ad (₹500)' option. VIP Ads display a 'Verified' badge and gold border and are pinned to the top of listings for better visibility.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Extend the backend listing data model to add a boolean `isVip` field to each listing record (defaulting to `false`). Update the `createListing` function to accept an `isVip` parameter. VIP listings must be persisted with this flag. Add or update a `getListings` / `getAllListings` query so that VIP listings are returned first (sorted to the top), followed by non-VIP listings sorted by creation timestamp descending.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Pashu Mandi",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

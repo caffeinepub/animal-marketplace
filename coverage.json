@@ -1,0 +1,88 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-25T12:41:41.349Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 4,
+    "items": [
+      {
+        "id": "REQ-22",
+        "summary": "Extend the backend listing data model to add a boolean `isVip` field to each listing record (defaulting to `false`). Update the `createListing` function to accept an `isVip` parameter. VIP listings must be persisted with this flag. Add or update a `getListings` / `getAllListings` query so that VIP listings are returned first (sorted to the top), followed by non-VIP listings sorted by creation timestamp descending.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-23",
+        "summary": "In PostAdPage, add a clearly labelled checkbox or toggle option reading 'Make this a VIP Ad (₹500)' below the existing form fields. When this option is selected, set a `isVip` flag in the form state. Pass this flag through to the PaymentModal so the payment modal can display the correct fee (₹500 for VIP ads, ₹199 for regular ads). The VIP option must be styled consistently with the Professional Blue theme.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/PostAdPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/PostAdPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-24",
+        "summary": "Update PaymentModal to accept and display the correct posting fee based on whether the listing is a VIP Ad. When isVip is true, display 'Posting Fee: ₹500' and update the UPI QR code amount to ₹500. When isVip is false, retain the existing ₹199 flow. The promo code discount feature should only apply to non-VIP ads (disable promo code input when isVip is true, or show a note that promo codes are not applicable for VIP Ads).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/PaymentModal.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/PaymentModal.tsx"
+        ]
+      },
+      {
+        "id": "REQ-25",
+        "summary": "Update ListingCard to visually distinguish VIP listings: render a gold border (e.g. border-yellow-400 or equivalent) around the card and display a 'Verified' badge (gold background, white or dark text) prominently on the card (e.g. top-left or top-right corner overlay) when the listing's `isVip` field is true. Non-VIP cards must remain visually unchanged.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ListingCard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ListingCard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-26",
+        "summary": "On the HomePage, add a 'Featured Animals' section above the main listings grid. This section displays only VIP listings (isVip === true) as a horizontally scrollable row or a small dedicated grid. The section must have a prominent heading 'Featured Animals' styled with a gold accent (e.g. a gold star icon or gold underline). If there are no VIP listings, this section should be hidden entirely. The main listings grid below continues to show all active listings (VIP first, then regular), unchanged in layout.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/HomePage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/HomePage.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/ListingCard.tsx",
+    "frontend/src/components/PaymentModal.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/PostAdPage.tsx",
+    "frontend/src/pages/ProfilePage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}
