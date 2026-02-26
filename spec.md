@@ -1,15 +1,32 @@
-# Specification
+# Animal Pashu Bazar
 
-## Summary
-**Goal:** Fix the bottom navigation bar's z-index and pointer events so all tabs are reliably tappable, and update the app version label to "Version 55".
+## Current State
+A full-featured animal marketplace app (OLX-style) with listing creation, chat, user profiles, payment flow, admin dashboard, and role-based routing. The Admin Dashboard at `/admin` was previously blocking or appearing transparent due to CSS layering and the `AdminRouteGuard` was waiting for a slow backend `isAdmin()` call before granting access.
 
-**Planned changes:**
-- Set `z-[999]` on the bottom navigation bar's root container in `BottomNav.tsx`
-- Apply `pointer-events: auto` and proper positioning to all five tab buttons (Home, Chats, Sell, My Ads, Account) in `BottomNav.tsx`
-- Apply `z-[999]` and `isolation: isolate` to the floating "Sell" button in `BottomNav.tsx`
-- Add `pointer-events: none` to all decorative/background layer elements in `Layout.tsx` and `HomePage.tsx`
-- Audit all page components (HomePage, PostAdPage, ListingDetailPage, MessagesPage, ProfilePage, UserDashboardPage, SignUpPage, etc.) for full-width/full-height containers that may block the bottom nav, and apply `pointer-events: none` where needed
-- Verify the "Actor not available" fix is intact in `useActor.ts`, `useQueries.ts`, `SignUpPage.tsx`, and `App.tsx`; re-apply if any regression is found
-- Update the visible version label to "Version 55" throughout the UI
+## Requested Changes (Diff)
 
-**User-visible outcome:** All five bottom navigation tabs respond correctly to taps/clicks on every page, the Sell button is always accessible, and the app displays "Version 55".
+### Add
+- Refresh button on Admin Dashboard to reload all data
+
+### Modify
+- **AdminRouteGuard**: Completely simplified — no backend `isAdmin()` call anymore. Checks principal ID directly and instantly. No loading spinner waiting for backend.
+- **Admin button in Layout**: Changed from `navigate({ to: '/admin' })` to `window.location.href = '/admin'` for a hard page reload that bypasses any router state issues.
+- **AdminDashboardPage**: Fully rewritten with all inline `!important`-equivalent styles (React inline styles). Solid white background, opacity:1, visibility:visible enforced at the top-level div. All buttons (APPROVE / REJECT / DELETE) use inline styles with explicit `pointerEvents: 'auto'` and `zIndex: 9999` — no CSS class dependencies.
+- Default tab changed to "pending" so admin sees pending listings immediately on open.
+- Version label updated to v57.
+
+### Remove
+- `useActor` and `useQuery` imports from App.tsx (no longer needed by AdminRouteGuard)
+
+## Implementation Plan
+1. Simplify AdminRouteGuard to principal-ID-only check (no backend call)
+2. Update Admin button to use window.location.href
+3. Rewrite AdminDashboardPage with full inline styles for all interactive elements
+4. Add Refresh button to reload data
+5. Update version labels to v57
+
+## UX Notes
+- Pending tab is shown by default so the admin sees actionable items first
+- APPROVE/REJECT buttons are large, green/red, clearly labeled
+- All content has solid white background with no transparency
+- Stats, Users, and Activity tabs remain accessible via tab bar
